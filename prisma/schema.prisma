@@ -46,23 +46,23 @@ model Donor {
 
 model Donation {
   DonationID      String    @id @default(uuid())
-  AmountDonated   Float     @map(name: "amount_donated")
-  DateReceived    DateTime  @map(name: "date_received")
-  FundingAreas    String[]  @map(name: "funding_areas")
-  KidsUPrograms   String[]  @map(name: "kids_u_programs")
-  DueDate         DateTime? @map(name: "due_date")
+  AmountDonated   Float     
+  DateReceived    DateTime  
+  FundingAreas    String[]  
+  KidsUPrograms   String[]  
+  DueDate         DateTime? 
   Donor           Donor     @relation(fields: [DonorID], references: [DonorID])
-  DonorID         String    @map(name: "donor_id")
+  DonorID         String    
 }
 
 model Organization {
   OrganizationID                 Int       @id @default(autoincrement())
-  PositionInCompany              String?   @map(name: "position_in_company")
-  WebsiteForFunder               String?   @map(name: "website_for_funder")
-  PortalForGrantApplication      String?   @map(name: "portal_for_grant_application")
-  NotesAboutLoginInfo            String?   @map(name: "notes_about_login_info")
+  PositionInCompany              String?   
+  WebsiteForFunder               String?   
+  PortalForGrantApplication      String?   
+  NotesAboutLoginInfo            String?   
   Constituent                    Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-  ConstituentID                  String      @map(name: "constituent_id")
+  ConstituentID                  String      
   grants                         Grant[]
 }
 
@@ -84,7 +84,7 @@ model Grant {
   AmountAwarded             Float
   EndOfGrantReportDueDate   DateTime
   Organization              Organization @relation(fields: [OrganizationID], references: [OrganizationID])
-  OrganizationID            Int          @map(name: "organization_id")
+  OrganizationID            Int          
 }
 
 model Event {
