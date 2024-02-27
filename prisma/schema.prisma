@@ -11,7 +11,7 @@ datasource db {
 }
 
 model Constituent {
-  ConstituentID      String        @id
+  ConstituentID      String        @id @default(uuid())
   Name               String
   Address            String
   EmailAddress       String?
@@ -23,7 +23,7 @@ model Constituent {
 }
 
 model Volunteer {
-  VolunteerID             String      @id @default(uuid())
+  VolunteerID             String     @id @default(uuid())
   DOB                     DateTime    
   Age                     Int
   EmergencyContact        String?     
@@ -36,23 +36,23 @@ model Volunteer {
 }
 
 model Donor {
-  DonorID             Int       @id @default(autoincrement())
-  ContactPreference  String?  
-  NotesResources     String?   
+  DonorID             String      @id @default(uuid())
+  ContactPreference   String?  
+  NotesResources      String?   
   Constituent         Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
   ConstituentID       String      
   donations           Donation[]
 }
 
 model Donation {
-  DonationID      Int       @id @default(autoincrement())
+  DonationID      String    @id @default(uuid())
   AmountDonated   Float     @map(name: "amount_donated")
   DateReceived    DateTime  @map(name: "date_received")
-  FundingAreas    String[] @map(name: "funding_areas")
-  KidsUPrograms   String[] @map(name: "kids_u_programs")
+  FundingAreas    String[]  @map(name: "funding_areas")
+  KidsUPrograms   String[]  @map(name: "kids_u_programs")
   DueDate         DateTime? @map(name: "due_date")
   Donor           Donor     @relation(fields: [DonorID], references: [DonorID])
-  DonorID         Int       @map(name: "donor_id")
+  DonorID         String    @map(name: "donor_id")
 }
 
 model Organization {
