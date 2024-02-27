@@ -9,3 +9,99 @@ datasource db {
   provider = "postgresql"
   url      = env("PRISMA_DB_URL")
 }
+
+model Constituent {
+  ConstituentID      String        @id
+  Name               String
+  Address            String
+  EmailAddress       String?
+  PhoneNumber        String?
+  CompanySchoolName  String?
+  volunteers         Volunteer[]
+  donors             Donor[]
+  organizations      Organization[]
+}
+
+model Volunteer {
+  VolunteerID             String      @id @default(uuid())
+  DOB                     DateTime    
+  Age                     Int
+  EmergencyContact        String?     
+  EventsAttended          String[]    
+  AgreementToMediaUse     Boolean?    
+  TrainingCompletion      String?     
+  Constituent             Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
+  ConstituentID           String      
+  VolunteerEvents         VolunteerEvent[]
+}
+
+model Donor {
+  DonorID             Int       @id @default(autoincrement())
+  ContactPreference  String?  
+  NotesResources     String?   
+  Constituent         Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
+  ConstituentID       String      
+  donations           Donation[]
+}
+
+model Donation {
+  DonationID      Int       @id @default(autoincrement())
+  AmountDonated   Float     @map(name: "amount_donated")
+  DateReceived    DateTime  @map(name: "date_received")
+  FundingAreas    String[] @map(name: "funding_areas")
+  KidsUPrograms   String[] @map(name: "kids_u_programs")
+  DueDate         DateTime? @map(name: "due_date")
+  Donor           Donor     @relation(fields: [DonorID], references: [DonorID])
+  DonorID         Int       @map(name: "donor_id")
+}
+
+model Organization {
+  OrganizationID                 Int       @id @default(autoincrement())
+  PositionInCompany              String?   @map(name: "position_in_company")
+  WebsiteForFunder               String?   @map(name: "website_for_funder")
+  PortalForGrantApplication      String?   @map(name: "portal_for_grant_application")
+  NotesAboutLoginInfo            String?   @map(name: "notes_about_login_info")
+  Constituent                    Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
+  ConstituentID                  String      @map(name: "constituent_id")
+  grants                         Grant[]
+}
+
+model Grant {
+  GrantID                   Int        @id @default(autoincrement())
+  GrantName                 String
+  Years                     Int
+  FundingAreas              String[]
+  KidsUProgram              String[]
+  GrantOpeningDates         DateTime[]
+  AskDate                   DateTime?
+  AwardDate                 DateTime?
+  ReportingDates            DateTime[]
+  TypeOfReporting           String?
+  DateToReapplyForGrant     DateTime?
+  WaitingPeriodToReapply    Int?
+  FundingRestrictions       String?
+  AskAmount                 Float
+  AmountAwarded             Float
+  EndOfGrantReportDueDate   DateTime
+  Organization              Organization @relation(fields: [OrganizationID], references: [OrganizationID])
+  OrganizationID            Int          @map(name: "organization_id")
+}
+
+model Event {
+  EventID                 Int           @id @default(autoincrement())
+  NameOfEvent             String
+  Date                    DateTime
+  Time                    DateTime
+  VolunteersAttended      VolunteerEvent[]
+}
+
+model VolunteerEvent {
+  ID                      Int           @id @default(autoincrement())
+  Volunteer               Volunteer     @relation(fields: [VolunteerID], references: [VolunteerID])
+  VolunteerID             String
+  Event                   Event         @relation(fields: [EventID], references: [EventID])
+  EventID                 Int
+  LoginTime               DateTime
+  LogoutTime              DateTime
+  LoggedHours             Int
+}
