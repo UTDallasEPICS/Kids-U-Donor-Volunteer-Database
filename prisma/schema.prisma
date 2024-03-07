@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,97 +8,103 @@ datasource db {
 }
 
 model Constituent {
-  ConstituentID      String        @id @default(uuid())
-  Name               String
-  Address            String
-  EmailAddress       String?
-  PhoneNumber        String?
-  CompanySchoolName  String?
-  volunteers         Volunteer[]
-  donors             Donor[]
-  organizations      Organization[]
+  ConstituentID     String         @id @default(uuid())
+  FirstName         String
+  LastName          String
+  StreetAddress     String
+  City              String
+  State             String
+  Zipcode           String
+  Country           String
+  EmailAddress      String?
+  PhoneNumber       String?
+  CompanySchoolName String?
+  donors            Donor[]
+  organizations     Organization[]
+  volunteers        Volunteer[]
 }
 
 model Volunteer {
-  VolunteerID             String     @id @default(uuid())
-  DOB                     DateTime    
-  Age                     Int
-  EmergencyContact        String?     
-  EventsAttended          String[]    
-  AgreementToMediaUse     Boolean?    
-  TrainingCompletion      String?     
-  Constituent             Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-  ConstituentID           String      
-  VolunteerEvents         VolunteerEvent[]
+  VolunteerID         String           @id @default(uuid())
+  DOB                 DateTime
+  Age                 Int
+  EmergencyContact    String?
+  EventsAttended      String[]
+  AgreementToMediaUse Boolean?
+  TrainingCompletion  String?
+  BackgroundCheckCompletion     Boolean?
+  ConstituentID       String
+  Constituent         Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
+  VolunteerEvents     VolunteerEvent[]
 }
 
 model Donor {
-  DonorID             String      @id @default(uuid())
-  ContactPreference   String?  
-  NotesResources      String?   
-  Constituent         Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-  ConstituentID       String      
-  donations           Donation[]
+  DonorID           String      @id @default(uuid())
+  ContactPreference String?
+  NotesResources    String?
+  ConstituentID     String
+  donations         Donation[]
+  Constituent       Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
 }
 
 model Donation {
-  DonationID      String    @id @default(uuid())
-  AmountDonated   Float     
-  DateReceived    DateTime  
-  FundingAreas    String[]  
-  KidsUPrograms   String[]  
-  DueDate         DateTime? 
-  Donor           Donor     @relation(fields: [DonorID], references: [DonorID])
-  DonorID         String    
+  DonationID    String    @id @default(uuid())
+  AmountDonated Float
+  DateReceived  DateTime
+  FundingAreas  String[]
+  KidsUPrograms String[]
+  DueDate       DateTime?
+  DonorID       String
+  Donor         Donor     @relation(fields: [DonorID], references: [DonorID])
 }
 
 model Organization {
-  OrganizationID                 Int       @id @default(autoincrement())
-  PositionInCompany              String?   
-  WebsiteForFunder               String?   
-  PortalForGrantApplication      String?   
-  NotesAboutLoginInfo            String?   
-  Constituent                    Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-  ConstituentID                  String      
-  grants                         Grant[]
+  OrganizationID            Int         @id @default(autoincrement())
+  PositionInCompany         String?
+  WebsiteForFunder          String?
+  PortalForGrantApplication String?
+  NotesAboutLoginInfo       String?
+  ConstituentID             String
+  grants                    Grant[]
+  Constituent               Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
 }
 
 model Grant {
-  GrantID                   Int        @id @default(autoincrement())
-  GrantName                 String
-  Years                     Int
-  FundingAreas              String[]
-  KidsUProgram              String[]
-  GrantOpeningDates         DateTime[]
-  AskDate                   DateTime?
-  AwardDate                 DateTime?
-  ReportingDates            DateTime[]
-  TypeOfReporting           String?
-  DateToReapplyForGrant     DateTime?
-  WaitingPeriodToReapply    Int?
-  FundingRestrictions       String?
-  AskAmount                 Float
-  AmountAwarded             Float
-  EndOfGrantReportDueDate   DateTime
-  Organization              Organization @relation(fields: [OrganizationID], references: [OrganizationID])
-  OrganizationID            Int          
+  GrantID                 Int          @id @default(autoincrement())
+  GrantName               String
+  Years                   Int
+  FundingAreas            String[]
+  KidsUProgram            String[]
+  GrantOpeningDates       DateTime[]
+  AskDate                 DateTime?
+  AwardDate               DateTime?
+  ReportingDates          DateTime[]
+  TypeOfReporting         String?
+  DateToReapplyForGrant   DateTime?
+  WaitingPeriodToReapply  Int?
+  FundingRestrictions     String?
+  AskAmount               Float
+  AmountAwarded           Float
+  EndOfGrantReportDueDate DateTime
+  OrganizationID          Int
+  Organization            Organization @relation(fields: [OrganizationID], references: [OrganizationID])
 }
 
 model Event {
-  EventID                 Int           @id @default(autoincrement())
-  NameOfEvent             String
-  Date                    DateTime
-  Time                    DateTime
-  VolunteersAttended      VolunteerEvent[]
+  EventID            Int              @id @default(autoincrement())
+  NameOfEvent        String
+  Date               DateTime
+  Time               DateTime
+  VolunteersAttended VolunteerEvent[]
 }
 
 model VolunteerEvent {
-  ID                      Int           @id @default(autoincrement())
-  Volunteer               Volunteer     @relation(fields: [VolunteerID], references: [VolunteerID])
-  VolunteerID             String
-  Event                   Event         @relation(fields: [EventID], references: [EventID])
-  EventID                 Int
-  LoginTime               DateTime
-  LogoutTime              DateTime
-  LoggedHours             Int
+  ID          Int       @id @default(autoincrement())
+  VolunteerID String
+  EventID     Int
+  LoginTime   DateTime
+  LogoutTime  DateTime
+  LoggedHours Int
+  Event       Event     @relation(fields: [EventID], references: [EventID])
+  Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
 }
