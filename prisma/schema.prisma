@@ -18,6 +18,7 @@ model Constituent {
   Country           String
   EmailAddress      String?
   PhoneNumber       String?
+  AreaCode          String?
   CompanySchoolName String?
   donors            Donor[]
   organizations     Organization[]
@@ -33,6 +34,7 @@ model Volunteer {
   AgreementToMediaUse Boolean?
   TrainingCompletion  String?
   BackgroundCheckCompletion     Boolean?
+  IsOverEighteen        Boolean?
   ConstituentID       String
   Constituent         Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
   VolunteerEvents     VolunteerEvent[]
@@ -108,3 +110,4 @@ model VolunteerEvent {
   Event       Event     @relation(fields: [EventID], references: [EventID])
   Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
 }
+
