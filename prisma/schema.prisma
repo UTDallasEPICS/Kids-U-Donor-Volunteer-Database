@@ -30,8 +30,8 @@ model Volunteer {
   EventsAttended          String[]    
   AgreementToMediaUse     Boolean?    
   TrainingCompletion      String?     
-  Constituent             Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-  ConstituentID           String      
+  Constituent             Constituent[]
+  ConstituentID           String[]    
   VolunteerEvents         VolunteerEvent[]
 }
 
