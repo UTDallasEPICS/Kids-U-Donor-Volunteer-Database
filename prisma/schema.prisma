@@ -20,7 +20,6 @@ model Constituent {
   PhoneNumber       String?
   CompanySchoolName String?
   donors            Donor[]
-  organizations     Organization[]
   volunteers        Volunteer[]
 }
 
@@ -60,13 +59,28 @@ model Donation {
 
 model Organization {
   OrganizationID            Int         @id @default(autoincrement())
-  PositionInCompany         String?
   WebsiteForFunder          String?
+  StreetAddress             String
+  City                      String
+  State                     String
+  Zipcode                   String
+  Country                   String
+  CompanySchoolName         String?
   PortalForGrantApplication String?
   NotesAboutLoginInfo       String?
-  ConstituentID             String
+  representative            Representative[]
+  
+}
+
+model Representative{
+  RepresentativeID          Int         @id @default(autoincrement())
+  RepresentativeName        String[]
+  RepresentativeEmail       String[]
+  RepresentativePhone       String[]
+  PositionInCompany         String[]
   grants                    Grant[]
-  Constituent               Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
+  OrganizationID            Int
+  Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
 }
 
 model Grant {
@@ -86,8 +100,7 @@ model Grant {
   AskAmount               Float
   AmountAwarded           Float
   EndOfGrantReportDueDate DateTime
-  OrganizationID          Int
-  Organization            Organization @relation(fields: [OrganizationID], references: [OrganizationID])
+  Representative          Representative[]
 }
 
 model Event {
