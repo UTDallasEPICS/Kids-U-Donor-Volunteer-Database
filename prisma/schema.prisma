@@ -16,10 +16,9 @@ model Constituent {
   State             String
   Zipcode           String
   Country           String
-  EmailAddress      String?
-  PhoneNumber       String?
+  EmailAddress      String         @unique
+  PhoneNumber       String?        @unique
   AreaCode          String?
-  CompanySchoolName String?
   donors            Donor[]
   volunteers        Volunteer[]
 }
@@ -67,7 +66,7 @@ model Organization {
   State                     String
   Zipcode                   String
   Country                   String
-  CompanySchoolName         String?
+  OrganizationName          String      @unique
   PortalForGrantApplication String?
   NotesAboutLoginInfo       String?
   representative            Representative[]
@@ -76,10 +75,11 @@ model Organization {
 
 model Representative{
   RepresentativeID          Int         @id @default(autoincrement())
-  RepresentativeName        String[]
-  RepresentativeEmail       String[]
-  RepresentativePhone       String[]
-  PositionInCompany         String[]
+  RepresentativeFirstName   String
+  RepresentativeLastName    String
+  RepresentativeEmail       String      @unique
+  RepresentativePhone       String?     @unique
+  PositionInCompany         String
   grants                    Grant[]
   OrganizationID            Int
   Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
@@ -87,7 +87,7 @@ model Representative{
 
 model Grant {
   GrantID                 Int          @id @default(autoincrement())
-  GrantName               String
+  GrantName               String       @unique
   Years                   Int
   FundingAreas            String[]
   KidsUProgram            String[]
