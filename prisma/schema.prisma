@@ -59,7 +59,7 @@ model Donation {
 }
 
 model Organization {
-  OrganizationID            Int         @id @default(autoincrement())
+  OrganizationID            String         @id @default(uuid())
   WebsiteForFunder          String?
   StreetAddress             String
   City                      String
@@ -74,20 +74,24 @@ model Organization {
 }
 
 model Representative{
-  RepresentativeID          Int         @id @default(autoincrement())
+
+  RepresentativeID          String         @id @default(uuid())
   RepresentativeFirstName   String
   RepresentativeLastName    String
   RepresentativeEmail       String      @unique
   RepresentativePhone       String?     @unique
   PositionInCompany         String
+
   grants                    Grant[]
-  OrganizationID            Int
+  OrganizationID            String
   Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
 }
 
 model Grant {
-  GrantID                 Int          @id @default(autoincrement())
+
+  GrantID                 String          @id @default(uuid())
   GrantName               String       @unique
+
   Years                   Int
   FundingAreas            String[]
   KidsUProgram            String[]
@@ -106,7 +110,7 @@ model Grant {
 }
 
 model Event {
-  EventID            Int              @id @default(autoincrement())
+  EventID            String             @id @default(uuid())
   NameOfEvent        String
   Date               DateTime
   Time               DateTime
@@ -114,9 +118,9 @@ model Event {
 }
 
 model VolunteerEvent {
-  ID          Int       @id @default(autoincrement())
+  ID          String      @id @default(uuid())
   VolunteerID String
-  EventID     Int
+  EventID     String
   LoginTime   DateTime
   LogoutTime  DateTime
   LoggedHours Int
