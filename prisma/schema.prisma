@@ -19,8 +19,8 @@ model Constituent {
   EmailAddress      String         @unique
   PhoneNumber       String?        @unique
   AreaCode          String?
-  donors            Donor[]
-  volunteers        Volunteer[]
+  Donors            Donor[]
+  Volunteers        Volunteer[]
 }
 
 model Volunteer {
@@ -82,7 +82,7 @@ model Representative{
   RepresentativePhone       String?     @unique
   PositionInCompany         String
 
-  grants                    Grant[]
+  Grants                    Grant[]
   OrganizationID            String
   Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
 }
