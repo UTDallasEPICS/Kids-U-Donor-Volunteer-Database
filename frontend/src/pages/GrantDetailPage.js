@@ -1,11 +1,12 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import './GrantDetailPage.css';
+import { Link } from 'react-router-dom'; // Import Link from react-router-dom
 import MainSidebar from '../components/MainSidebar';  // Import MainSidebar
 
 const GrantDetailPage = () => {
   // Access the ID from the URL parameters
-  const { id } = useParams();
+  
 
   return (
     <div className="grants-page">
@@ -25,8 +26,9 @@ const GrantDetailPage = () => {
 const GrantDetailsSidebar = () => (
   <div className="grant-details-sidebar">
     <ul>
-      <li className="active">Grants List</li>
-      <li>Grant Tasks</li>
+      <li className="active">SELECTED FOUNDATION NAME</li> {/* selected foundation name should populate here */}
+      <li>{/* Make the Grants List clickable */}
+          <Link to="/">Grants List</Link></li>
       <li>Grants Budget</li>
       <li>Grant Expenses</li>
       <li>Grant Notes</li>
@@ -37,6 +39,7 @@ const GrantDetailsSidebar = () => (
     </ul>
   </div>
 );
+
 
 const Breadcrumb = () => (
   <div className="breadcrumb">

@@ -64,10 +64,6 @@ const GrantsTable = () => (
         {/* Add a row for "We Give Foundation" */}
         <tr>
           <td>Organization</td>
-          <td>
-            {/* Make the Grant Name clickable */}
-            <Link to="/grant/1">We Give Foundation</Link>
-          </td>
           <td>Grant Status</td>
           <td>Requested Amount</td>
           <td>Awarded Amount</td>
@@ -77,6 +73,12 @@ const GrantsTable = () => (
           <td>Award Date</td>
           <td>Linked Donations</td>
           <td>Outstanding Fund Amount</td>
+        </tr>
+        <tr>
+        <td>
+          {/* Make the Grant Name clickable */}
+          <Link to="/grant/1">We Give Foundation</Link>
+        </td>
         </tr>
         {/* Other data rows */}
       </tbody>
