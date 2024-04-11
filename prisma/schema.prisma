@@ -19,8 +19,8 @@ model Constituent {
   EmailAddress      String         @unique
   PhoneNumber       String?        @unique
   AreaCode          String?
-  donors            Donor[]
-  volunteers        Volunteer[]
+  Donors            Donor[]
+  Volunteers        Volunteer[]
 }
 
 model Volunteer {
@@ -43,7 +43,7 @@ model Donor {
   ContactPreference String?
   NotesResources    String?
   ConstituentID     String
-  donations         Donation[]
+  Donations         Donation[]
   Constituent       Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
 }
 
@@ -69,8 +69,16 @@ model Organization {
   OrganizationName          String      @unique
   PortalForGrantApplication String?
   NotesAboutLoginInfo       String?
-  representative            Representative[]
-  
+  Representatives            Representative[]
+  Foundations                Foundation[]
+}
+
+model Foundation {
+  FoundationID              String      @id @default(uuid())
+  FoundationName            String      @unique
+  OrganizationID            String      
+  Organization              Organization? @relation (fields: [OrganizationID], references: [OrganizationID])
+
 }
 
 model Representative{
@@ -81,8 +89,7 @@ model Representative{
   RepresentativeEmail       String      @unique
   RepresentativePhone       String?     @unique
   PositionInCompany         String
-
-  grants                    Grant[]
+  Grants                    Grant[]
   OrganizationID            String
   Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
 }
@@ -91,7 +98,6 @@ model Grant {
 
   GrantID                 String          @id @default(uuid())
   GrantName               String       @unique
-
   Years                   Int
   FundingAreas            String[]
   KidsUProgram            String[]
