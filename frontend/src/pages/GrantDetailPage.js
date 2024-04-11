@@ -1,14 +1,16 @@
-// src/pages/GrantsPage.js
 import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { useParams } from 'react-router-dom';
+import './GrantDetailPage.css';
 import MainSidebar from '../components/MainSidebar';  // Import MainSidebar
-import './GrantsPage.css';
 
-const GrantsPage = () => {
+const GrantDetailPage = () => {
+  // Access the ID from the URL parameters
+  const { id } = useParams();
+
   return (
     <div className="grants-page">
       <MainSidebar />
-      <GrantsSidebar />
+      <GrantDetailsSidebar />
       <div className="grants-content">
         <Breadcrumb />
         <Header />
@@ -20,11 +22,18 @@ const GrantsPage = () => {
 };
 
 
-const GrantsSidebar = () => (
-  <div className="grants-sidebar">
+const GrantDetailsSidebar = () => (
+  <div className="grant-details-sidebar">
     <ul>
       <li className="active">Grants List</li>
-      <li>Add a New Grant</li>
+      <li>Grant Tasks</li>
+      <li>Grants Budget</li>
+      <li>Grant Expenses</li>
+      <li>Grant Notes</li>
+      <li>Add a New Task</li>
+      <li>Add a New Budget</li>
+      <li>Add a New Expense</li>
+      <li>Add a New Notes</li>
     </ul>
   </div>
 );
@@ -64,10 +73,6 @@ const GrantsTable = () => (
         {/* Add a row for "We Give Foundation" */}
         <tr>
           <td>Organization</td>
-          <td>
-            {/* Make the Grant Name clickable */}
-            <Link to="/grant/1">We Give Foundation</Link>
-          </td>
           <td>Grant Status</td>
           <td>Requested Amount</td>
           <td>Awarded Amount</td>
@@ -85,4 +90,5 @@ const GrantsTable = () => (
 );
 
 
-export default GrantsPage;
+
+export default GrantDetailPage;
