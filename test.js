@@ -40,26 +40,44 @@ var client_1 = require("@prisma/client");
 var prisma = new client_1.PrismaClient();
 function main() {
     return __awaiter(this, void 0, void 0, function () {
-        var createManyOrg, organizations;
+        var newConstituent, createManyOrg, organizations;
         return __generator(this, function (_a) {
             switch (_a.label) {
-                case 0: return [4 /*yield*/, prisma.organization.createMany({
-                        data: [
-                            { StreetAddress: '123 Something St.', City: 'SomewhereCity', State: 'SomeState',
-                                Zipcode: 'SomeZipcode', Country: 'SomeCountry' },
-                            { StreetAddress: '456 Test Rd.', City: 'TestCity', State: 'TestState',
-                                Zipcode: 'TestZipcode', Country: 'TestCountry' },
-                            { StreetAddress: '789 A St.', City: 'ACity', State: 'AState',
-                                Zipcode: 'AZipcode', Country: 'ACountry' },
-                            { StreetAddress: '789 A St.', City: 'ACity', State: 'AState',
-                                Zipcode: 'AZipcode', Country: 'ACountry' },
-                        ],
-                        skipDuplicates: true,
+                case 0: return [4 /*yield*/, prisma.constituent.create({
+                        data: {
+                            FirstName: 'first',
+                            LastName: 'last',
+                            StreetAddress: '123 Something St.',
+                            City: 'SomewhereCity',
+                            State: 'SomeState',
+                            Zipcode: 'SomeZipcode',
+                            Country: 'SomeCountry',
+                            EmailAddress: 'email@example.com'
+                        },
+                        select: {
+                            FirstName: true,
+                            LastName: true
+                        }
                     })];
                 case 1:
+                    newConstituent = _a.sent();
+                    return [4 /*yield*/, prisma.organization.createMany({
+                            data: [
+                                { StreetAddress: '123 Something St.', City: 'SomewhereCity', State: 'SomeState',
+                                    Zipcode: 'SomeZipcode', Country: 'SomeCountry', OrganizationName: 'SomeOrganization' },
+                                { StreetAddress: '456 Test Rd.', City: 'TestCity', State: 'TestState',
+                                    Zipcode: 'TestZipcode', Country: 'TestCountry', OrganizationName: 'TestOrganization' },
+                                { StreetAddress: '789 A St.', City: 'ACity', State: 'AState',
+                                    Zipcode: 'AZipcode', Country: 'ACountry', OrganizationName: 'AOrganization' },
+                                { StreetAddress: '789 A St.', City: 'ACity', State: 'AState',
+                                    Zipcode: 'AZipcode', Country: 'ACountry', OrganizationName: 'AOrganization' },
+                            ],
+                            skipDuplicates: true,
+                        })];
+                case 2:
                     createManyOrg = _a.sent();
                     return [4 /*yield*/, prisma.organization.findMany()];
-                case 2:
+                case 3:
                     organizations = _a.sent();
                     console.log(JSON.stringify(organizations));
                     return [2 /*return*/];

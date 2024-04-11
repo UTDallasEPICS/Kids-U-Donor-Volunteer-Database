@@ -1,0 +1,92 @@
+/* src/pages/GrantDetailPage.css */
+.grants-page {
+    display: flex;
+    font-family: Arial, sans-serif;
+  }
+  
+  .main-sidebar, .grant-details-sidebar {
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .main-sidebar {
+    width: 250px;
+    background-color: #f9f9f9;
+  }
+  
+  .grant-details-sidebar {
+    width: 200px;
+    background-color: #ececec;
+    border-left: 1px solid #ccc;
+  }
+  
+  .main-sidebar ul, .grant-details-sidebar ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .main-sidebar li, .grant-details-sidebar li {
+    padding: 10px 15px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  .grant-details-sidebar li.active {
+    background-color: #ddd;
+    border-left: 4px solid #007bff;
+  }
+  
+  .grants-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .breadcrumb {
+    margin-bottom: 20px;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header-buttons button {
+    padding: 8px 16px;
+    margin-left: 8px;
+  }
+  
+  .search-bar {
+    display: flex;
+    margin-bottom: 20px;
+  }
+  
+  .search-bar input {
+    padding: 8px;
+    margin-right: 8px;
+  }
+  
+  .grants-table-container {
+    overflow-x: auto;
+  }
+  
+  .grants-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+  
+  .grants-table th, .grants-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .grants-table th {
+    background-color: #f2f2f2;
+  }
+  
