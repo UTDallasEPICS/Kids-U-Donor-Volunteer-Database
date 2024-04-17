@@ -1,4 +1,5 @@
 /* src/pages/GrantDetailPage.css */
+/* Style for Grant Detail Page*/
 .grants-page {
     display: flex;
     font-family: Arial, sans-serif;
@@ -18,6 +19,7 @@
     width: 200px;
     background-color: #ececec;
     border-left: 1px solid #ccc;
+    text-align: left;
   }
   
   .main-sidebar ul, .grant-details-sidebar ul {
@@ -70,23 +72,40 @@
     margin-right: 8px;
   }
   
-  .grants-table-container {
+  .gDetails-table-container {
     overflow-x: auto;
   }
   
-  .grants-table {
+  .gDetails-table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: 20px;
   }
   
-  .grants-table th, .grants-table td {
-    border: 1px solid #ddd;
+  .gDetails-table th, .gDetails-table td {
     padding: 8px;
     text-align: left;
+    border: none; /* Hide the border of table cells */
+    background-color: #f1f1f1;
   }
   
-  .grants-table th {
-    background-color: #f2f2f2;
+  .gDetails-table th {
+    background-color: #f1f1f1;
   }
   
+
+  /* Style for label */
+.label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: left;
+}
+
+/* Style for input field */
+.input-field {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
