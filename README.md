@@ -132,7 +132,7 @@ Email Templates, Campaigns, and Marketing
 * Campaign information shall be editable 
 
 Database 
-*Stores information related to donations 
+* Stores information related to donations 
   * Includes donor’s name, amount donated, type of donation, date, and the campaign or event associated with the donation 
 * Stores information related to grants 
   * Includes the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
