@@ -4,8 +4,7 @@ import ApiTestPage from './pages/ApiTestPage'; // Import the GrantsPage componen
 import GrantsPage from './pages/GrantsPage'; // Import the GrantsPage component
 import GrantDetailPage from './pages/GrantDetailPage'; // Import the GrantDetailPage component
 
-import './App.css'; // This could contain global styles
-
+import './App.css'; 
 const App = () => {
   return (
     <Router> {/* Wrap your components with the Router component */}
