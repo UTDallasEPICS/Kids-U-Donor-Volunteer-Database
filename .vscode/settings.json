@@ -1,5 +1,11 @@
 {
     "cSpell.words": [
         "pnpx"
-    ]
+    ],
+    "files.associations": {
+        "cstring": "cpp",
+        "iostream": "cpp",
+        "stdexcept": "cpp",
+        "xstring": "cpp"
+    }
 }
