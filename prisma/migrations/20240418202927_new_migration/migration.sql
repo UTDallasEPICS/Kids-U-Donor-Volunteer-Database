@@ -1,11 +1,16 @@
 -- CreateTable
 CREATE TABLE "Constituent" (
     "ConstituentID" TEXT NOT NULL,
-    "Name" TEXT NOT NULL,
-    "Address" TEXT NOT NULL,
-    "EmailAddress" TEXT,
+    "FirstName" TEXT NOT NULL,
+    "LastName" TEXT NOT NULL,
+    "StreetAddress" TEXT NOT NULL,
+    "City" TEXT NOT NULL,
+    "State" TEXT NOT NULL,
+    "Zipcode" TEXT NOT NULL,
+    "Country" TEXT NOT NULL,
+    "EmailAddress" TEXT NOT NULL,
     "PhoneNumber" TEXT,
-    "CompanySchoolName" TEXT,
+    "AreaCode" TEXT,
 
     CONSTRAINT "Constituent_pkey" PRIMARY KEY ("ConstituentID")
 );
@@ -19,6 +24,8 @@ CREATE TABLE "Volunteer" (
     "EventsAttended" TEXT[],
     "AgreementToMediaUse" BOOLEAN,
     "TrainingCompletion" TEXT,
+    "BackgroundCheckCompletion" BOOLEAN,
+    "IsOverEighteen" BOOLEAN,
     "ConstituentID" TEXT NOT NULL,
 
     CONSTRAINT "Volunteer_pkey" PRIMARY KEY ("VolunteerID")
@@ -49,21 +56,41 @@ CREATE TABLE "Donation" (
 
 -- CreateTable
 CREATE TABLE "Organization" (
-    "OrganizationID" SERIAL NOT NULL,
-    "PositionInCompany" TEXT,
+    "OrganizationID" TEXT NOT NULL,
     "WebsiteForFunder" TEXT,
+    "StreetAddress" TEXT NOT NULL,
+    "City" TEXT NOT NULL,
+    "State" TEXT NOT NULL,
+    "Zipcode" TEXT NOT NULL,
+    "Country" TEXT NOT NULL,
+    "OrganizationName" TEXT NOT NULL,
     "PortalForGrantApplication" TEXT,
     "NotesAboutLoginInfo" TEXT,
-    "ConstituentID" TEXT NOT NULL,
 
     CONSTRAINT "Organization_pkey" PRIMARY KEY ("OrganizationID")
 );
 
 -- CreateTable
+CREATE TABLE "Representative" (
+    "RepresentativeID" TEXT NOT NULL,
+    "RepresentativeFirstName" TEXT NOT NULL,
+    "RepresentativeLastName" TEXT NOT NULL,
+    "RepresentativeEmail" TEXT NOT NULL,
+    "RepresentativePhone" TEXT,
+    "PositionInCompany" TEXT NOT NULL,
+    "OrganizationID" TEXT NOT NULL,
+
+    CONSTRAINT "Representative_pkey" PRIMARY KEY ("RepresentativeID")
+);
+
+-- CreateTable
 CREATE TABLE "Grant" (
-    "GrantID" SERIAL NOT NULL,
+    "GrantID" TEXT NOT NULL,
     "GrantName" TEXT NOT NULL,
-    "Years" INTEGER NOT NULL,
+    "AwardStatus" TEXT NOT NULL,
+    "GrantDueDate" TIMESTAMP(3) NOT NULL,
+    "ContactType" TEXT NOT NULL,
+    "Years" INTEGER,
     "FundingAreas" TEXT[],
     "KidsUProgram" TEXT[],
     "GrantOpeningDates" TIMESTAMP(3)[],
@@ -77,14 +104,13 @@ CREATE TABLE "Grant" (
     "AskAmount" DOUBLE PRECISION NOT NULL,
     "AmountAwarded" DOUBLE PRECISION NOT NULL,
     "EndOfGrantReportDueDate" TIMESTAMP(3) NOT NULL,
-    "OrganizationID" INTEGER NOT NULL,
 
     CONSTRAINT "Grant_pkey" PRIMARY KEY ("GrantID")
 );
 
 -- CreateTable
 CREATE TABLE "Event" (
-    "EventID" SERIAL NOT NULL,
+    "EventID" TEXT NOT NULL,
     "NameOfEvent" TEXT NOT NULL,
     "Date" TIMESTAMP(3) NOT NULL,
     "Time" TIMESTAMP(3) NOT NULL,
@@ -94,15 +120,45 @@ CREATE TABLE "Event" (
 
 -- CreateTable
 CREATE TABLE "VolunteerEvent" (
-    "ID" SERIAL NOT NULL,
+    "ID" TEXT NOT NULL,
     "VolunteerID" TEXT NOT NULL,
-    "EventID" INTEGER NOT NULL,
+    "EventID" TEXT NOT NULL,
     "LoginTime" TIMESTAMP(3) NOT NULL,
     "LogoutTime" TIMESTAMP(3) NOT NULL,
     "LoggedHours" INTEGER NOT NULL,
 
     CONSTRAINT "VolunteerEvent_pkey" PRIMARY KEY ("ID")
 );
+
+-- CreateTable
+CREATE TABLE "_GrantToRepresentative" (
+    "A" TEXT NOT NULL,
+    "B" TEXT NOT NULL
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Constituent_EmailAddress_key" ON "Constituent"("EmailAddress");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Constituent_PhoneNumber_key" ON "Constituent"("PhoneNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Organization_OrganizationName_key" ON "Organization"("OrganizationName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Representative_RepresentativeEmail_key" ON "Representative"("RepresentativeEmail");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Representative_RepresentativePhone_key" ON "Representative"("RepresentativePhone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Grant_GrantName_key" ON "Grant"("GrantName");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "_GrantToRepresentative_AB_unique" ON "_GrantToRepresentative"("A", "B");
+
+-- CreateIndex
+CREATE INDEX "_GrantToRepresentative_B_index" ON "_GrantToRepresentative"("B");
 
 -- AddForeignKey
 ALTER TABLE "Volunteer" ADD CONSTRAINT "Volunteer_ConstituentID_fkey" FOREIGN KEY ("ConstituentID") REFERENCES "Constituent"("ConstituentID") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -114,13 +170,16 @@ ALTER TABLE "Donor" ADD CONSTRAINT "Donor_ConstituentID_fkey" FOREIGN KEY ("Cons
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_DonorID_fkey" FOREIGN KEY ("DonorID") REFERENCES "Donor"("DonorID") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Organization" ADD CONSTRAINT "Organization_ConstituentID_fkey" FOREIGN KEY ("ConstituentID") REFERENCES "Constituent"("ConstituentID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Representative" ADD CONSTRAINT "Representative_OrganizationID_fkey" FOREIGN KEY ("OrganizationID") REFERENCES "Organization"("OrganizationID") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Grant" ADD CONSTRAINT "Grant_OrganizationID_fkey" FOREIGN KEY ("OrganizationID") REFERENCES "Organization"("OrganizationID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "VolunteerEvent" ADD CONSTRAINT "VolunteerEvent_EventID_fkey" FOREIGN KEY ("EventID") REFERENCES "Event"("EventID") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VolunteerEvent" ADD CONSTRAINT "VolunteerEvent_VolunteerID_fkey" FOREIGN KEY ("VolunteerID") REFERENCES "Volunteer"("VolunteerID") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "VolunteerEvent" ADD CONSTRAINT "VolunteerEvent_EventID_fkey" FOREIGN KEY ("EventID") REFERENCES "Event"("EventID") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "_GrantToRepresentative" ADD CONSTRAINT "_GrantToRepresentative_A_fkey" FOREIGN KEY ("A") REFERENCES "Grant"("GrantID") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "_GrantToRepresentative" ADD CONSTRAINT "_GrantToRepresentative_B_fkey" FOREIGN KEY ("B") REFERENCES "Representative"("RepresentativeID") ON DELETE CASCADE ON UPDATE CASCADE;
