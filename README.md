@@ -48,6 +48,7 @@ General Administrative Dashboard
   * Can also set up reminders to get in touch with donors  
   * Can assign tasks to yourself or other users  
   * If any outstanding tasks exist, those will show up until marked as complete. 
+
 Donations Module 
 * Tracks and keeps a record of all online donations 
 * Allows offline donations to be manually logged 
@@ -55,6 +56,7 @@ Donations Module
 * Admins need to be able to add information to donation records 
 * Admins need to be able to edit information in donation records 
 * Admins need to be able to upload attachments and notes related to donations 
+
 Grants Module 
 * Tracks and records all grants 
   * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
@@ -66,6 +68,7 @@ Pledges Module
 * Pledge Tracking 
   * Records information such as Constituent name, Pledge Date, Pledge Amount, Fund type (generic desired use), Event, Gift type (Check/Cash), whether the pledge is pending, Pledge details, etc. 
   * Includes credit card tracking to allow donors to pay over a period and make reoccurring payments 
+
 Constituents Module 
 * Tracks and keeps a record of all constituents  
 * Creates a profile page for all constituents 
@@ -75,6 +78,7 @@ Constituents Module
 * Admins need be able to add information to constituents’ profile 
 * Admins need be able to edit and update information in constituents’ profile 
 * Admins need to be able to search through the record of constituents 
+
 Volunteers Module 
 * Event Registration 
   * Single time or reoccurring 
@@ -88,6 +92,7 @@ Volunteers Module
   * Generates QR codes/links that can be used on site to confirm attendance 
   * Check in page that allows volunteers to tell their name and have it recorded 
   * Manually log attendance hours/people 
+
 Events Module 
 * Keeps track of any events  
 * Allow users to add new events 
@@ -104,6 +109,7 @@ Events Module
 * Allow guests to be added to events 
   * Include contact information for each guest 
 * Allow users to add notes about the events 
+
 Reports Module 
 * Dynamic reports 
   * Allow reports to be fully customizable where criteria can be handpicked for the end results desired 
@@ -113,6 +119,7 @@ Reports Module
 * Provide for pre-loaded reports  
 * Allow users to pull reports for other forms 
 * Reports shall be able to be exported into Excel, PDF, or mailing list form 
+
 Email Templates, Campaigns, and Marketing 
 * Admins need to be able to send documents to constituents  
 * Admins need to be able to send out acknowledgement emails or letters to donors 
@@ -123,6 +130,7 @@ Email Templates, Campaigns, and Marketing
 * Admins need to be able to add new campaigns 
   *Includes information such as campaign name, start and end dates, and goal amount 
 * Campaign information shall be editable 
+
 Database 
 *Stores information related to donations 
   * Includes donor’s name, amount donated, type of donation, date, and the campaign or event associated with the donation 
