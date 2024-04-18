@@ -1,27 +1,36 @@
-// components/ExampleComponent.js
-
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
-const ExampleComponent = () => {
-  const [message, setMessage] = useState('');
+function YourComponent() {
+  const [data, setData] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`/api/data`)
-      .then(response => {
-        setMessage(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching data:', error);
-      });
+    const fetchData = async () => {
+      try {
+        const response = await fetch('/api/grant/getGrants'); // Replace '/yourEndpoint' with the actual endpoint URL
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const jsonData = await response.json();
+        setData(jsonData);
+      } catch (error) {
+        setError('Error fetching data: ' + error.message);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
     <div>
-      <h1>API Response:</h1>
-      <p>{message}</p>
+      <h1>Data from API</h1>
+      {error ? (
+        <div>{error}</div>
+      ) : (
+        <div>{String(data)}</div>
+      )}
     </div>
   );
-};
+}
 
-export default ExampleComponent;
+export default YourComponent;
