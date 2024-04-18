@@ -19,7 +19,7 @@ function YourComponent() {
     };
 
     fetchData();
-  }, []);
+  }, [data]);
 
   return (
     <div>
@@ -27,7 +27,7 @@ function YourComponent() {
       {error ? (
         <div>{error}</div>
       ) : (
-        <div>{String(data)}</div>
+        <div>{JSON.stringify(data)}</div>
       )}
     </div>
   );
