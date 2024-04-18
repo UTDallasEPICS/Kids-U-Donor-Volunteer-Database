@@ -40,9 +40,9 @@ Project Overview:
 
 General Administrative Dashboard  
 
-*Administrators need to be able create an account 
+* Administrators need to be able create an account 
 
-*Administrators need to be able to log in to access the dashboard 
+* Administrators need to be able to log in to access the dashboard 
 
 *After an administrator logs in, they shall be able to view several dashboards throughout the system that automatically provides visual graphics of the stored data 
 
