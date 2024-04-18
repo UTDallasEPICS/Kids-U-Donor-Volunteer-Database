@@ -1,4 +1,4 @@
-# UTDesign EPICS # UTDesign EPICS Kids-U Donor Volunteer Database
+# UTDesign EPICS Kids-U Donor Volunteer Database
 
 The core technologies used are:
 
