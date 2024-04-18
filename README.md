@@ -9,7 +9,8 @@ The core technologies used are:
 <!-- markdownlint-disable-next-line MD033 -->
 <details><summary><h2>Table of Contents</h2></summary>
 
-- [Getting Started](#getting-started)
+- [Overview](#overview)
+- [Functional Requirements](#functional-requirements)
 - [Prerequisites](#prerequisites)
   - [Installing Node](#installing-node)
     - [Node for Windows](#node-for-windows)
@@ -32,11 +33,11 @@ The core technologies used are:
 
 </details>
 
-## Getting Started
+## Overview
 
 This is a database system with a web application that will contain various modules such as donations, grants, pledges, constituents, volunteer management, event management, and reports, along with dedicated features for campaigning and marketing through email communication. The users should be able to log into the system and contribute donations to Kids-U, while the administration should have the capabilities to view a list of all the donors with certain data fields, keep track of grant applications, get notified for upcoming grant deadlines, and other streamlined forms of management. As of now the grants module is complete with backend and frontend.   
 
-Project Overview:
+## Functional Requirements
 
 General Administrative Dashboard  
 
