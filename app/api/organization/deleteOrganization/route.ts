@@ -18,17 +18,16 @@ export async function GET(Request: Request): Promise<Response> {
 
 
     // Retrieve data from the database
-    const grant = await prisma.Grant.findUnique({
+    const organization = await prisma.Organization.delete({
       where: {
         // Specify the condition to find the grant (e.g., by ID)
-  
-        GrantID: id
+        OrganizationID: id
       }
     });
-    console.log(grant);
+    console.log(organization);
 
     // Send the retrieved data as a response
-    return Response.json(grant);
+    return Response.json(organization);
   } catch (error) {
     // Handle errors
     console.error('Error fetching data:', error);

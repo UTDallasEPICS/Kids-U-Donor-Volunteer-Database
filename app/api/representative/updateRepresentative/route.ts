@@ -17,15 +17,15 @@ export async function PUT(Request: Request): Promise<Response> {
     const updatedData = requestBody.updatedData; 
 
     // Update the data in the database
-    const updatedGrant = await prisma.Grant.update({
+    const updatedRepresentative = await prisma.Representative.update({
       where: {
-        GrantID: id // Specify the condition to find the grant (e.g., by ID)
+        RepresentativeID: id 
       },
       data: updatedData // Specify the updated data object
     });
 
     // Send the updated data as a response
-    return Response.json(updatedGrant);
+    return Response.json(updatedRepresentative);
   } catch (error) {
     // Handle errors
     console.error('Error updating data:', error);

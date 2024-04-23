@@ -21,7 +21,6 @@ export async function GET(Request: Request): Promise<Response> {
     const grant = await prisma.Grant.delete({
       where: {
         // Specify the condition to find the grant (e.g., by ID)
-        // Replace 'id' with the actual field you want to use for lookup
         GrantID: id
       }
     });
