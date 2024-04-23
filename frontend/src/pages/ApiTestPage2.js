@@ -10,7 +10,6 @@ function GrantDetails() {
     async function fetchData() {
       try {
         if (!id) return; // Don't fetch if ID is empty
-        // Replace 'YOUR_ENDPOINT_URL' with the actual endpoint URL
         
         const response = await axios.get(`/api/grant/deleteGrant?id=${id}`);
         setGrant(response.data);

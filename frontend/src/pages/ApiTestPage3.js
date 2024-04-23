@@ -12,7 +12,6 @@ function GrantDetails() {
     async function fetchData() {
       try {
         if (!id) return; // Don't fetch if ID is empty
-        // Replace 'YOUR_ENDPOINT_URL' with the actual endpoint URL
         const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
           // Send updated data in the request body
           updatedData: { GrantName, ContactType }

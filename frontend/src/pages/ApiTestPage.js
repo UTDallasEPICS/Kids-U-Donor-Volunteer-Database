@@ -7,7 +7,7 @@ function YourComponent() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('/api/grant/getGrants'); // Replace '/yourEndpoint' with the actual endpoint URL
+        const response = await fetch('/api/grant/getGrants'); 
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
