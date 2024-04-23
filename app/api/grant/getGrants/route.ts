@@ -11,7 +11,6 @@ export async function GET(Request: Request): Promise<Response> {
     //console.log(req);
     // Retrieve data from the database
     const data = await prisma.Grant.findMany(); // Replace 'yourModelName' with the name of your Prisma model
-    console.log(data);
     // Send the retrieved data as a response
 
     return Response.json(data);
