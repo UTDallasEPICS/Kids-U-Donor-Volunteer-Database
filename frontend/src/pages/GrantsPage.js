@@ -93,8 +93,8 @@ const GrantsTable = ({ grants }) => (
   <Link to={`/grant/${grant.GrantID}`}>{grant.GrantName}</Link>
   </td>
   <td>{grant.AwardStatus || "Pending"}</td>
-  <td>${grant.AskAmount ? grant.AskAmount.toFixed(2) : "0.00"}</td>
-  <td>${grant.AmountAwarded ? grant.AwardedAmount.toFixed(2) : "0.00"}</td>
+  <td>${grant.AskAmount ? grant.AskAmount?.toFixed(2) : "0.00"}</td>
+  <td>${grant.AmountAwarded ? grant.AwardedAmount?.toFixed(2) : "0.00"}</td>
   <td>{grant.FundingRestrictions || "None"}</td>
   <td>{grant.EndOfGrantReportDueDate || "N/A"}</td>
   <td>{grant.DueDate || "N/A"}</td>
