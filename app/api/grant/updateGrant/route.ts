@@ -17,6 +17,29 @@ export async function PUT(Request: Request): Promise<Response> {
     const updatedData = requestBody.updatedData; 
     console.log(updatedData);
 
+    let WaitingPeriodToReapply = updatedData.WaitingPeriodToReapply;
+    WaitingPeriodToReapply = parseInt(WaitingPeriodToReapply);
+    if(isNaN(WaitingPeriodToReapply)){
+      WaitingPeriodToReapply = 0;
+    }
+    updatedData.WaitingPeriodToReapply = WaitingPeriodToReapply
+    
+    let AskAmount = updatedData.AskAmount;
+    AskAmount = parseFloat(AskAmount);
+    if(isNaN(AskAmount)){
+      AskAmount = 0.0;
+    }
+    updatedData.AskAmount = AskAmount
+
+    let AmountAwarded = updatedData.AmountAwarded;
+    AskAmount = parseFloat(AmountAwarded);
+    if(isNaN(AmountAwarded)){
+      AmountAwarded = 0.0;
+    }
+    updatedData.AmountAwarded = AskAmount
+
+
+
     // Update the data in the database
     const updatedGrant = await prisma.Grant.update({
       where: {
