@@ -15,6 +15,7 @@ export async function PUT(Request: Request): Promise<Response> {
     // Extract the updated data from the request body
     const requestBody = await Request.json();
     const updatedData = requestBody.updatedData; 
+    console.log(updatedData);
 
     // Update the data in the database
     const updatedGrant = await prisma.Grant.update({
