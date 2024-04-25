@@ -1,13 +1,22 @@
 # Functional Requirements
-for now
-## Functional Requirements
 
+## This semester (Spring 2024)
+
+### Grants Module 
+Grant List Page
+* Tracks and records all grants 
+  * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
+* Tracks budget and expenses for each grant 
+* Admins need to be able to manually edit and update grant information 
+* Admins need to be able to upload attachments and notes related to grants 
+* Admins shall be able to assign tasks for specific grants 
+
+## For the entirety of the project
 General Administrative Dashboard  
 
 * Administrators need to be able create an account 
 * Administrators need to be able to log in to access the dashboard 
 * After an administrator logs in, they shall be able to view several dashboards throughout the system that automatically provides visual graphics of the stored data 
-  * Examples include: viewing donor and dollar distribution, viewing the giving broken up by affiliation, viewing progress of campaigns, viewing top donors, etc. 
 * Creates a task list designed to help notify administration of new information that needs attention 
   * Can also set up reminders to get in touch with donors  
   * Can assign tasks to yourself or other users  
@@ -28,10 +37,6 @@ Grants Module
 * Admins need to be able to manually edit and update grant information 
 * Admins need to be able to upload attachments and notes related to grants 
 * Admins shall be able to assign tasks for specific grants 
-Pledges Module 
-* Pledge Tracking 
-  * Records information such as Constituent name, Pledge Date, Pledge Amount, Fund type (generic desired use), Event, Gift type (Check/Cash), whether the pledge is pending, Pledge details, etc. 
-  * Includes credit card tracking to allow donors to pay over a period and make reoccurring payments 
 
 Constituents Module 
 * Tracks and keeps a record of all constituents  
