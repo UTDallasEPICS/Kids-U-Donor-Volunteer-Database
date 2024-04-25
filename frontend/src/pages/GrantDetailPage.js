@@ -2,52 +2,66 @@
 //Grant Details Page
 
 import React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './GrantDetailPage.css';
 import MainSidebar from '../components/MainSidebar';
-import mockGrantData from './mockGrantData';
+import mockGrantData from './mockGrantData'; // delete later
+import axios from 'axios';
 
 const GrantDetailPage = () => {
-  // Access the ID from the URL parameters
   const { id } = useParams();
   const [grantDetails, setGrantDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Find the grant details with the matching ID
-  const grant = mockGrantData.find(grant => grant.GrantID === id);
+  useEffect(() => {
+    const fetchGrantDetails = async () => {
+      try {
+        const response = await axios.get(`/api/grant/getGrant?id=${id}`);
+        setGrantDetails(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching grant details:', error);
+        setLoading(false);
+      }
+    };
 
-  // Set grant details once found
-  if (!grantDetails && grant) {
-    setGrantDetails({ ...grant });
-  }
+    if (id) {
+      fetchGrantDetails();
+    }
+  }, [id]);
 
-   // Handle edit button click
-   const handleEditClick = () => {
-    setIsEditing(prevState => !prevState); // Toggle editing mode
+  const handleEditClick = () => {
+    setIsEditing(prevState => !prevState);
   };
 
-  // Handle save button click
-  const handleSaveClick = () => {
-    // Update grant details in the local state or make API call to save changes to the database
-    // For now, let's just log the updated grant details
-    console.log("Updated grant details:", grantDetails);
-    setIsEditing(false); // Exit editing mode after saving
+  const handleSaveClick = async () => {
+    try {
+      const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
+        updatedData: grantDetails
+      });
+      console.log("Updated grant details:", response.data);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error updating grant details:', error);
+      // Handle error
+    }
   };
 
-  // Handle input change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setGrantDetails((prevGrantDetails) => ({
+    setGrantDetails(prevGrantDetails => ({
       ...prevGrantDetails,
       [name]: value,
     }));
   };
 
-  
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
-  //Checks if grantDetails is still null. That means grant is null, so grant not found
   if (!grantDetails) {
     return <div>Grant not found</div>;
   }
@@ -55,7 +69,7 @@ const GrantDetailPage = () => {
   return (
     <div className="grants-page">
       <MainSidebar />
-      <GrantDetailsSidebar grantName={grant.GrantName} />
+      <GrantDetailsSidebar grantName={grantDetails.GrantName} />
       <div className="grants-content">
         <Breadcrumb />
         <Header
@@ -65,9 +79,8 @@ const GrantDetailPage = () => {
         />
         <SearchBar />
         <DetailsTable
-          grant={grant}
+          grantDetails={grantDetails} 
           isEditing={isEditing}
-          grantDetails={grantDetails}
           handleInputChange={handleInputChange}
         />
       </div>
@@ -135,7 +148,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
     { label: 'End of Grant Report Due Date', name: 'EndOfGrantReportDueDate', isDate: true },
     { label: 'Ask Date', name: 'AskDate', isDate: true },
     { label: 'Award Date', name: 'AwardDate', isDate: true },
-    { label: 'Reporting Dates', name: 'ReportingDates', join: true },
+    { label: 'Reporting Dates', name: 'ReportingDates', join: true, isDate:true },
     { label: 'Date to Reapply to Grant', name: 'DateToReapplyForGrant', isDate: true },
     { label: 'Waiting Period to Reapply', name: 'WaitingPeriodToReapply' },
     { label: 'Grant Period', name: 'GrantPeriod', join: true, joinDash: true, isDate: true },
