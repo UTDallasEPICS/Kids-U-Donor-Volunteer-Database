@@ -5,6 +5,7 @@ function GrantDetails() {
   const [id, setId] = useState('');
   const [GrantName, setName] = useState('');
   const [ContactType, setContactType] = useState('');
+  const [AskAmountS, setAskAmount] = useState('');
   const [grant, setGrant] = useState(null);
   const [error, setError] = useState(null);
 
@@ -12,9 +13,17 @@ function GrantDetails() {
     async function fetchData() {
       try {
         if (!id) return; // Don't fetch if ID is empty
+        let AskAmount = parseFloat(AskAmountS);
+        let FundingAreas = ["test1", "test2"];
+        let AwardStatus = "test";
+
+        if(isNaN(AskAmount)){
+          AskAmount = 0.0;
+        }
         const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
           // Send updated data in the request body
-          updatedData: { GrantName, ContactType }
+          
+          updatedData: { GrantName, ContactType, AskAmount , FundingAreas, AwardStatus}
         });
         setGrant(response.data);
       } catch (error) {
@@ -23,7 +32,7 @@ function GrantDetails() {
     }
 
     fetchData();
-  }, [id, GrantName, ContactType]); // Re-fetch data whenever ID, name, or contactType changes
+  }, [id, GrantName, ContactType, AskAmountS]); // Re-fetch data whenever ID, name, or contactType changes
 
   const handleIdChange = (e) => {
     setId(e.target.value);
@@ -35,6 +44,10 @@ function GrantDetails() {
 
   const handleContactTypeChange = (e) => {
     setContactType(e.target.value);
+  };
+
+  const handleAskAmountChange = (e) => {
+    setAskAmount(e.target.value);
   };
 
   return (
@@ -57,6 +70,12 @@ function GrantDetails() {
         placeholder="Enter Contact Type"
         value={ContactType}
         onChange={handleContactTypeChange}
+      />
+      <input
+        type="text"
+        placeholder="Enter AskAmount"
+        value={AskAmountS}
+        onChange={handleAskAmountChange}
       />
       {error && <p>Error: {error}</p>}
       {grant && (

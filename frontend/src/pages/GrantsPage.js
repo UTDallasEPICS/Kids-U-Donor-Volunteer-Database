@@ -1,12 +1,29 @@
 // src/pages/GrantsPage.js
 //This is the GrantLists page
-import React from 'react';
-import { Link } from 'react-router-dom'; // Import Link from react-router-dom
-import MainSidebar from '../components/MainSidebar';  // Import MainSidebar
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import MainSidebar from '../components/MainSidebar';
 import './GrantsPage.css';
-import mockGrantData from './mockGrantData'; //import mockgrantdata
+import axios from 'axios'; // Import Axios
 
 const GrantsPage = () => {
+  // Define state to hold grant data
+  const [grants, setGrants] = useState([]);
+
+  // Use effect hook to fetch data when component mounts
+  useEffect(() => {
+    const fetchGrants = async () => {
+      try {
+        const response = await axios.get('/api/grant/getGrants'); // Adjust endpoint if needed
+        setGrants(response.data);
+      } catch (error) {
+        console.error('Error fetching grants:', error);
+      }
+    };
+
+    fetchGrants();
+  }, []); // Empty dependency array ensures effect runs only once on mount
+
   return (
     <div className="grants-page">
       <MainSidebar />
@@ -15,7 +32,7 @@ const GrantsPage = () => {
         <Breadcrumb />
         <Header />
         <SearchBar />
-        <GrantsTable />
+        <GrantsTable grants={grants} />
       </div>
     </div>
   );
@@ -55,7 +72,7 @@ const SearchBar = () => (
 );
 
 //This table dynamically creates rows with each grant
-const GrantsTable = () => (
+const GrantsTable = ({ grants }) => (
   <div className="grants-table-container">
     <table className="grants-table">
       <thead>
@@ -74,7 +91,7 @@ const GrantsTable = () => (
         </tr>
       </thead>
       <tbody>
-        {mockGrantData.map((grant) => (
+       {grants.map((grant) => (
           <tr key={grant.GrantID}>
             <td>{/* Render organization name here */}</td>
             <td>
