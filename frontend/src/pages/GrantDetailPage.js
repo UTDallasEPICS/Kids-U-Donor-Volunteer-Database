@@ -38,6 +38,7 @@ const GrantDetailPage = () => {
   };
 
   const handleSaveClick = async () => {
+    console.log("Save button clicked"); // Add this line
     try {
       const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
         updatedData: grantDetails
