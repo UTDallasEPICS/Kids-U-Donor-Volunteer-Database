@@ -1,74 +1,71 @@
 // src/pages/GrantsPage.js
-//This is the GrantLists page
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import MainSidebar from '../components/MainSidebar';
 import './GrantsPage.css';
-import axios from 'axios'; // Import Axios
-
+ 
 const GrantsPage = () => {
-  // Define state to hold grant data
-  const [grants, setGrants] = useState([]);
-
-  // Use effect hook to fetch data when component mounts
+  const [grants, setGrants] = useState([]); // State to store grants data
+ 
   useEffect(() => {
     const fetchGrants = async () => {
       try {
-        const response = await axios.get('/api/grant/getGrants'); // Adjust endpoint if needed
-        setGrants(response.data);
+        const response = await axios.get('/api/grant/getGrants'); // Endpoint to fetch grants
+        setGrants(response.data); // Set grants data from the API response
       } catch (error) {
         console.error('Error fetching grants:', error);
+        // Optionally handle error or set default state
       }
     };
-
+ 
     fetchGrants();
-  }, []); // Empty dependency array ensures effect runs only once on mount
-
+  }, []); // Dependency array left empty to run only once on component mount
+ 
   return (
-    <div className="grants-page">
-      <MainSidebar />
-      <GrantsSidebar />
-      <div className="grants-content">
-        <Breadcrumb />
-        <Header />
-        <SearchBar />
-        <GrantsTable grants={grants} />
-      </div>
-    </div>
+<div className="grants-page">
+<MainSidebar />
+<GrantsSidebar />
+<div className="grants-content">
+<Breadcrumb />
+<Header />
+<SearchBar />
+<GrantsTable grants={grants} />
+</div>
+</div>
   );
 };
-
-
+ 
 const GrantsSidebar = () => (
-  <div className="grants-sidebar">
-    <ul>
-      <li className="active">Grants List</li>
-      <li>Add a New Grant</li>
-    </ul>
-  </div>
+<div className="grants-sidebar">
+<ul>
+<li className="active">Grants List</li>
+<li>Add a New Grant</li>
+</ul>
+</div>
 );
-
+ 
 const Breadcrumb = () => (
-  <div className="breadcrumb">
+<div className="breadcrumb">
     Home - Grants
-  </div>
+</div>
 );
-
+ 
 const Header = () => (
-  <div className="header">
-    <h1>Grants</h1>
-    <div className="header-buttons">
-      <button>Add A New Grant</button>
-    </div>
-  </div>
+<div className="header">
+<h1>Grants</h1>
+<div className="header-buttons">
+<button>Add A New Grant</button>
+</div>
+</div>
 );
-
+ 
 const SearchBar = () => (
-  <div className="search-bar">
-    <input type="text" placeholder="Quick Search" />
-    <button>Go</button>
-    <button>Advanced</button>
-  </div>
+<div className="search-bar">
+<input type="text" placeholder="Quick Search" />
+<button>Go</button>
+<button>Advanced</button>
+</div>
 );
 
 //This table dynamically creates rows with each grant
@@ -108,6 +105,5 @@ const GrantsTable = ({ grants }) => (
   </table>
   </div>
   );
-
-
+  
 export default GrantsPage;

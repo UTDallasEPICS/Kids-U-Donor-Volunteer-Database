@@ -13,14 +13,17 @@ function GrantDetails() {
     async function fetchData() {
       try {
         if (!id) return; // Don't fetch if ID is empty
-        let AskAmount = parseFloat(AskAmountS);
+        let AskAmount = AskAmountS;
+        let FundingAreas = ["test1", "test2"];
+        let AwardStatus = "test";
+
         if(isNaN(AskAmount)){
           AskAmount = 0.0;
         }
         const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
           // Send updated data in the request body
           
-          updatedData: { GrantName, ContactType, AskAmount }
+          updatedData: { GrantName, ContactType, AskAmount , FundingAreas, AwardStatus}
         });
         setGrant(response.data);
       } catch (error) {
