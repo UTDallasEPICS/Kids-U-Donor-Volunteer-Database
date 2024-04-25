@@ -24,6 +24,14 @@ export async function PUT(Request: Request): Promise<Response> {
     }
     updatedData.GrantDueDate = GrantDueDate;
 
+    for (let i =0; i < updatedData.GrantOpeningDates.length; i++){
+      let GrantOpeningDates = new Date(updatedData.GrantOpeningDates[i])
+      if(GrantOpeningDates.toString() == "Invalid Date"){
+        GrantOpeningDates = new Date("1970-01-01");
+      }
+      updatedData.GrantOpeningDates[i] = GrantOpeningDates;
+    }
+
     let AskDate = updatedData.AskDate;
     AskDate = new Date(AskDate);
     if(AskDate.toString() == "Invalid Date"){
@@ -37,6 +45,14 @@ export async function PUT(Request: Request): Promise<Response> {
       AwardDate = new Date("1970-01-01");
     }
     updatedData.AwardDate = AwardDate;
+
+    for (let i =0; i < updatedData.ReportingDates.length; i++){
+      let ReportingDates = new Date(updatedData.ReportingDates[i])
+      if(ReportingDates.toString() == "Invalid Date"){
+        ReportingDates = new Date("1970-01-01");
+      }
+      updatedData.ReportingDates[i] = ReportingDates;
+    }
 
     let DateToReapplyForGrant = updatedData.DateToReapplyForGrant;
     DateToReapplyForGrant = new Date(DateToReapplyForGrant);
