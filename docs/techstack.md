@@ -1,19 +1,21 @@
 # Our Techstack
 
 ## React
+[Learn React](https://legacy.reactjs.org/docs/hello-world.html)
 
 ## Next.js
+[Setup Next.js](https://nextjs.org/learn-pages-router/basics/create-nextjs-app/setup)
 
 ## PostgreSQL
 PostgreSQL serves as our underlying database engine for storing and managing data. Since we use Prisma, we do not need to interact directly with Postgres.
+[Install PostgreSQL](https://www.postgresql.org/docs/15/install-procedure.html)
 
 ## Prisma
 Prisma is database Object Relational Mapper (ORM) used to connect Next.js to the PostgresSQL database.
-
 [Prisma Documentation](https://www.prisma.io/docs)
 
 ## Docker
-
+[Install Docker](https://www.docker.com/get-started/)
 
 Some random stuff to clean later
 
