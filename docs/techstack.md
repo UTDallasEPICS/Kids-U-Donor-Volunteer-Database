@@ -1,9 +1,11 @@
 # Our Techstack
 
 ## React
+We utilized react for our UI. You can learn more below:
 [Learn React](https://legacy.reactjs.org/docs/hello-world.html)
 
 ## Next.js
+We utilized Next.js as well for our UI. Follow the instructions below to setup and use Next.js
 [Setup Next.js](https://nextjs.org/learn-pages-router/basics/create-nextjs-app/setup)
 
 ## PostgreSQL
@@ -15,6 +17,7 @@ Prisma is database Object Relational Mapper (ORM) used to connect Next.js to the
 [Prisma Documentation](https://www.prisma.io/docs)
 
 ## Docker
+Follow the installation procedures below to setup docker:
 [Install Docker](https://www.docker.com/get-started/)
 
 Some random stuff to clean later
