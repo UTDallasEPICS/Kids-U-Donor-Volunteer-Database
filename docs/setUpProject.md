@@ -23,7 +23,7 @@
 - Select the location for the repository
 - Open the repository in VSCode
 
-## 3. Set up Postgres
+## 3. Setting up Postgres
 - Open pgAdmin
     - This should be downloaded with Postgres, but if you do not have it, download it [here](https://www.pgadmin.org/download/)
 - Keep the username of the master account as 'postgres'

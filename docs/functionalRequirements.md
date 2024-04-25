@@ -3,7 +3,6 @@
 ## This semester (Spring 2024)
 
 ### Grants Module 
-Grant List Page
 * Tracks and records all grants 
   * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
 * Tracks budget and expenses for each grant 
@@ -11,9 +10,9 @@ Grant List Page
 * Admins need to be able to upload attachments and notes related to grants 
 * Admins shall be able to assign tasks for specific grants 
 
-## For the entirety of the project
-General Administrative Dashboard  
+## For the rest of the project
 
+General Administrative Dashboard  
 * Administrators need to be able create an account 
 * Administrators need to be able to log in to access the dashboard 
 * After an administrator logs in, they shall be able to view several dashboards throughout the system that automatically provides visual graphics of the stored data 
