@@ -20,14 +20,6 @@ Prisma is database Object Relational Mapper (ORM) used to connect Next.js to the
 Follow the installation procedures below to setup docker:
 [Install Docker](https://www.docker.com/get-started/)
 
-Some random stuff to clean later
-
-- [Next.js](https://nextjs.org): A full stack web development framework
-- [Prisma](https://prisma.io): A database ORM used to connect Next.js to a database
-- [PostgreSQL](https://www.postgresql.org): An open source SQL database
-
-
-
 ## Learn More
 
 ### Learn HTML, CSS, JavaScript, and TypeScript
