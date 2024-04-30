@@ -14,6 +14,8 @@ const GrantsPage = () => {
       try {
         const response = await axios.get('/api/grant/getGrants'); // Endpoint to fetch grants
         setGrants(response.data); // Set grants data from the API response
+        // Log the fetched grant data
+        console.log('Fetched Grants:', response.data);
       } catch (error) {
         console.error('Error fetching grants:', error);
         // Optionally handle error or set default state
@@ -94,8 +96,8 @@ const GrantsTable = ({ grants }) => (
   <Link to={`/grant/${grant.GrantID}`}>{grant.GrantName}</Link>
   </td>
   <td>{grant.AwardStatus || "Pending"}</td>
-  <td>${grant.AskAmount ? grant.AskAmount?.toFixed(2) : "0.00"}</td>
-  <td>${grant.AmountAwarded ? grant.AwardedAmount?.toFixed(2) : "0.00"}</td>
+  <td>${grant.AskAmount || "0.00"}</td>
+  <td>${grant.AmountAwarded || "0.00"}</td>
   <td>{grant.FundingRestrictions || "None"}</td>
   <td>{formatDate(grant.EndOfGrantReportDueDate) || "N/A"}</td>
   <td>{formatDate(grant.DueDate) || "N/A"}</td>

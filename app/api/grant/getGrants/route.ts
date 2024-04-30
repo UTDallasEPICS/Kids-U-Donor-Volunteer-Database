@@ -13,7 +13,7 @@ export async function GET(Request: Request): Promise<Response> {
     const data = await prisma.Grant.findMany(); 
     // Send the retrieved data as a response
 
-    return Response.json(data);
+    return Response.json(data); 
   } catch (error) {
     // Handle errors
     console.error('Error fetching data:', error);
