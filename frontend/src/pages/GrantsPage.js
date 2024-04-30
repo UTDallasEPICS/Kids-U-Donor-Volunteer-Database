@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import MainSidebar from '../components/MainSidebar';
 import './GrantsPage.css';
+import formatDate from '../utils/dateUtils';
  
 const GrantsPage = () => {
   const [grants, setGrants] = useState([]); // State to store grants data
@@ -96,9 +97,9 @@ const GrantsTable = ({ grants }) => (
   <td>${grant.AskAmount ? grant.AskAmount?.toFixed(2) : "0.00"}</td>
   <td>${grant.AmountAwarded ? grant.AwardedAmount?.toFixed(2) : "0.00"}</td>
   <td>{grant.FundingRestrictions || "None"}</td>
-  <td>{grant.EndOfGrantReportDueDate || "N/A"}</td>
-  <td>{grant.DueDate || "N/A"}</td>
-  <td>{grant.AwardDate || "Not Awarded Yet"}</td>
+  <td>{formatDate(grant.EndOfGrantReportDueDate) || "N/A"}</td>
+  <td>{formatDate(grant.DueDate) || "N/A"}</td>
+  <td>{formatDate(grant.AwardDate) || "Not Awarded Yet"}</td>
   </tr>
           ))}
   </tbody>
