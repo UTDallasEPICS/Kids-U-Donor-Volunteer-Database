@@ -48,6 +48,7 @@ For backend
 For frontend
 - Open a new terminal
 - Run `cd frontend`
+- Run `npm install` and `npm install react dom` again
 - Run `npm start`
 - When prompted to run the app on another port, answer yes
 - Open http://localhost:3001 with your browser to see the result
