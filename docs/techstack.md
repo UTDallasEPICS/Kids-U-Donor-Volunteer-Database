@@ -39,6 +39,7 @@ Our frontend mostly consists of HTML, CSS, JavaScript.
 - [Javacript Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 
 Why Javacript instead of Typescript?
+
 Our frontend team decided using Javascript would be easier, while our backend team decided to use Typescript.
 
 ## Axios

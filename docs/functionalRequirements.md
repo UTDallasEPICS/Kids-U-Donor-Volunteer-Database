@@ -110,7 +110,7 @@ Since these are to be implemented in the future, the requirements will be a bit 
 * Allow reports to be scheduled when to send in advance 
 * Keep track of current campaigns and fundraising 
 * Admins need to be able to add new campaigns 
-  *Includes information such as campaign name, start and end dates, and goal amount 
+  * Includes information such as campaign name, start and end dates, and goal amount 
 * Campaign information shall be editable 
 
 #### Database 

@@ -23,5 +23,5 @@ Currently, we do not have any third party integrations.
 Currently, we do not have any migration scripts.
 
 ## Figma
-Currently, there are no figma files since Kids-U gave us their desired UI design for the current portion of the project.
+Currently, there are no figma files since Kids-U gave us their desired UI design for the grants portion of the project.
 
