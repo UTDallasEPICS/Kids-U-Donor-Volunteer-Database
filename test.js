@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var client_1 = require("@prisma/client");
 var prisma = new client_1.PrismaClient();
+// Make sure to empty database before using.
 function main() {
     return __awaiter(this, void 0, void 0, function () {
         var createManyGrants;
@@ -82,13 +83,13 @@ function main() {
                             { GrantName: "Mock Grant Three",
                                 FundingAreas: ["Education"],
                                 KidsUProgram: ["After School Tutoring"],
-                                FundingRestrictions: "None",
+                                FundingRestrictions: "A mock restriction",
                                 ContactType: "John Smith",
                                 GrantOpeningDates: [new Date("2000-08-12"), new Date("2001-05-01"), new Date("2023-06-01")],
                                 EndOfGrantReportDueDate: new Date("2007-09-23"),
                                 GrantDueDate: new Date("2008-02-17"),
                                 AskDate: new Date("2001-08-15"),
-                                AwardDate: null,
+                                AwardDate: new Date("2001-06-01"),
                                 ReportingDates: [new Date("2004-04-01"), new Date("2005-10-15")],
                                 TypeOfReporting: "Yearly",
                                 DateToReapplyForGrant: new Date("2009-12-01"),
@@ -105,19 +106,19 @@ function main() {
                                 EndOfGrantReportDueDate: new Date("2040-12-20"),
                                 GrantDueDate: new Date("2040-12-21"),
                                 AskDate: new Date("2031-07-16"),
-                                AwardDate: null,
+                                AwardDate: new Date("2031-10-24"),
                                 ReportingDates: [new Date("2035-04-15"), new Date("2037-11-15")],
                                 TypeOfReporting: "Biannually",
                                 DateToReapplyForGrant: new Date("2045-07-25"),
                                 WaitingPeriodToReapply: 3,
                                 AskAmount: 30000.00,
                                 AwardStatus: "Accepted",
-                                AmountAwarded: 15000.00, },
+                                AmountAwarded: 15000.00 },
                             { GrantName: "Mock Grant Five",
                                 FundingAreas: ["Education"],
                                 KidsUProgram: ["Marketing Video"],
                                 FundingRestrictions: "None",
-                                ContactType: "Email Grant",
+                                ContactType: "Company Website",
                                 GrantOpeningDates: [new Date("2026-05-01"), new Date("2027-06-01"), new Date("2028-07-01")],
                                 EndOfGrantReportDueDate: new Date("2028-04-31"),
                                 GrantDueDate: new Date("2029-05-05"),
@@ -146,7 +147,24 @@ function main() {
                                 WaitingPeriodToReapply: 5,
                                 AskAmount: 18000.00,
                                 AwardStatus: "Declined",
-                                AmountAwarded: 0.00, }
+                                AmountAwarded: 0.00, },
+                            { GrantName: "Mock Grant Seven",
+                                FundingAreas: ["Education"],
+                                KidsUProgram: ["After School Tutoring"],
+                                FundingRestrictions: "Another mock restriction",
+                                ContactType: "Jane Doe",
+                                GrantOpeningDates: [new Date("2008-04-16"), new Date("2009-06-18"), new Date("2010-08-20")],
+                                EndOfGrantReportDueDate: new Date("2012-12-24"),
+                                GrantDueDate: new Date("2014-02-14"),
+                                AskDate: new Date("2008-09-05"),
+                                AwardDate: new Date("2009-08-16"),
+                                ReportingDates: [new Date("2009-05-05"), new Date("2010-06-06")],
+                                TypeOfReporting: "Biannually",
+                                DateToReapplyForGrant: new Date("2015-09-23"),
+                                WaitingPeriodToReapply: 2,
+                                AskAmount: 13500.00,
+                                AwardStatus: "Awarded",
+                                AmountAwarded: 10000.00, }
                         ]
                     })];
                 case 1:
