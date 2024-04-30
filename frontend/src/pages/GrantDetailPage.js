@@ -7,8 +7,8 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import './GrantDetailPage.css';
 import MainSidebar from '../components/MainSidebar';
-import mockGrantData from './mockGrantData'; // delete later
 import axios from 'axios';
+import formatDate from '../utils/dateUtils';
 
 const GrantDetailPage = () => {
   const { id } = useParams();
@@ -53,12 +53,29 @@ const GrantDetailPage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setGrantDetails(prevGrantDetails => ({
-      ...prevGrantDetails,
-      [name]: value,
-    }));
+    setGrantDetails(prevGrantDetails => {
+      if (Array.isArray(prevGrantDetails[name])) {
+        // If the field is an array (e.g., Grant Opening Dates), split the value by comma
+        return {
+          ...prevGrantDetails,
+          [name]: value.split(',').map(date => new Date(date.trim()).toISOString()) // Convert Date objects to ISO 8601 strings
+        };
+      } else if (value instanceof Date) {
+        // If the value is a Date object, convert it to an ISO 8601 string
+        return {
+          ...prevGrantDetails,
+          [name]: value.toISOString()
+        };
+      } else {
+        // If the field is not an array and not a Date object, directly update the value
+        return {
+          ...prevGrantDetails,
+          [name]: value
+        };
+      }
+    });
   };
-
+  
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -171,15 +188,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
   // Calculate the width for each column
   const columnWidth = `${100 / columnsPerRow}%`;
 
-  // Parses date to MM/DD/YYYY format
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A"; // Check if dateString is null
-    const date = new Date(dateString);
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear().toString();
-    return `${month}/${day}/${year}`;
-  };
+
 
   return (
     <div className="gDetails-table-container">
