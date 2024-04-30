@@ -3,24 +3,27 @@
 ## This semester (Spring 2024)
 
 ### Grants Module 
-Grants List Page
+#### Grants List Page
+* Tracks and records all grants
+* Lists information for each grant including organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates, etc.
+#### Grants Individual Page
+* Tracks information for each grant as mentioned above.
+* Admins need to be able to manually edit and update grant information.
 
-Grants 
+### Database
+* Stores information related to donors and donations 
+  * Includes donor’s name, amount donated, type of donation, date, and the campaign or event associated with the donation 
+* Stores information related to organizations and representatives
+  * Includes organization's name, their representatives (name, contact details), website link, and location
+* Stores information related to grants 
+  * Includes the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates.
+* Stores information related to constituents 
+  * Includes personal information (names, addresses, contact details) 
+* Stores information related to volunteers and events
+  * Includes their name, age, address, email, emergency contact, agreement to media use and background check, and status regarding their training
 
-
-
-
-
-
-
-* Tracks and records all grants 
-  * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
-* Tracks budget and expenses for each grant 
-* Admins need to be able to manually edit and update grant information 
-* Admins need to be able to upload attachments and notes related to grants 
-* Admins shall be able to assign tasks for specific grants 
-
-## For the rest of the project
+## Future (the rest of the project)
+Since these are to be implemented in the future, the requirements will be a bit broader (not listed by page but by modules)
 
 General Administrative Dashboard  
 * Administrators need to be able create an account 
@@ -29,7 +32,7 @@ General Administrative Dashboard
 * Creates a task list designed to help notify administration of new information that needs attention 
   * Can also set up reminders to get in touch with donors  
   * Can assign tasks to yourself or other users  
-  * If any outstanding tasks exist, those will show up until marked as complete. 
+  * If any outstanding tasks exist, those will show up until marked as complete 
 
 Donations Module 
 * Tracks and keeps a record of all online donations 
@@ -40,22 +43,23 @@ Donations Module
 * Admins need to be able to upload attachments and notes related to donations 
 
 Grants Module 
-* Tracks and records all grants 
-  * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
 * Tracks budget and expenses for each grant 
-* Admins need to be able to manually edit and update grant information 
 * Admins need to be able to upload attachments and notes related to grants 
 * Admins shall be able to assign tasks for specific grants 
 
 Constituents Module 
-* Tracks and keeps a record of all constituents  
+* Tracks and keeps a record of all constituents (donors, volunteers)  
 * Creates a profile page for all constituents 
-  * Includes personal and business information (names, addresses, contact details, organization affiliated with, etc.)  
-  * Includes information regarding their donations and pledges 
+  * Includes personal and business information (names, addresses, contact details)  
+  * Includes information regarding their donations
   * Includes information related to volunteer work (trainings, certifications) 
-* Admins need be able to add information to constituents’ profile 
-* Admins need be able to edit and update information in constituents’ profile 
-* Admins need to be able to search through the record of constituents 
+* Tracks all organizations
+* Creates a page for each organization
+  * Includes representatives and personal information (name, contact details)
+  * Includes organization's name, location, and website link
+* Admins need be able to add information
+* Admins need be able to edit and update information
+* Admins need to be able to search through the record of constituents and organizations
 
 Volunteers Module 
 * Event Registration 
@@ -110,18 +114,5 @@ Email Templates, Campaigns, and Marketing
 * Campaign information shall be editable 
 
 Database 
-* Stores information related to donations 
-  * Includes donor’s name, amount donated, type of donation, date, and the campaign or event associated with the donation 
-* Stores information related to grants 
-  * Includes the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
-* Stores information related to pledges 
-  * Includes constituent name, pledge date, pledge amount, associated campaign, fund type (generic desired use), event, payment type, pledge status, and additional details 
-* Stores information related to constituents 
-  * Includes personal information (names, addresses, contact details, relationships) 
-  * Includes business information regarding employment (organization name, affiliation) 
-  * Includes information related to donations and pledges  
-  * Includes information related to volunteer work (trainings, certifications) 
-* Stores information related to volunteers 
-  * Includes their name, age, address, email, emergency contact, agreement to media use and background check, and status regarding their training (if necessary). 
-* Admins need to be able to backup the database 
-* Admins need to be able to import data from spreadsheets and export data onto spreadsheets 
+* Admins need to be able to backup the database
+* Admins need to be able to import data from Excel spreadsheets
