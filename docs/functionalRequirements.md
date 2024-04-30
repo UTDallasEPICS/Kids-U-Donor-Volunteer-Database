@@ -3,6 +3,16 @@
 ## This semester (Spring 2024)
 
 ### Grants Module 
+Grants List Page
+
+Grants 
+
+
+
+
+
+
+
 * Tracks and records all grants 
   * Includes grant information regarding the organization’s name, grant name, status of the grant, amount requested, amount received, start date, and due dates 
 * Tracks budget and expenses for each grant 

@@ -33,7 +33,7 @@
 ## 4. Setting up Prisma
 - In VSCode, create a new .env file at the project repository root
 - Copy the text from the .env.example file and paste into the .env file
-- Change the `PASSWORD` and `NAME` variables to your account password and your database name
+- Change the `PASSWORD` and `NAME` to your account password and your database name
 - In the VSCode terminal (open with `Terminal > New Terminal` if necessary), run `npm install -g prisma`
 - Restart your computer
 - Then, in the VSCode terminal, run `npx prisma generate` to initialize the database 
@@ -43,12 +43,12 @@
 - Run `npm install react dom`
 
 For backend
-- Run `npm run build`
-- Run `npm start`
+- Run `npm run dev`
 
 For frontend
 - Open a new terminal
 - Run `cd frontend`
+- Run `npm install` and `npm install react dom` again
 - Run `npm start`
 - When prompted to run the app on another port, answer yes
 - Open http://localhost:3001 with your browser to see the result
