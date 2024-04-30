@@ -25,7 +25,7 @@
 ## Future (the rest of the project)
 Since these are to be implemented in the future, the requirements will be a bit broader (not listed by page but by modules)
 
-General Administrative Dashboard  
+#### General Administrative Dashboard  
 * Administrators need to be able create an account 
 * Administrators need to be able to log in to access the dashboard 
 * After an administrator logs in, they shall be able to view several dashboards throughout the system that automatically provides visual graphics of the stored data 
@@ -34,7 +34,7 @@ General Administrative Dashboard
   * Can assign tasks to yourself or other users  
   * If any outstanding tasks exist, those will show up until marked as complete 
 
-Donations Module 
+#### Donations Module 
 * Tracks and keeps a record of all online donations 
 * Allows offline donations to be manually logged 
   * Admins need to be able to log the donor’s name, the amount, the type of donation, date, and the campaign or event associated with it 
@@ -42,12 +42,12 @@ Donations Module
 * Admins need to be able to edit information in donation records 
 * Admins need to be able to upload attachments and notes related to donations 
 
-Grants Module 
+#### Grants Module 
 * Tracks budget and expenses for each grant 
 * Admins need to be able to upload attachments and notes related to grants 
 * Admins shall be able to assign tasks for specific grants 
 
-Constituents Module 
+#### Constituents Module 
 * Tracks and keeps a record of all constituents (donors, volunteers)  
 * Creates a profile page for all constituents 
   * Includes personal and business information (names, addresses, contact details)  
@@ -61,21 +61,21 @@ Constituents Module
 * Admins need be able to edit and update information
 * Admins need to be able to search through the record of constituents and organizations
 
-Volunteers Module 
+#### Volunteers Module 
 * Event Registration 
   * Single time or reoccurring 
-  * Sign up type (Individual, Group, Group Member) 
-  * Customizable Volunteer data registration pages, includes Name, Email, Address, Emergency contact, Agreement to media use/background check, Training completion, age 
+  * Sign up type (individual, group, group member) 
+  * Customizable volunteer data registration pages, includes name, email, address, emergency contact, agreement to media use/background check, Training completion, age 
   * Includes a custom volunteer waiver  
 * Volunteer registration pages 
   * A calendar view so volunteers can see all upcoming opportunities 
-  * Form pages to collect information listed above. 
+  * Form pages to collect information listed above
 * Volunteer attendance 
   * Generates QR codes/links that can be used on site to confirm attendance 
   * Check in page that allows volunteers to tell their name and have it recorded 
   * Manually log attendance hours/people 
 
-Events Module 
+#### Events Module 
 * Keeps track of any events  
 * Allow users to add new events 
   * Includes information such as the event name, type, start date and time, end date and time, RSVP date, location, event status, general event description, and contact details 
@@ -92,7 +92,7 @@ Events Module
   * Include contact information for each guest 
 * Allow users to add notes about the events 
 
-Reports Module 
+#### Reports Module 
 * Dynamic reports 
   * Allow reports to be fully customizable where criteria can be handpicked for the end results desired 
   * Reports created will be saved  
@@ -102,10 +102,10 @@ Reports Module
 * Allow users to pull reports for other forms 
 * Reports shall be able to be exported into Excel, PDF, or mailing list form 
 
-Email Templates, Campaigns, and Marketing 
+#### Email Templates, Campaigns, and Marketing 
 * Admins need to be able to send documents to constituents  
 * Admins need to be able to send out acknowledgement emails or letters to donors 
-* Custom email templates tied to certain events that can be triggered to send based on certain *events, such as volunteer registration or a scheduled date before the event 
+* Custom email templates tied to certain events that can be triggered to send based on certain events, such as volunteer registration or a scheduled date before the event 
 * Emails shall be able to have variables that can change based on the event or volunteer 
 * Allow reports to be scheduled when to send in advance 
 * Keep track of current campaigns and fundraising 
@@ -113,6 +113,6 @@ Email Templates, Campaigns, and Marketing
   *Includes information such as campaign name, start and end dates, and goal amount 
 * Campaign information shall be editable 
 
-Database 
+#### Database 
 * Admins need to be able to backup the database
 * Admins need to be able to import data from Excel spreadsheets
