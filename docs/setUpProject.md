@@ -47,6 +47,9 @@
 - Run `npm install` and `npm install react dom` again
 
 #### After everything is installed
+For the database
+- Run `prisma migrate dev` (if you have not ran it yet)
+
 For backend
 - Make sure you're at the root of the project, not in `\frontend`
 - Run `npm run dev`
