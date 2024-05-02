@@ -16,6 +16,10 @@ PostgreSQL serves as our underlying database engine for storing and managing dat
 Prisma is database Object Relational Mapper (ORM) used to connect our web application to the PostgresSQL database.
 - [Prisma Documentation](https://www.prisma.io/docs)
 - You can run `prisma studio` in the VSCode terminal to visualize the current data in the database.
+- If you have an issue with Prisma, you might have forgotten to run `prisma migrate dev`
+    - If running this causes an error, there is likely conflicting migrations
+    - To resolve this issue, clear the migrations in the `\prisma\migrations` folder 
+    - Try `prisma migrate dev` again
 
 ## Docker
 Follow the installation procedures below to setup Docker:
