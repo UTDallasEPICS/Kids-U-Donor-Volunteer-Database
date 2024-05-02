@@ -170,9 +170,9 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
     { label: 'Date to Reapply to Grant', name: 'DateToReapplyForGrant', isDate: true },
     { label: 'Waiting Period to Reapply', name: 'WaitingPeriodToReapply' },
     { label: 'Grant Period', name: 'GrantPeriod', join: true, joinDash: true, isDate: true },
-    { label: 'Ask Amount', name: 'AskAmount' },
+    { label: 'Ask Amount', name: 'AskAmount', isDollar: true },
     { label: 'Award Status', name: 'AwardStatus' },
-    { label: 'Amount Awarded', name: 'AmountAwarded' },
+    { label: 'Amount Awarded', name: 'AmountAwarded', isDollar: true },
     { label: 'Representative', name: 'Representative', join: true },
   ];
 
@@ -220,6 +220,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
                         )
                       ) : (
                         field.isDate ? formatDate(grantDetails[field.name]) : grantDetails[field.name]
+                        
                       )}
                     </div>
                   )}
