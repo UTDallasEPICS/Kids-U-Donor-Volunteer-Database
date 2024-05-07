@@ -55,10 +55,16 @@ const GrantDetailPage = () => {
     const { name, value } = e.target;
     setGrantDetails(prevGrantDetails => {
       if (Array.isArray(prevGrantDetails[name])) {
-        // If the field is an array (e.g., Grant Opening Dates), split the value by comma
+        // If the field is an array, split the value by comma
+        const values = value.split(',');
+        // Check if each item can be parsed as a Date object
+        const updatedValues = values.map(item => {
+          const date = new Date(item.trim());
+          return isNaN(date.getTime()) ? item.trim() : date.toISOString(); // If it's not a valid date, keep it as string
+        });
         return {
           ...prevGrantDetails,
-          [name]: value.split(',').map(date => new Date(date.trim()).toISOString()) // Convert Date objects to ISO 8601 strings
+          [name]: updatedValues
         };
       } else if (value instanceof Date) {
         // If the value is a Date object, convert it to an ISO 8601 string
@@ -67,7 +73,7 @@ const GrantDetailPage = () => {
           [name]: value.toISOString()
         };
       } else {
-        // If the field is not an array and not a Date object, directly update the value
+        // For other cases, directly update the value
         return {
           ...prevGrantDetails,
           [name]: value
