@@ -118,7 +118,8 @@ Since these are to be implemented in the future, the requirements will be a bit 
 * Admins need to be able to import data from Excel spreadsheets
 
 
-Functional Requirements:
+
+
 
 **Project Structure/Files**
 
