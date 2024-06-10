@@ -14,7 +14,7 @@
     "@types/node": "20.6.5",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
-    "axios": "^1.6.8",
+    "axios": "^1.7.2",
     "cors": "^2.8.5",
     "dom": "^0.0.3",
     "eslint": "8.50.0",
