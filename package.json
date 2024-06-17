@@ -18,7 +18,7 @@
     "cors": "^2.8.5",
     "dom": "^0.0.3",
     "eslint": "8.50.0",
-    "eslint-config-next": "13.5.2",
+    "eslint-config-next": "14.2.4",
     "express": "^4.19.2",
     "next": "14.0.3",
     "react": "^18.2.0",
