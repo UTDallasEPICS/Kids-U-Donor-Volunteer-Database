@@ -10,12 +10,11 @@ import Link from 'next/link';
 export default function Home() {
   return (
     <div>
-      <Link href= './pages/GrantsPage'>
+      <Link href= './GrantsPage'>
         <a>Go to Grants Page</a>
       </Link>
     </div>
   )
 }
-
 
 
