@@ -1,8 +1,8 @@
 // src/pages/GrantsPage.js
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom';
 import axios from 'axios';
-import MainSidebar from '../components/MainSidebar';
+import MainSidebar from '../sidebar/page';
 import './GrantsPage.css';
 import formatDate from '../utils/dateUtils';
  
