@@ -7,14 +7,15 @@ import Link from 'next/link';
 // import GrantsPage from './pages/GrantsPage'; // Import the GrantsPage component
 // import GrantDetailPage from './pages/GrantDetailPage';  // Import the GrantDetailPage component
 
-export default function Home() {
+const home = () => {
   return (
     <div>
       <Link href= './GrantsPage'>
-        <a>Go to Grants Page</a>
+        Go to Grants Page
       </Link>
     </div>
   )
 }
 
 
+export default home
