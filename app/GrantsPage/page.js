@@ -1,10 +1,11 @@
 // src/pages/GrantsPage.js
+'use client'
 import React, { useState, useEffect } from 'react';
 // import { Link } from 'react-router-dom';
 import axios from 'axios';
 import MainSidebar from '../sidebar/page';
-import './GrantsPage.css';
-import formatDate from '../utils/dateUtils';
+
+import styles from "./page.module.css";
  
 const GrantsPage = () => {
   const [grants, setGrants] = useState([]); // State to store grants data
@@ -26,10 +27,10 @@ const GrantsPage = () => {
   }, []); // Dependency array left empty to run only once on component mount
  
   return (
-<div className="grants-page">
+<div className={styles.grantsPage}>
 <MainSidebar />
 <GrantsSidebar />
-<div className="grants-content">
+<div className={styles.grantsContent}>
 <Breadcrumb />
 <Header />
 <SearchBar />
@@ -40,16 +41,16 @@ const GrantsPage = () => {
 };
  
 const GrantsSidebar = () => (
-<div className="grants-sidebar">
+<div className={styles.grantsSidebar}>
 <ul>
-<li className="active">Grants List</li>
+<li className={styles.active}>Grants List</li>
 <li>Add a New Grant</li>
 </ul>
 </div>
 );
  
 const Breadcrumb = () => (
-<div className="breadcrumb">
+<div className={styles.breadcrumb}>
     Home - Grants
 </div>
 );
@@ -57,14 +58,14 @@ const Breadcrumb = () => (
 const Header = () => (
 <div className="header">
 <h1>Grants</h1>
-<div className="header-buttons">
+<div className={styles.headerButtons}>
 <button>Add A New Grant</button>
 </div>
 </div>
 );
  
 const SearchBar = () => (
-<div className="search-bar">
+<div className={styles.searchBar}>
 <input type="text" placeholder="Quick Search" />
 <button>Go</button>
 <button>Advanced</button>
@@ -73,8 +74,8 @@ const SearchBar = () => (
 
 //This table dynamically creates rows with each grant
 const GrantsTable = ({ grants }) => (
-  <div className="grants-table-container">
-  <table className="grants-table">
+  <div className={styles.grantsTableContainer}>
+  <table className={styles.grantsTable}>
   <thead>
   <tr>
   <th>Organization</th>
@@ -99,9 +100,9 @@ const GrantsTable = ({ grants }) => (
   <td>${grant.AskAmount || "0.00"}</td>
   <td>${grant.AmountAwarded || "0.00"}</td>
   <td>{grant.FundingRestrictions || "None"}</td>
-  <td>{formatDate(grant.EndOfGrantReportDueDate) || "N/A"}</td>
-  <td>{formatDate(grant.DueDate) || "N/A"}</td>
-  <td>{formatDate(grant.AwardDate) || "Not Awarded Yet"}</td>
+  <td>{grant.EndOfGrantReportDueDate?.toLocalString() || "N/A"}</td>
+  <td>{grant.DueDate?.toLocaleString() || "N/A"} </td>
+  <td>{grant.AwardDate?.toLocalString() || "Not Awarded Yet"}</td>
   </tr>
           ))}
   </tbody>

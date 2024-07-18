@@ -1,11 +1,13 @@
 // src/pages/GrantDetailsPage.js
 //Grant Details Page
-
+'use client'
 import React from 'react';
 import { useEffect, useState } from 'react';
 // import { useParams } from 'react-router-dom';
 // import { Link } from 'react-router-dom';
-import './GrantDetailPage.css';
+
+import styles from "./page.module.css";
+
 import MainSidebar from '../sidebar/page';
 import axios from 'axios';
 import formatDate from '../utils/dateUtils';
@@ -91,10 +93,10 @@ const GrantDetailPage = () => {
   }
 
   return (
-    <div className="grants-page">
+    <div className={styles.grantsPage}>
       <MainSidebar />
       <GrantDetailsSidebar grantName={grantDetails.GrantName} />
-      <div className="grants-content">
+      <div className={styles.grantsContent}>
         <Breadcrumb />
         <Header
           handleEditClick={handleEditClick}
@@ -113,9 +115,9 @@ const GrantDetailPage = () => {
 };
 
 const GrantDetailsSidebar = ({ grantName }) => (
-  <div className="grant-details-sidebar">
+  <div className={styles.grantsDetailsSidebar}>
     <ul>
-      <li className="active">{grantName}</li>
+      <li className={styles.active}>{grantName}</li>
       <li><Link to="/">Grants List</Link></li>
       <li>Grants Budget</li>
       <li>Grant Expenses</li>
@@ -129,15 +131,15 @@ const GrantDetailsSidebar = ({ grantName }) => (
 );
 
 const Breadcrumb = () => (
-  <div className="breadcrumb">
+  <div className={styles.breadCrumb}>
     Home - Grants
   </div>
 );
 
 const Header = ({ handleEditClick, isEditing, handleSaveClick }) => (
-  <div className="header">
+  <div className={styles.header}>
     <h1>Grants</h1>
-    <div className="header-buttons">
+    <div className={styles.headerButtons}>
       {isEditing ? (
         <>
           <button onClick={handleSaveClick}>Save</button>
@@ -151,7 +153,7 @@ const Header = ({ handleEditClick, isEditing, handleSaveClick }) => (
 );
 
 const SearchBar = () => (
-  <div className="search-bar">
+  <div className={styles.searchBar}>
     <input type="text" placeholder="Quick Search" />
     <button>Go</button>
     <button>Advanced</button>
@@ -197,14 +199,14 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
 
 
   return (
-    <div className="gDetails-table-container">
-      <table className="gDetails-table">
+    <div className={styles.gDetailsTableContainer}>
+      <table className={styles.gDetailsTable}>
         <tbody>
           {fieldRows.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((field, columnIndex) => (
                 <td key={columnIndex} style={{ width: columnWidth }}>
-                  <div className="label">{field.label}</div>
+                  <div className={styles.label}>{field.label}</div>
                   {isEditing ? (
                     <input
                       type="text"
@@ -213,7 +215,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
                       onChange={handleInputChange}
                     />
                   ) : (
-                    <div className="text-box">
+                    <div className={styles.textBox}>
                       {Array.isArray(grantDetails[field.name]) ? (
                         field.join ? (
                           field.joinDash ? (
