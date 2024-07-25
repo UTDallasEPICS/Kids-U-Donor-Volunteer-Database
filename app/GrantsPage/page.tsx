@@ -4,6 +4,10 @@ import React, { useState, useEffect } from 'react';
 // import { Link } from 'react-router-dom';
 import axios from 'axios';
 import MainSidebar from '../sidebar/page';
+import type {Grant} from "@/prisma";
+import Link from 'next/link';
+
+
 
 import styles from "./page.module.css";
  
@@ -73,7 +77,7 @@ const SearchBar = () => (
 );
 
 //This table dynamically creates rows with each grant
-const GrantsTable = ({ grants }) => (
+const GrantsTable = ({ grants }:{grants:Grant[]}) => (
   <div className={styles.grantsTableContainer}>
   <table className={styles.grantsTable}>
   <thead>

@@ -3,14 +3,12 @@
 'use client'
 import React from 'react';
 import { useEffect, useState } from 'react';
-// import { useParams } from 'react-router-dom';
-// import { Link } from 'react-router-dom';
-
-import styles from "./page.module.css";
-
-import MainSidebar from '../sidebar/page';
 import axios from 'axios';
 import formatDate from '../utils/dateUtils';
+
+
+import styles from "./page.module.css";
+import MainSidebar from '../sidebar/page';
 
 const GrantDetailPage = () => {
   const { id } = useParams();
