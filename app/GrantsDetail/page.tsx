@@ -1,4 +1,3 @@
-// src/pages/GrantDetailsPage.js
 //Grant Details Page
 'use client'
 import React from 'react';

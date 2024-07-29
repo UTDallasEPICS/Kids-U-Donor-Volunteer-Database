@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MainSidebar = ({ children }) => {
+const MainSidebar = ({ children: any }:) => {
   return (
     <div className= "main-sidebar">
       <ul>
@@ -9,7 +9,7 @@ const MainSidebar = ({ children }) => {
         <li>Donations</li>
         {/* other main navigation items */}
       </ul>
-      {children} {/* Render children components */}
+      {any} {/* Render children components */}
     </div>
   );
 };
