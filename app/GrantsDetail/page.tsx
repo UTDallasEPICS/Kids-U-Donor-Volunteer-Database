@@ -3,11 +3,13 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useParams, Link } from 'react-router-dom';
 import formatDate from '../utils/dateUtils';
 
-
-import styles from "./page.module.css";
+// import styles from "./page.module.css";
 import MainSidebar from '../sidebar/page';
+
+
 
 const GrantDetailPage = () => {
   const { id } = useParams();
@@ -90,10 +92,10 @@ const GrantDetailPage = () => {
   }
 
   return (
-    <div className={styles.grantsPage}>
+    <div className="flex font-sans">
       <MainSidebar />
       <GrantDetailsSidebar grantName={grantDetails.GrantName} />
-      <div className={styles.grantsContent}>
+      <div className="flex-grow p-5">
         <Breadcrumb />
         <Header
           handleEditClick={handleEditClick}
@@ -112,9 +114,9 @@ const GrantDetailPage = () => {
 };
 
 const GrantDetailsSidebar = ({ grantName }) => (
-  <div className={styles.grantsDetailsSidebar}>
+  <div className="min-h-screen p-5 w-52 bg-gray-200 border-l border-gray-300 text-left">
     <ul>
-      <li className={styles.active}>{grantName}</li>
+      <li className="bg-gray-300 border-l-4 border-blue-500">{grantName}</li>
       <li><Link to="/">Grants List</Link></li>
       <li>Grants Budget</li>
       <li>Grant Expenses</li>
@@ -128,32 +130,32 @@ const GrantDetailsSidebar = ({ grantName }) => (
 );
 
 const Breadcrumb = () => (
-  <div className={styles.breadCrumb}>
+  <div className="mb-5">
     Home - Grants
   </div>
 );
 
 const Header = ({ handleEditClick, isEditing, handleSaveClick }) => (
-  <div className={styles.header}>
+  <div className="flex justify-between items-center mb-5">
     <h1>Grants</h1>
     <div className={styles.headerButtons}>
       {isEditing ? (
         <>
-          <button onClick={handleSaveClick}>Save</button>
-          <button onClick={handleEditClick}>Cancel Edit</button>
+          <button onClick={handleSaveClick} className="p-2 ml-2" >Save</button>
+          <button onClick={handleEditClick} className="p-2 ml-2" >Cancel Edit</button>
         </>
       ) : (
-        <button onClick={handleEditClick}>Edit Grant Details</button>
+        <button onClick={handleEditClick} className="p-2 ml-2" >Edit Grant Details</button>
       )}
     </div>
   </div>
 );
 
 const SearchBar = () => (
-  <div className={styles.searchBar}>
-    <input type="text" placeholder="Quick Search" />
-    <button>Go</button>
-    <button>Advanced</button>
+  <div className="flex mb-5">
+    <input type="text" placeholder="Quick Search" className="p-2 mr-2"/>
+    <button className="p-2">Go</button>
+    <button className="p-2 ml-2">Advanced</button>
   </div>
 );
 
@@ -196,14 +198,14 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
 
 
   return (
-    <div className={styles.gDetailsTableContainer}>
-      <table className={styles.gDetailsTable}>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse mb-5">
         <tbody>
           {fieldRows.map((row, rowIndex) => (
             <tr key={rowIndex}>
               {row.map((field, columnIndex) => (
                 <td key={columnIndex} style={{ width: columnWidth }}>
-                  <div className={styles.label}>{field.label}</div>
+                  <div className="font-bold mb-1 text-left">{field.label}</div>
                   {isEditing ? (
                     <input
                       type="text"
@@ -212,7 +214,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
                       onChange={handleInputChange}
                     />
                   ) : (
-                    <div className={styles.textBox}>
+                    <div className="p-2 bg-gray-100">
                       {Array.isArray(grantDetails[field.name]) ? (
                         field.join ? (
                           field.joinDash ? (

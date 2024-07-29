@@ -1,6 +1,6 @@
 import React from 'react';
 
-const MainSidebar = ({ children: any }:) => {
+const MainSidebar = ({ children: any }) => {
   return (
     <div className= "main-sidebar">
       <ul>
