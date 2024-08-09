@@ -3,8 +3,8 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
-import formatDate from '../utils/dateUtils';
+
+
 
 // import styles from "./page.module.css";
 import MainSidebar from '../sidebar/page';
@@ -13,7 +13,7 @@ import MainSidebar from '../sidebar/page';
 
 const GrantDetailPage = () => {
   const { id } = useParams();
-  const [grantDetails, setGrantDetails] = useState(null);
+  const [grantDetails, setGrantDetails] = useState<any>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -52,14 +52,14 @@ const GrantDetailPage = () => {
     }
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: any) => {
     const { name, value } = e.target;
-    setGrantDetails(prevGrantDetails => {
+    setGrantDetails((prevGrantDetails: any) => {
       if (Array.isArray(prevGrantDetails[name])) {
         // If the field is an array, split the value by comma
         const values = value.split(',');
         // Check if each item can be parsed as a Date object
-        const updatedValues = values.map(item => {
+        const updatedValues = values.map((item: any) => {
           const date = new Date(item.trim());
           return isNaN(date.getTime()) ? item.trim() : date.toISOString(); // If it's not a valid date, keep it as string
         });
@@ -113,7 +113,7 @@ const GrantDetailPage = () => {
   );  
 };
 
-const GrantDetailsSidebar = ({ grantName }) => (
+const GrantDetailsSidebar = ({ grantName }: any) => (
   <div className="min-h-screen p-5 w-52 bg-gray-200 border-l border-gray-300 text-left">
     <ul>
       <li className="bg-gray-300 border-l-4 border-blue-500">{grantName}</li>
@@ -135,10 +135,10 @@ const Breadcrumb = () => (
   </div>
 );
 
-const Header = ({ handleEditClick, isEditing, handleSaveClick }) => (
+const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
   <div className="flex justify-between items-center mb-5">
     <h1>Grants</h1>
-    <div className={styles.headerButtons}>
+    <div className="flex justify-between items-center mb-5">
       {isEditing ? (
         <>
           <button onClick={handleSaveClick} className="p-2 ml-2" >Save</button>
@@ -161,7 +161,7 @@ const SearchBar = () => (
 
 
 
-const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
+const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
   const fields = [
     { label: 'Grant Name', name: 'GrantName', join: false },
     { label: 'Organization', name: 'Organization', join: false },
@@ -218,15 +218,15 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }) => {
                       {Array.isArray(grantDetails[field.name]) ? (
                         field.join ? (
                           field.joinDash ? (
-                            grantDetails[field.name].map(date => field.isDate ? formatDate(date) : date).join(' - ')
+                            grantDetails[field.name].map((date: any) => field.isDate ? new Date(date).toLocaleString() : date).join(' - ')
                           ) : (
-                            grantDetails[field.name].map(value => field.isDate ? formatDate(value) : value).join(', ')
+                            grantDetails[field.name].map((value: any) => field.isDate ? new Date(value).toLocaleString() : value).join(', ')
                           )
                         ) : (
-                          grantDetails[field.name].map(value => field.isDate ? formatDate(value) : value).join(', ')
+                          grantDetails[field.name].map((value: any) => field.isDate ? new Date(value).toLocaleString() : value).join(', ')
                         )
                       ) : (
-                        field.isDate ? formatDate(grantDetails[field.name]) : grantDetails[field.name]
+                        field.isDate ? new Date((grantDetails[field.name])).toLocaleString() : grantDetails[field.name]
                         
                       )}
                     </div>

@@ -75,11 +75,11 @@ model Organization {
 
 model Representative{
 
-  RepresentativeID          String         @id @default(uuid())
-  RepresentativeFirstName   String
-  RepresentativeLastName    String
-  RepresentativeEmail       String      @unique
-  RepresentativePhone       String?     @unique
+  ID                        String         @id @default(uuid())
+  FirstName                 String
+  LastName                  String
+  Email                     String      @unique
+  Phone                     String?     @unique
   PositionInCompany         String
   Grants                    Grant[]
   OrganizationID            String
@@ -91,7 +91,7 @@ model Grant {
   GrantID                 String          @id @default(uuid())
   GrantName               String       @unique
   AwardStatus             String
-  GrantDueDate            DateTime
+  DueDate                 DateTime
   ContactType             String
   FundingAreas            String[]
   KidsUProgram            String[]
