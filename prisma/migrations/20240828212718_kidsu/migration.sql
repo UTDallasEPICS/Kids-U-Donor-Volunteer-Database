@@ -72,15 +72,15 @@ CREATE TABLE "Organization" (
 
 -- CreateTable
 CREATE TABLE "Representative" (
-    "RepresentativeID" TEXT NOT NULL,
-    "RepresentativeFirstName" TEXT NOT NULL,
-    "RepresentativeLastName" TEXT NOT NULL,
-    "RepresentativeEmail" TEXT NOT NULL,
-    "RepresentativePhone" TEXT,
+    "ID" TEXT NOT NULL,
+    "FirstName" TEXT NOT NULL,
+    "LastName" TEXT NOT NULL,
+    "Email" TEXT NOT NULL,
+    "Phone" TEXT,
     "PositionInCompany" TEXT NOT NULL,
     "OrganizationID" TEXT NOT NULL,
 
-    CONSTRAINT "Representative_pkey" PRIMARY KEY ("RepresentativeID")
+    CONSTRAINT "Representative_pkey" PRIMARY KEY ("ID")
 );
 
 -- CreateTable
@@ -89,8 +89,8 @@ CREATE TABLE "Grant" (
     "GrantName" TEXT NOT NULL,
     "AwardStatus" TEXT NOT NULL,
     "GrantDueDate" TIMESTAMP(3) NOT NULL,
+    "DueDate" TIMESTAMP(3) NOT NULL,
     "ContactType" TEXT NOT NULL,
-    "Years" INTEGER,
     "FundingAreas" TEXT[],
     "KidsUProgram" TEXT[],
     "GrantOpeningDates" TIMESTAMP(3)[],
@@ -146,10 +146,10 @@ CREATE UNIQUE INDEX "Constituent_PhoneNumber_key" ON "Constituent"("PhoneNumber"
 CREATE UNIQUE INDEX "Organization_OrganizationName_key" ON "Organization"("OrganizationName");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Representative_RepresentativeEmail_key" ON "Representative"("RepresentativeEmail");
+CREATE UNIQUE INDEX "Representative_Email_key" ON "Representative"("Email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Representative_RepresentativePhone_key" ON "Representative"("RepresentativePhone");
+CREATE UNIQUE INDEX "Representative_Phone_key" ON "Representative"("Phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Grant_GrantName_key" ON "Grant"("GrantName");
@@ -182,4 +182,4 @@ ALTER TABLE "VolunteerEvent" ADD CONSTRAINT "VolunteerEvent_VolunteerID_fkey" FO
 ALTER TABLE "_GrantToRepresentative" ADD CONSTRAINT "_GrantToRepresentative_A_fkey" FOREIGN KEY ("A") REFERENCES "Grant"("GrantID") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_GrantToRepresentative" ADD CONSTRAINT "_GrantToRepresentative_B_fkey" FOREIGN KEY ("B") REFERENCES "Representative"("RepresentativeID") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "_GrantToRepresentative" ADD CONSTRAINT "_GrantToRepresentative_B_fkey" FOREIGN KEY ("B") REFERENCES "Representative"("ID") ON DELETE CASCADE ON UPDATE CASCADE;

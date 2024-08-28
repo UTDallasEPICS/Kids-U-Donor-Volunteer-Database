@@ -9,18 +9,19 @@
 # https://github.com/docker/awesome-compose
 services:
   db:
+    container_name: kidsu-db
     image: postgres
     restart: always
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      POSTGRES_DB: kidsu
+      POSTGRES_USER: kidsu
+      POSTGRES_PASSWORD: kidsu
     ports:
-      - '11111:5432'
+      - '5432:5432'
     volumes:
-      - kidsu-db:/var/lib/postgresql/data
+      - kidsu-postgres-volume:/var/lib/postgresql/data
 volumes:
-  kidsu-db:
-    driver: local
+  kidsu-postgres-volume:
 
 # The commented out section below is an example of how to define a PostgreSQL
 # database that your application can use. `depends_on` tells Docker Compose to
