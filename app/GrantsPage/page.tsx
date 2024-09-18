@@ -45,11 +45,11 @@ const GrantsPage = () => {
 };
  
 const GrantsSidebar = () => (
-<div className="w-52 bg-gray-200 border-l border-gray-300 min-h-screen p-5">
+<div className="w-30 bg-gray-200 border-l border-gray-300 min-h-screen p-2">
 <ul className="list-none p-0 m-0">
-<li className="p-4 mb-1 cursor-pointer text-sm text-gray-800 active:bg-gray-300 active:border-l-4 active:border-blue-500">
+<li className="p-4 mb-1 cursor-pointer text-sm text-gray-800 border-l-4 border-transparent active:bg-gray-300 active:border-blue-500">
   Grants List</li>
-<li className="p-4 mb-1 cursor-pointer text-sm text-gray-800">
+  <li className="p-4 mb-1 cursor-pointer text-sm text-gray-800 border-l-4 border-transparent active:bg-gray-300 active:border-blue-500">
   Add a New Grant</li>
 </ul>
 </div>
@@ -67,7 +67,7 @@ const Header = () => (
 <div className="flex justify-between items-center mb-5">
 <h1 className="text-2xl font-bold text-gray-800">Grants</h1>
 <div className="px-4 py-2 ml-2">
-<button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">Add A New Grant</button>
+{/* <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">Add A New Grant</button> */}
 </div>
 </div>
 );
@@ -109,9 +109,15 @@ const GrantsTable = ({ grants }:{grants:Grant[]}) => (
   <td className="border border-gray-300 p-2">${grant.AskAmount || "0.00"}</td>
   <td className="border border-gray-300 p-2">${grant.AmountAwarded || "0.00"}</td>
   <td className="border border-gray-300 p-2">{grant.FundingRestrictions || "None"}</td>
-  <td className="border border-gray-300 p-2">{grant.EndOfGrantReportDueDate?.toLocaleString() || "N/A"}</td>
-  <td className="border border-gray-300 p-2">{grant.DueDate?.toLocaleString() || "N/A"} </td>
-  <td className="border border-gray-300 p-2">{grant.AwardDate?.toLocaleString() || "Not Awarded Yet"}</td>
+  <td className="border border-gray-300 p-2">
+    {grant.EndOfGrantReportDueDate ? new Date(grant.EndOfGrantReportDueDate).toLocaleDateString() : "N/A"}
+  </td>
+  <td className="border border-gray-300 p-2">
+    {grant.DueDate ? new Date(grant.DueDate).toLocaleDateString() : "N/A"}
+  </td>
+  <td className="border border-gray-300 p-2">
+    {grant.AwardDate ? new Date(grant.AwardDate).toLocaleDateString() : "Not Awarded Yet"}
+  </td>
   </tr>
           ))}
   </tbody>
