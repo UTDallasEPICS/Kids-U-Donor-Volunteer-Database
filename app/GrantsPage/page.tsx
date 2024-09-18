@@ -141,13 +141,21 @@ export default function GrantsPage() {
                   {grant.FundingRestrictions || 'None'}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {grant.EndOfGrantReportDueDate?.toLocaleString() || 'N/A'}
+                  {grant.EndOfGrantReportDueDate
+                    ? new Date(
+                        grant.EndOfGrantReportDueDate
+                      ).toLocaleDateString()
+                    : 'N/A'}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {grant.GrantDueDate?.toLocaleString() || 'N/A'}{' '}
+                  {grant.DueDate
+                    ? new Date(grant.DueDate).toLocaleDateString()
+                    : 'N/A'}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {grant.AwardDate?.toLocaleString() || 'Not Awarded Yet'}
+                  {grant.AwardDate
+                    ? new Date(grant.AwardDate).toLocaleDateString()
+                    : 'Not Awarded Yet'}
                 </td>
               </tr>
             ))}
