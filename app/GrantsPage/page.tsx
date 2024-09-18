@@ -33,7 +33,7 @@ const GrantsPage = () => {
   return (
 <div className={"flex font-sans"}>
 <MainSidebar />
-<GrantsSidebar />
+
 <div className="flex-grow p-5">
 <Breadcrumb />
 <Header />
@@ -44,16 +44,7 @@ const GrantsPage = () => {
   );
 };
  
-const GrantsSidebar = () => (
-<div className="w-52 bg-gray-200 border-l border-gray-300 min-h-screen p-5">
-<ul className="list-none p-0 m-0">
-<li className="p-4 mb-1 cursor-pointer text-sm text-gray-800 active:bg-gray-300 active:border-l-4 active:border-blue-500">
-  Grants List</li>
-<li className="p-4 mb-1 cursor-pointer text-sm text-gray-800">
-  Add a New Grant</li>
-</ul>
-</div>
-);
+
  
 const Breadcrumb = () => (
 <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
