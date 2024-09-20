@@ -1,12 +1,8 @@
-// src/pages/GrantsPage.js
-'use client';
-import React, { useState, useEffect } from 'react';
-// import { Link } from 'react-router-dom';
-import MainSidebar from '../sidebar/page';
-import type { Grant } from '@/prisma';
-import Link from 'next/link';
-
-// import styles from "./page.module.css";
+"use client";
+import React, { useState, useEffect } from "react";
+import type { Grant } from "@/prisma";
+import Link from "next/link";
+import { SecondarySideBar } from "../components/SecondarySideBar";
 
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
@@ -17,11 +13,11 @@ export default function GrantsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch('/api/grants/');
+      const response = await fetch("/api/grants/");
       const result = await response.json();
       setGrantsData(result.data);
     } catch (error) {
-      console.error('Error fetching grants:', error);
+      console.error("Error fetching grants:", error);
     }
   };
 
@@ -108,41 +104,41 @@ export default function GrantsPage() {
                 <td className="border border-gray-300 p-2">
                   {grant.Representative
                     ? grant.Representative[0].FirstName
-                    : 'N/A'}
+                    : "N/A"}
                 </td>
-                <td className="border border-gray-300 p-2">
-                  <Link href={`/grant/${grant.GrantID}`}>
+                <td className="border border-gray-300 p-2 text-blue-500">
+                  <Link href={`/Grants/Detail/${grant.GrantID}`}>
                     {grant.GrantName}
                   </Link>
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {grant.AwardStatus || 'Pending'}
+                  {grant.AwardStatus || "Pending"}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  ${grant.AskAmount || '0.00'}
+                  ${grant.AskAmount || "0.00"}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  ${grant.AmountAwarded || '0.00'}
+                  ${grant.AmountAwarded || "0.00"}
                 </td>
                 <td className="border border-gray-300 p-2">
-                  {grant.FundingRestrictions || 'None'}
+                  {grant.FundingRestrictions || "None"}
                 </td>
                 <td className="border border-gray-300 p-2">
                   {grant.EndOfGrantReportDueDate
                     ? new Date(
                         grant.EndOfGrantReportDueDate
                       ).toLocaleDateString()
-                    : 'N/A'}
+                    : "N/A"}
                 </td>
                 <td className="border border-gray-300 p-2">
                   {grant.GrantDueDate
                     ? new Date(grant.GrantDueDate).toLocaleDateString()
-                    : 'N/A'}
+                    : "N/A"}
                 </td>
                 <td className="border border-gray-300 p-2">
                   {grant.AwardDate
                     ? new Date(grant.AwardDate).toLocaleDateString()
-                    : 'Not Awarded Yet'}
+                    : "Not Awarded Yet"}
                 </td>
               </tr>
             ))}
@@ -153,8 +149,7 @@ export default function GrantsPage() {
   };
 
   return (
-    <div className={'flex font-sans'}>
-      <MainSidebar />
+    <div className={"flex font-sans"}>
       <div className="flex-grow p-5">
         <Breadcrumb />
         <Header />

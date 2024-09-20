@@ -89,7 +89,6 @@ CREATE TABLE "Grant" (
     "GrantName" TEXT NOT NULL,
     "AwardStatus" TEXT NOT NULL,
     "GrantDueDate" TIMESTAMP(3) NOT NULL,
-    "DueDate" TIMESTAMP(3) NOT NULL,
     "ContactType" TEXT NOT NULL,
     "FundingAreas" TEXT[],
     "KidsUProgram" TEXT[],

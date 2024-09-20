@@ -1,15 +1,8 @@
-//Grant Details Page
-'use client'
-import React from 'react';
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-
-
-
-// import styles from "./page.module.css";
-import MainSidebar from '../sidebar/page';
-
-
+"use client";
+import React from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { useParams } from "next/navigation";
 
 const GrantDetailPage = () => {
   const { id } = useParams();
@@ -20,11 +13,11 @@ const GrantDetailPage = () => {
   useEffect(() => {
     const fetchGrantDetails = async () => {
       try {
-        const response = await axios.get(`/api/grant/getGrant?id=${id}`);
+        const response = await axios.get(`/api/grants/${id}`);
         setGrantDetails(response.data);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching grant details:', error);
+        console.error("Error fetching grant details:", error);
         setLoading(false);
       }
     };
@@ -35,19 +28,19 @@ const GrantDetailPage = () => {
   }, [id]);
 
   const handleEditClick = () => {
-    setIsEditing(prevState => !prevState);
+    setIsEditing((prevState) => !prevState);
   };
 
   const handleSaveClick = async () => {
     console.log("Save button clicked"); // Add this line
     try {
       const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
-        updatedData: grantDetails
+        updatedData: grantDetails,
       });
       console.log("Updated grant details:", response.data);
       setIsEditing(false);
     } catch (error) {
-      console.error('Error updating grant details:', error);
+      console.error("Error updating grant details:", error);
       // Handle error
     }
   };
@@ -57,7 +50,7 @@ const GrantDetailPage = () => {
     setGrantDetails((prevGrantDetails: any) => {
       if (Array.isArray(prevGrantDetails[name])) {
         // If the field is an array, split the value by comma
-        const values = value.split(',');
+        const values = value.split(",");
         // Check if each item can be parsed as a Date object
         const updatedValues = values.map((item: any) => {
           const date = new Date(item.trim());
@@ -65,24 +58,24 @@ const GrantDetailPage = () => {
         });
         return {
           ...prevGrantDetails,
-          [name]: updatedValues
+          [name]: updatedValues,
         };
       } else if (value instanceof Date) {
         // If the value is a Date object, convert it to an ISO 8601 string
         return {
           ...prevGrantDetails,
-          [name]: value.toISOString()
+          [name]: value.toISOString(),
         };
       } else {
         // For other cases, directly update the value
         return {
           ...prevGrantDetails,
-          [name]: value
+          [name]: value,
         };
       }
     });
   };
-  
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -93,8 +86,6 @@ const GrantDetailPage = () => {
 
   return (
     <div className="flex font-sans">
-      <MainSidebar />
-      <GrantDetailsSidebar grantName={grantDetails.GrantName} />
       <div className="flex-grow p-5">
         <Breadcrumb />
         <Header
@@ -104,36 +95,16 @@ const GrantDetailPage = () => {
         />
         <SearchBar />
         <DetailsTable
-          grantDetails={grantDetails} 
+          grantDetails={grantDetails}
           isEditing={isEditing}
           handleInputChange={handleInputChange}
         />
       </div>
     </div>
-  );  
+  );
 };
 
-const GrantDetailsSidebar = ({ grantName }: any) => (
-  <div className="min-h-screen p-5 w-52 bg-gray-200 border-l border-gray-300 text-left">
-    <ul>
-      <li className="bg-gray-300 border-l-4 border-blue-500">{grantName}</li>
-      <li><Link to="/">Grants List</Link></li>
-      <li>Grants Budget</li>
-      <li>Grant Expenses</li>
-      <li>Grant Notes</li>
-      <li>Add a New Task</li>
-      <li>Add a New Budget</li>
-      <li>Add a New Expense</li>
-      <li>Add a New Notes</li>
-    </ul>
-  </div>
-);
-
-const Breadcrumb = () => (
-  <div className="mb-5">
-    Home - Grants
-  </div>
-);
+const Breadcrumb = () => <div className="mb-5">Home - Grants</div>;
 
 const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
   <div className="flex justify-between items-center mb-5">
@@ -141,11 +112,17 @@ const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
     <div className="flex justify-between items-center mb-5">
       {isEditing ? (
         <>
-          <button onClick={handleSaveClick} className="p-2 ml-2" >Save</button>
-          <button onClick={handleEditClick} className="p-2 ml-2" >Cancel Edit</button>
+          <button onClick={handleSaveClick} className="p-2 ml-2">
+            Save
+          </button>
+          <button onClick={handleEditClick} className="p-2 ml-2">
+            Cancel Edit
+          </button>
         </>
       ) : (
-        <button onClick={handleEditClick} className="p-2 ml-2" >Edit Grant Details</button>
+        <button onClick={handleEditClick} className="p-2 ml-2">
+          Edit Grant Details
+        </button>
       )}
     </div>
   </div>
@@ -153,34 +130,56 @@ const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
 
 const SearchBar = () => (
   <div className="flex mb-5">
-    <input type="text" placeholder="Quick Search" className="p-2 mr-2"/>
+    <input type="text" placeholder="Quick Search" className="p-2 mr-2" />
     <button className="p-2">Go</button>
     <button className="p-2 ml-2">Advanced</button>
   </div>
 );
 
-
-
 const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
   const fields = [
-    { label: 'Grant Name', name: 'GrantName', join: false },
-    { label: 'Organization', name: 'Organization', join: false },
-    { label: 'Funding Area', name: 'FundingAreas', join: true },
-    { label: 'KidsU Program', name: 'KidsUProgram', join: true },
-    { label: 'Contact Type', name: 'ContactType', join: true },
-    { label: 'Funding Restrictions', name: 'FundingRestrictions' },
-    { label: 'Grant Opening Dates', name: 'GrantOpeningDates', join: true , isDate: true},
-    { label: 'End of Grant Report Due Date', name: 'EndOfGrantReportDueDate', isDate: true },
-    { label: 'Ask Date', name: 'AskDate', isDate: true },
-    { label: 'Award Date', name: 'AwardDate', isDate: true },
-    { label: 'Reporting Dates', name: 'ReportingDates', join: true, isDate:true },
-    { label: 'Date to Reapply to Grant', name: 'DateToReapplyForGrant', isDate: true },
-    { label: 'Waiting Period to Reapply', name: 'WaitingPeriodToReapply' },
-    { label: 'Grant Period', name: 'GrantPeriod', join: true, joinDash: true, isDate: true },
-    { label: 'Ask Amount', name: 'AskAmount', isDollar: true },
-    { label: 'Award Status', name: 'AwardStatus' },
-    { label: 'Amount Awarded', name: 'AmountAwarded', isDollar: true },
-    { label: 'Representative', name: 'Representative', join: true },
+    { label: "Grant Name", name: "GrantName", join: false },
+    { label: "Organization", name: "Organization", join: false },
+    { label: "Funding Area", name: "FundingAreas", join: true },
+    { label: "KidsU Program", name: "KidsUProgram", join: true },
+    { label: "Contact Type", name: "ContactType", join: true },
+    { label: "Funding Restrictions", name: "FundingRestrictions" },
+    {
+      label: "Grant Opening Dates",
+      name: "GrantOpeningDates",
+      join: true,
+      isDate: true,
+    },
+    {
+      label: "End of Grant Report Due Date",
+      name: "EndOfGrantReportDueDate",
+      isDate: true,
+    },
+    { label: "Ask Date", name: "AskDate", isDate: true },
+    { label: "Award Date", name: "AwardDate", isDate: true },
+    {
+      label: "Reporting Dates",
+      name: "ReportingDates",
+      join: true,
+      isDate: true,
+    },
+    {
+      label: "Date to Reapply to Grant",
+      name: "DateToReapplyForGrant",
+      isDate: true,
+    },
+    { label: "Waiting Period to Reapply", name: "WaitingPeriodToReapply" },
+    {
+      label: "Grant Period",
+      name: "GrantPeriod",
+      join: true,
+      joinDash: true,
+      isDate: true,
+    },
+    { label: "Ask Amount", name: "AskAmount", isDollar: true },
+    { label: "Award Status", name: "AwardStatus" },
+    { label: "Amount Awarded", name: "AmountAwarded", isDollar: true },
+    { label: "Representative", name: "Representative", join: true },
   ];
 
   // Define the number of columns in each row
@@ -194,8 +193,6 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
 
   // Calculate the width for each column
   const columnWidth = `${100 / columnsPerRow}%`;
-
-
 
   return (
     <div className="overflow-x-auto">
@@ -215,20 +212,33 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
                     />
                   ) : (
                     <div className="p-2 bg-gray-100">
-                      {Array.isArray(grantDetails[field.name]) ? (
-                        field.join ? (
-                          field.joinDash ? (
-                            grantDetails[field.name].map((date: any) => field.isDate ? new Date(date).toLocaleString() : date).join(' - ')
-                          ) : (
-                            grantDetails[field.name].map((value: any) => field.isDate ? new Date(value).toLocaleString() : value).join(', ')
-                          )
-                        ) : (
-                          grantDetails[field.name].map((value: any) => field.isDate ? new Date(value).toLocaleString() : value).join(', ')
-                        )
-                      ) : (
-                        field.isDate ? new Date((grantDetails[field.name])).toLocaleString() : grantDetails[field.name]
-                        
-                      )}
+                      {Array.isArray(grantDetails[field.name])
+                        ? field.join
+                          ? field.joinDash
+                            ? grantDetails[field.name]
+                                .map((date: any) =>
+                                  field.isDate
+                                    ? new Date(date).toLocaleString()
+                                    : date
+                                )
+                                .join(" - ")
+                            : grantDetails[field.name]
+                                .map((value: any) =>
+                                  field.isDate
+                                    ? new Date(value).toLocaleString()
+                                    : value
+                                )
+                                .join(", ")
+                          : grantDetails[field.name]
+                              .map((value: any) =>
+                                field.isDate
+                                  ? new Date(value).toLocaleString()
+                                  : value
+                              )
+                              .join(", ")
+                        : field.isDate
+                          ? new Date(grantDetails[field.name]).toLocaleString()
+                          : grantDetails[field.name]}
                     </div>
                   )}
                 </td>
@@ -240,8 +250,5 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
     </div>
   );
 };
-
-
-
 
 export default GrantDetailPage;
