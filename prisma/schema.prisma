@@ -19,7 +19,7 @@ model Constituent {
   EmailAddress      String         @unique
   PhoneNumber       String?        @unique
   AreaCode          String?
-  Donors            Donor[]
+  //Donors            Donor[]
   Volunteers        Volunteer[]
 }
 
@@ -36,26 +36,6 @@ model Volunteer {
   ConstituentID       String
   Constituent         Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
   VolunteerEvents     VolunteerEvent[]
-}
-
-model Donor {
-  DonorID           String      @id @default(uuid())
-  ContactPreference String?
-  NotesResources    String?
-  ConstituentID     String
-  Donations         Donation[]
-  Constituent       Constituent @relation(fields: [ConstituentID], references: [ConstituentID])
-}
-
-model Donation {
-  DonationID    String    @id @default(uuid())
-  AmountDonated Float
-  DateReceived  DateTime
-  FundingAreas  String[]
-  KidsUPrograms String[]
-  DueDate       DateTime?
-  DonorID       String
-  Donor         Donor     @relation(fields: [DonorID], references: [DonorID])
 }
 
 model Organization {
@@ -128,3 +108,36 @@ model VolunteerEvent {
   Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
 }
 
+// Donation Related
+model Donor {
+  id String @id @default(uuid())   
+  name String
+  type String
+  address Address?
+  phone String
+  email String
+  donation Donation?
+}
+
+model Address {
+  id String @id @default(uuid())
+  street String
+  city String
+  state String
+  zipCode String
+  donorId String @unique
+  donor Donor @relation(fields: [donorId], references: [id])
+}
+
+model Donation {
+  id String  @id @default(uuid())
+  type String
+  amount Float?
+  item String?
+  itemValue Float?
+  paymentMethod String?
+  campaign String
+  date DateTime
+  donorId String @unique
+  donor Donor @relation(fields: [donorId], references: [id])
+}
