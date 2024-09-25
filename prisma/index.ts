@@ -4,11 +4,11 @@ import {
   Event as PEvent,
   VolunteerEvent as PVolunteerEvent,
   Organization as POrganization,
-  Donation as PDonation,
   Volunteer as PVolunteer,
   Constituent as PConstituent,
-  Donor as PDonor,
-} from '@prisma/client';
+} from "@prisma/client";
+
+import { Donor, Address, Donation } from "@prisma/client";
 
 export type Grant = PGrant & {
   Representative: Representative[];
@@ -32,10 +32,6 @@ export type Organization = POrganization & {
   Representatives: Representative[];
 };
 
-export type Donation = PDonation & {
-  Donor: Donor;
-};
-
 export type Volunteer = PVolunteer & {
   Constituent: Constituent;
   VolunteerEvents: VolunteerEvent[];
@@ -44,9 +40,4 @@ export type Volunteer = PVolunteer & {
 export type Constituent = PConstituent & {
   Donors: Donor[];
   Volunteers: Volunteer[];
-};
-
-export type Donor = PDonor & {
-  Constituent: Constituent;
-  Donations: Donation[];
 };
