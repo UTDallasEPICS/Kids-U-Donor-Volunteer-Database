@@ -13,7 +13,7 @@ export default function GrantsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch("/api/grants/");
+      const response = await fetch("/api/Volunteer/");
       const result = await response.json();
       setGrantsData(result.data);
     } catch (error) {

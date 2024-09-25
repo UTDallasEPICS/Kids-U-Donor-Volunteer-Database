@@ -10,8 +10,9 @@ export default function GrantsLayout({
     <div className="flex">
       <SecondarySideBar
         items={[
-          { name: "Grants List", reference: "/Grants" },
-          { name: "Add a Grant", reference: "/Grants/Add" },
+          { name: "Check-In / Out", reference: "/Volunteer/Checkinout" },
+          { name: "Mail", reference: "/Volunteer/Mail" },
+          { name: "Registration", reference: "/Volunteer/Registration" }
         ]}
       />
       <div className="flex-grow">{children}</div>
