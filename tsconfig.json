@@ -22,6 +22,17 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/home/page.js", "app/utils/test.js", "app/pages/home.js", "app/utils/getOrganization.js", "frontend/src/pages/ApiTestPage.js", "app/GrantsDetail/page.tsx"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "app/home/page.js",
+    "app/utils/test.js",
+    "app/pages/home.js",
+    "app/utils/getOrganization.js",
+    "frontend/src/pages/ApiTestPage.js",
+    "app/Grants/Detail/[id]/page.tsx"
+  ],
   "exclude": ["node_modules"]
 }

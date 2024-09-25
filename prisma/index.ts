@@ -1,55 +1,52 @@
-import { 
-    Grant as PGrant, 
-    Representative as PRepresentative,
-    Event as PEvent,
-    VolunteerEvent as PVolunteerEvent,
-    Organization as POrganization,
-    Donation as PDonation, 
-    Volunteer as PVolunteer, 
-    Constituent as PConstituent,
-    Donor as PDonor
+import {
+  Grant as PGrant,
+  Representative as PRepresentative,
+  Event as PEvent,
+  VolunteerEvent as PVolunteerEvent,
+  Organization as POrganization,
+  Donation as PDonation,
+  Volunteer as PVolunteer,
+  Constituent as PConstituent,
+  Donor as PDonor,
+} from '@prisma/client';
 
+export type Grant = PGrant & {
+  Representative: Representative[];
+};
 
-} from "@prisma/client";
+export type Representative = PRepresentative & {
+  Organization: Organization;
+  Grants: Grant[];
+};
 
-export type Grant = PGrant& {
-    Representative: Representative[]
-}
+export type Event = PEvent & {
+  VolunteersAtteneded: VolunteerEvent[];
+};
 
-export type Representative = PRepresentative& {
-    Organization: Organization, 
-    Grants: Grant[]
-}
+export type VolunteerEvent = PVolunteerEvent & {
+  Event: Event;
+  Volunteer: Volunteer;
+};
 
-export type Event = PEvent& {
-    VolunteersAtteneded: VolunteerEvent[]
-}
+export type Organization = POrganization & {
+  Representatives: Representative[];
+};
 
-export type VolunteerEvent = PVolunteerEvent&{
-    Event: Event, 
-    Volunteer: Volunteer
-}
+export type Donation = PDonation & {
+  Donor: Donor;
+};
 
-export type Organization = POrganization&{
-    Representatives: Representative[]
-}
+export type Volunteer = PVolunteer & {
+  Constituent: Constituent;
+  VolunteerEvents: VolunteerEvent[];
+};
 
-export type Donation = PDonation&{
-    Donor: Donor
-}
+export type Constituent = PConstituent & {
+  Donors: Donor[];
+  Volunteers: Volunteer[];
+};
 
-export type Volunteer = PVolunteer&{
-    Constituent: Constituent,
-    VolunteerEvents: VolunteerEvent[]
-}
-
-export type Constituent = PConstituent&{
-    Donors: Donor[],
-    Volunteers: Volunteer[]
-}
-
-export type Donor = PDonor&{
-    Constituent: Constituent,
-    Donations: Donation[]
-}
-
+export type Donor = PDonor & {
+  Constituent: Constituent;
+  Donations: Donation[];
+};

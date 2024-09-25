@@ -1,21 +1,7 @@
-'use client' 
-//import { useState } from 'react';
-import React from 'react';
-import Link from 'next/link';
-
-// import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Import BrowserRouter, Route, and Routes
-// import GrantsPage from './pages/GrantsPage'; // Import the GrantsPage component
-// import GrantDetailPage from './pages/GrantDetailPage';  // Import the GrantDetailPage component
-
-const home = () => {
+export default function Home() {
   return (
-    <div>
-      <Link href= './GrantsPage'>
-        Go to Grants Page
-      </Link>
+    <div className="flex justify-between items-center mb-5">
+      <h1 className="text-xl">Dashboard/Home Page</h1>
     </div>
-  )
+  );
 }
-
-
-export default home

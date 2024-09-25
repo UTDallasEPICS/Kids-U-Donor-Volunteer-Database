@@ -91,7 +91,7 @@ model Grant {
   GrantID                 String          @id @default(uuid())
   GrantName               String       @unique
   AwardStatus             String
-  DueDate                 DateTime
+  GrantDueDate                 DateTime
   ContactType             String
   FundingAreas            String[]
   KidsUProgram            String[]
