@@ -65,7 +65,7 @@ model Representative{
   OrganizationID            String
   Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
 }
-
+// make it all lowercase unless it's a direct relation
 model Grant {
 
   GrantID                 String          @id @default(uuid())
