@@ -15,23 +15,7 @@ model Person {
   phoneNumber    String?         @unique
   donor          Donor?
   representative Representative?
-  volunteer      Volunteer?
   address        Address?
-}
-
-model Volunteer {
-  id                        String           @id @default(uuid())
-  dateOfBirth               DateTime
-  age                       Int
-  emergencyContact          String?
-  eventsAttended            String
-  agreementToMediaUse       Boolean?
-  trainingCompletion        String?
-  backgroundCheckCompletion Boolean?
-  isOverEighteen            Boolean?
-  personId                  String           @unique
-  person                    Person           @relation(fields: [personId], references: [id])
-  volunteerEvent            VolunteerEvent[]
 }
 
 model Grantor {
@@ -108,10 +92,6 @@ model Grant {
   GrantExpense        GrantExpense[]
 }
 
-model GrantReport {
-  id String @id @default(uuid())
-}
-
 model GrantExpense {
   id      String @id @default(uuid())
   grantId String
@@ -126,25 +106,6 @@ model RepresentativeGrant {
   representative   Representative @relation(fields: [representativeId], references: [id])
 
   @@id([grantId, representativeId])
-}
-
-model Event {
-  id                 String           @id @default(uuid())
-  nameOfEvent        String
-  date               DateTime
-  time               DateTime
-  volunteersAttended VolunteerEvent[]
-}
-
-model VolunteerEvent {
-  id          String    @id @default(uuid())
-  volunteerId String
-  eventId     String
-  loginTime   DateTime
-  logoutTime  DateTime
-  loggedHours Int
-  event       Event     @relation(fields: [eventId], references: [id])
-  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 }
 
 // Donation Related
@@ -177,7 +138,6 @@ model Donation {
   type               String
   amount             Float?
   item               String?
-  itemValue          Float?
   paymentMethod      String?
   campaign           String
   date               DateTime
