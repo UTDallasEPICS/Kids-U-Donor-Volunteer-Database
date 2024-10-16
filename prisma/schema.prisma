@@ -56,8 +56,9 @@ model Grant {
   quarter                    String
   proposalSubmissionDate     DateTime
   awardNotificationDate      DateTime
+  fundingArea                String //specific area or general
   //
-  internalProposalDueDate    DateTime
+  internalProposalDueDate    DateTime?
   proposalDueDate            DateTime
   proposalSummary            String
   applicationType            String
@@ -66,7 +67,7 @@ model Grant {
   //
   fundingRestriction         String?
   matchingRequirement        String?
-  useArea                    String
+  useArea                    String //specific area or general
   //
   finalReportDueDate         String
   programImpact              String
@@ -89,14 +90,30 @@ model Grant {
   reportReviewDate           DateTime
 
   representativeGrant RepresentativeGrant[]
-  GrantExpense        GrantExpense[]
+  grantExpense        GrantExpense[]
+  grantPurpose        GrantPurpose[]
+}
+
+model GrantPayment {
+  id      String   @id @default(uuid())
+  grantId String
+  amount  Float
+  date    DateTime
+}
+
+model GrantPurpose {
+  id      String @id @default(uuid())
+  grantId String
+  purpose String
+  grant   Grant  @relation(fields: [grantId], references: [id])
 }
 
 model GrantExpense {
-  id      String @id @default(uuid())
-  grantId String
-  amount  Float
-  grant   Grant  @relation(fields: [grantId], references: [id])
+  id          String @id @default(uuid())
+  grantId     String
+  amount      Float
+  description String
+  grant       Grant  @relation(fields: [grantId], references: [id])
 }
 
 model RepresentativeGrant {
