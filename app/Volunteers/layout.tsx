@@ -1,7 +1,7 @@
 import React from "react";
 import { SecondarySideBar } from "../components/SecondarySideBar";
 
-export default function GrantsLayout({
+export default function VolunteerLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -10,9 +10,9 @@ export default function GrantsLayout({
     <div className="flex">
       <SecondarySideBar
         items={[
-          { name: "Check-In / Out", reference: "/Volunteer/Checkinout" },
-          { name: "Mail", reference: "/Volunteer/Mail" },
-          { name: "Registration", reference: "/Volunteer/Registration" }
+          { name: "Registration", reference: "/Volunteers/Registration" },
+          { name: "Mail", reference: "/Volunteers/Mail" },
+          { name: "Check-In / Out", reference: "/Volunteers/Checkinout" },
         ]}
       />
       <div className="flex-grow">{children}</div>
