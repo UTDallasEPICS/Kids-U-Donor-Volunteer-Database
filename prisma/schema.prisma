@@ -16,6 +16,14 @@ model Person {
   donor          Donor?
   representative Representative?
   address        Address?
+  user           User?
+}
+
+model User {
+  id       String  @id @default(uuid())
+  role     String
+  personId String? @unique
+  person   Person? @relation(fields: [personId], references: [id])
 }
 
 model Grantor {
@@ -42,7 +50,6 @@ model Representative {
   representativeGrant RepresentativeGrant[]
 }
 
-//working on this still
 model Grant {
   id                         String    @id @default(uuid())
   name                       String    @unique
@@ -155,7 +162,7 @@ model Donation {
   type               String
   amount             Float?
   item               String?
-  paymentMethod      String?
+  paymentMethod      String? //expand
   campaign           String
   date               DateTime
   fundDesignation    String
