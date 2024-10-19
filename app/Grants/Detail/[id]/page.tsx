@@ -412,27 +412,4 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
   );
 };
 
-
-const GrantorDetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
-
-
-  return(
-
-  <Box sx = {{ flexGrow : '2' }}>
-            <Grid container spacing={5}>
-
-    <Grid item xs={12}>
-    <Divider sx={{ my: 2 }} />
-  </Grid>
-  </Grid>
-
-  </Box>
-
-
-
-
-  );
-};
-
-
 export default GrantDetailPage;
