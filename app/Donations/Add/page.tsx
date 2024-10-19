@@ -12,17 +12,16 @@ import {
   TableRow,
   TableCell,
   TableBody,
-  TableSortLabel,
   TablePagination,
   TableFooter,
   IconButton,
+  Select,
 } from "@mui/material";
 import * as React from 'react';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { donors, Donation } from "../../utils/donationTestData";
 
 const styles = {
@@ -41,10 +40,9 @@ const styles = {
 export default function AddDonation() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState<Donation[]>(donors); // Using your rows state
-  const [searched, setSearched] = useState<string>(""); // Search input state
+  const [rows, setRows] = useState<Donation[]>(donors);
+  const [searched, setSearched] = useState<string>("");
 
-  // Search function for filtering rows
   const requestSearch = (searchedVal: string) => {
     const filteredRows = donors.filter((row) =>
       row.donor.name.toLowerCase().includes(searchedVal.toLowerCase())
@@ -57,7 +55,6 @@ export default function AddDonation() {
     setRows(donors);
   };
 
-  // Handle pagination
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
@@ -67,18 +64,37 @@ export default function AddDonation() {
     setPage(0);
   };
 
-
   const currentRows = rows.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
   );
 
-  // Render table rows
   const renderDonationRow = (donor: Donation) => (
     <TableRow key={donor.id}>
       <TableCell style={styles.tableCell}>
+        <Button
+            sx={{ marginRight: 5 }}
+            variant="contained"
+            onClick={() => {
+                setDonorData({
+                    firstName: donor.firstName || '',
+                    lastName: donor.lastName || '',
+                    organization: donor.organization || '',
+                    email: donor.email || '',
+                    phone: donor.phone || '',
+                    address: donor.address || '',
+                    donorType: donor.donorType || '',
+                    contactMethod: donor.contactMethod || '',
+                    donorStatus: donor.donorStatus || 'Existing',
+                    notes: donor.notes || '',
+                });
+            }}
+        >
+            Select
+        </Button>
         <Link href={`/Donations/Detail/${donor.id}`} className="text-blue-500">
           {donor.donor.name.trim()}
+          {donor.donor.phone}
         </Link>
       </TableCell>
     </TableRow>
@@ -224,7 +240,7 @@ export default function AddDonation() {
         <Box sx={{ p: 5 }}>
         <Typography variant="h5" sx={{ mb: 2 }}>Donor Lookup</Typography>
   
-        {/* Search and Category Filter */}
+        {/* Search Filter */}
         <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
           <TextField
             label="Search by Donor Name"
@@ -241,11 +257,12 @@ export default function AddDonation() {
           </Button>
         </Stack>
   
-        {/* Table */}
         <Table style={styles.table}>
           <TableHead>
             <TableRow>
-              <TableCell style={styles.tableCellHeader}>Donor Name</TableCell>
+              <TableCell style={styles.tableCellHeader}>Name</TableCell>
+              <TableCell style={styles.tableCellHeader}>Phone</TableCell>
+              <TableCell style={styles.tableCellHeader}>Email</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

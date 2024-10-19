@@ -11,7 +11,9 @@ export default function DonationsLayout({
       <SecondarySideBar
         items={[
           { name: "Donations List", reference: "/Donations" },
-          { name: "Add a Donations", reference: "/Donations/Add" },
+          { name: "Donors List", reference: "/Donations/Donors" },
+          { name: "Add a Donation", reference: "/Donations/Add" },
+          { name: "Add a Donor", reference: "/Donations/Donors/Add" },
         ]}
       />
       <div className="flex-grow">{children}</div>
