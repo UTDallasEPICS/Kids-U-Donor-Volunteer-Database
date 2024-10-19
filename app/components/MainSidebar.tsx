@@ -1,23 +1,31 @@
 import React from "react";
-import Link from "next/link";
+import Box from "@mui/material/Box";
+import List from "@mui/material/List";
+import Button from '@mui/material/Button';
+
+const sidebarButtonStyle = ({
+  color:"white", 
+  width:"8rem", 
+  justifyContent: "flex-start",
+  padding: 1,
+  "&:hover": { backgroundColor: "grey.600"}
+});
 
 export default function MainSidebar() {
   return (
-    <div className="bg-gray-800 text-white w-[8rem] min-h-screen flex flex-col">
-      <ul className="flex flex-col space-y-4 p-2">
-        <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
-          <Link href="/">Dashboard</Link>
-        </li>
-        <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
-          <Link href="/Constituents">Constituents</Link>
-        </li>
-        <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
-          <Link href="/Donations">Donations</Link>
-        </li>
-        <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
-          <Link href="/Grants">Grants</Link>
-        </li>
-      </ul>
-    </div>
+    <Box sx={{backgroundColor: "grey.800", minHeight: "100vh", padding: 0}}>
+      <List sx={{ padding: 1 }}>
+        <Button sx={sidebarButtonStyle} href="/">Dashboard</Button>
+      </List>
+      <List sx={{ padding: 1 }}>
+        <Button sx={sidebarButtonStyle} href="/Constituents">Constituents</Button>
+        </List>
+      <List sx={{ padding: 1 }}>
+        <Button sx={sidebarButtonStyle} href="/Donations">Donations</Button>
+        </List>
+      <List sx={{ padding: 1 }}>
+        <Button sx={sidebarButtonStyle} href="/Grants">Grants</Button>
+        </List>
+    </Box>
   );
 }
