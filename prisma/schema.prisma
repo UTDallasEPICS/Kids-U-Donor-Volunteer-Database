@@ -140,6 +140,8 @@ model Donor {
   status                  String
   notes                   String
   personId                String     @unique
+  isRetained              Boolean
+  segment                 String?
   donation                Donation[]
   person                  Person     @relation(fields: [personId], references: [id])
 }
@@ -158,17 +160,21 @@ model Address {
 }
 
 model Donation {
-  id                 String   @id @default(uuid())
-  type               String
-  amount             Float?
-  item               String?
-  paymentMethod      String? //expand
-  campaign           String
-  date               DateTime
-  fundDesignation    String
-  recurringFrequency String?
-  source             String
-  isMatching         Boolean
-  donorId            String   @unique
-  donor              Donor    @relation(fields: [donorId], references: [id])
+  id                  String   @id @default(uuid())
+  type                String
+  amount              Float?
+  item                String?
+  paymentMethod       String? //expand
+  campaign            String
+  date                DateTime
+  fundDesignation     String
+  recurringFrequency  String?
+  source              String
+  isMatching          Boolean
+  donorId             String   @unique
+  receiptSent         Boolean
+  receiptNumber       String   @default(uuid())
+  isAnonymous         Boolean
+  acknowledgementSent Boolean
+  donor               Donor    @relation(fields: [donorId], references: [id])
 }
