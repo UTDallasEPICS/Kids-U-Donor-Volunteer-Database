@@ -3,6 +3,11 @@ import React from "react";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
+import { Box , TextField, MenuItem, Select, Divider, InputAdornment  } from "@mui/material";
+import Grid from '@mui/material/Grid2';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 const GrantDetailPage = () => {
   const { id } = useParams();
@@ -93,7 +98,7 @@ const GrantDetailPage = () => {
           handleSaveClick={handleSaveClick}
           isEditing={isEditing}
         />
-        <SearchBar />
+        {/*<SearchBar />*/}
         <DetailsTable
           grantDetails={grantDetails}
           isEditing={isEditing}
@@ -104,13 +109,14 @@ const GrantDetailPage = () => {
   );
 };
 
-const Breadcrumb = () => <div className="mb-5">Home - Grants</div>;
+const Breadcrumb = () => <div className="mb-5">Home / Grants / Grant Details</div>;
 
 const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
   <div className="flex justify-between items-center mb-5">
-    <h1>Grants</h1>
+    <h1>Grant Details</h1>
     <div className="flex justify-between items-center mb-5">
-      {isEditing ? (
+      {isEditing ? 
+      (
         <>
           <button onClick={handleSaveClick} className="p-2 ml-2">
             Save
@@ -128,127 +134,305 @@ const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
   </div>
 );
 
-const SearchBar = () => (
-  <div className="flex mb-5">
-    <input type="text" placeholder="Quick Search" className="p-2 mr-2" />
-    <button className="p-2">Go</button>
-    <button className="p-2 ml-2">Advanced</button>
-  </div>
-);
+{/*<Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+          <DatePicker
+    label="Grant Period Start"
+    onChange={(newValue: dayjs | null) =>
+      handleInputChange({
+        target: { name: "grantPeriodStart", value: newValue },
+      })
+    }
+    // Directly using TextField as input component
+    slotProps={{
+      textField: {
+        id: "grant-Period-Start-Text-Field",
+        label: "Grant Period Start",
+        variant: "outlined",
+        sx: { width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }
+      }
+    }}
+  />
+  </Grid> */}
+
+
+
+
+          
 
 const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
-  const fields = [
-    { label: "Grant Name", name: "GrantName", join: false },
-    { label: "Organization", name: "Organization", join: false },
-    { label: "Funding Area", name: "FundingAreas", join: true },
-    { label: "KidsU Program", name: "KidsUProgram", join: true },
-    { label: "Contact Type", name: "ContactType", join: true },
-    { label: "Funding Restrictions", name: "FundingRestrictions" },
+  
+  const status = [
     {
-      label: "Grant Opening Dates",
-      name: "GrantOpeningDates",
-      join: true,
-      isDate: true,
+      value: 'loiSubmittedStatus',
+      label: 'LOI Submitted',
     },
     {
-      label: "End of Grant Report Due Date",
-      name: "EndOfGrantReportDueDate",
-      isDate: true,
-    },
-    { label: "Ask Date", name: "AskDate", isDate: true },
-    { label: "Award Date", name: "AwardDate", isDate: true },
-    {
-      label: "Reporting Dates",
-      name: "ReportingDates",
-      join: true,
-      isDate: true,
+      value: 'porposalSubmittedStatus',
+      label: 'Proposal Submitted',
     },
     {
-      label: "Date to Reapply to Grant",
-      name: "DateToReapplyForGrant",
-      isDate: true,
+      value: 'awardedStatus',
+      label: 'Awarded',
     },
-    { label: "Waiting Period to Reapply", name: "WaitingPeriodToReapply" },
     {
-      label: "Grant Period",
-      name: "GrantPeriod",
-      join: true,
-      joinDash: true,
-      isDate: true,
+      value: 'declinedStatus',
+      label: 'Declined',
     },
-    { label: "Ask Amount", name: "AskAmount", isDollar: true },
-    { label: "Award Status", name: "AwardStatus" },
-    { label: "Amount Awarded", name: "AmountAwarded", isDollar: true },
-    { label: "Representative", name: "Representative", join: true },
+    {
+      value: 'pedningStatus',
+      label: 'Pending',
+    }
   ];
 
-  // Define the number of columns in each row
-  const columnsPerRow = 3;
+  const quarter = [
+    {
+      value: 'Q1Status',
+      label: '1',
+    },
+    {
+      value: 'Q2Status',
+      label: '2',
+    },
+    {
+      value: 'Q3Status',
+      label: '3',
+    },
+    {
+      value: 'Q4Status',
+      label: '4',
+    },
+  ];
 
-  // Chunk the fields array into arrays of fields based on the number of columns
-  const fieldRows = [];
-  for (let i = 0; i < fields.length; i += columnsPerRow) {
-    fieldRows.push(fields.slice(i, i + columnsPerRow));
-  }
+  const multiyear = [
+    {
+      value: 'yesMultiYear',
+      label: 'Yes',
+    },
+    {
+      value: 'noMultiYear',
+      label: 'No',
+    },
+  ];
 
-  // Calculate the width for each column
-  const columnWidth = `${100 / columnsPerRow}%`;
+  const purpose = [
+    {
+      value: 'afterSchoolPurpose',
+      label: 'After-School Tutoring Program',
+    },
+    {
+      value: 'summerPurpose',
+      label: 'Summer Program',
+    },
+    {
+      value: 'FACEpurpose',
+      label: 'Family & Community Engagement (FACE)',
+    },
+    {
+      value: 'nutritionPurpose',
+      label: 'Nutrition and Meal Programs',
+    },
+    {
+      value: 'communitySafetyPurpose',
+      label: 'Community Safety Initiatives ',
+    },
+  ]
 
+  
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full border-collapse mb-5">
-        <tbody>
-          {fieldRows.map((row, rowIndex) => (
-            <tr key={rowIndex}>
-              {row.map((field, columnIndex) => (
-                <td key={columnIndex} style={{ width: columnWidth }}>
-                  <div className="font-bold mb-1 text-left">{field.label}</div>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name={field.name}
-                      value={grantDetails[field.name]}
-                      onChange={handleInputChange}
-                    />
-                  ) : (
-                    <div className="p-2 bg-gray-100">
-                      {Array.isArray(grantDetails[field.name])
-                        ? field.join
-                          ? field.joinDash
-                            ? grantDetails[field.name]
-                                .map((date: any) =>
-                                  field.isDate
-                                    ? new Date(date).toLocaleString()
-                                    : date
-                                )
-                                .join(" - ")
-                            : grantDetails[field.name]
-                                .map((value: any) =>
-                                  field.isDate
-                                    ? new Date(value).toLocaleString()
-                                    : value
-                                )
-                                .join(", ")
-                          : grantDetails[field.name]
-                              .map((value: any) =>
-                                field.isDate
-                                  ? new Date(value).toLocaleString()
-                                  : value
-                              )
-                              .join(", ")
-                        : field.isDate
-                          ? new Date(grantDetails[field.name]).toLocaleString()
-                          : grantDetails[field.name]}
-                    </div>
-                  )}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    
+      <Box sx = {{ flexGrow : '2' }}>
+
+        <Grid container spacing={5}>
+            <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+              <TextField 
+                id="organization-Text-Field" 
+                label="Organization" 
+                variant="outlined" 
+                sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}/>
+            </Grid>
+
+        {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="grant-Name-Text-Field" 
+              label="Grant Name" 
+              variant="outlined" 
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}/>
+          </Grid>
+
+        {/*----------------------------------------------------------------*/}
+
+        <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="amount-Requested-Text-Field" 
+              label="Grant Amount Requested" 
+              variant="outlined" 
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              slotProps={{
+                input: {
+                  startAdornment: <InputAdornment position="start">$</InputAdornment>,
+                },
+              }}
+              />
+          </Grid>
+
+        {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="Status-Text-Field"
+              label="Grant Status"
+              variant = "outlined"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              select>
+                {status.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+                ))} 
+            </TextField>
+          </Grid>
+
+        {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="grant-Status-Text-Field" 
+              label="Grant Purpose" 
+              variant="outlined"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              select>
+
+              {purpose.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+                ))} 
+            </TextField>
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="grant-Period-Start-Text-Field" 
+              label="Grant Period Start" 
+              type = "date"
+              variant="outlined" 
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              defaultValue={new Date().toISOString().split('T')[0]}
+              />
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="grant-Period-End-Text-Field" 
+              label="Grant Period End " 
+              type = "date"
+              variant="outlined" 
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              defaultValue={new Date().toISOString().split('T')[0]}
+              />
+          </Grid>
+          
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="quarter-Text-Field" 
+              label="Quarter" 
+              variant="outlined"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              select>
+
+              {quarter.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+                ))} 
+            </TextField>
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="multi-Year-Text-Field" 
+              label="MultiYear" 
+              variant="outlined"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              select>
+
+              {multiyear.map((option) => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+                ))} 
+            </TextField>
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="proposal-Submission-Date-Text-Field" 
+              label="Proposal Submission Date " 
+              variant="outlined" 
+              type="date"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              defaultValue={new Date().toISOString().split('T')[0]}
+              />
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          <Grid size={{ xs: 3, sm: 3 , md: 4 }}>
+            <TextField 
+              id="award-Notification-Date-Text-Field" 
+              label="Award Notification Date" 
+              variant="outlined" 
+              type="date"
+              sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }}
+              defaultValue={new Date().toISOString().split('T')[0]}
+              />
+          </Grid>
+
+          {/*----------------------------------------------------------------*/}
+
+          
+
+
+        </Grid>
+      </Box>
+
+      
   );
 };
+
+
+const GrantorDetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
+
+
+  return(
+
+  <Box sx = {{ flexGrow : '2' }}>
+            <Grid container spacing={5}>
+
+    <Grid item xs={12}>
+    <Divider sx={{ my: 2 }} />
+  </Grid>
+  </Grid>
+
+  </Box>
+
+
+
+
+  );
+};
+
 
 export default GrantDetailPage;
