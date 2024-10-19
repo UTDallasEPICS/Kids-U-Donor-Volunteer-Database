@@ -1,9 +1,94 @@
 "use client";
+import {
+  Checkbox, 
+  Box, 
+  TextField, 
+  Stack, Button, 
+  MenuItem, 
+  InputAdornment,
+  Table,
+  Typography,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableSortLabel,
+  TablePagination,
+  TableFooter,
+  IconButton,
+} from "@mui/material";
 import * as React from 'react';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
-import { Checkbox, Box, TextField, Stack, Button, MenuItem, InputAdornment } from '@mui/material';
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { donors, Donation } from "../../utils/donationTestData";
+
+const styles = {
+  table: {
+    minWidth: 650,
+  },
+  tableCellHeader: {
+    fontWeight: "bold",
+    border: "1px solid #ccc",
+  },
+  tableCell: {
+    border: "1px solid #ccc",
+  },
+};
 
 export default function AddDonation() {
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState<Donation[]>(donors); // Using your rows state
+  const [searched, setSearched] = useState<string>(""); // Search input state
+
+  // Search function for filtering rows
+  const requestSearch = (searchedVal: string) => {
+    const filteredRows = donors.filter((row) =>
+      row.donor.name.toLowerCase().includes(searchedVal.toLowerCase())
+    );
+    setRows(filteredRows);
+  };
+
+  const cancelSearch = () => {
+    setSearched("");
+    setRows(donors);
+  };
+
+  // Handle pagination
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+
+  const currentRows = rows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  // Render table rows
+  const renderDonationRow = (donor: Donation) => (
+    <TableRow key={donor.id}>
+      <TableCell style={styles.tableCell}>
+        <Link href={`/Donations/Detail/${donor.id}`} className="text-blue-500">
+          {donor.donor.name.trim()}
+        </Link>
+      </TableCell>
+    </TableRow>
+  );
+
+
+
+
+
+
   const [donorData, setDonorData] = React.useState({
     firstName: '',
     lastName: '',
@@ -111,6 +196,101 @@ export default function AddDonation() {
       <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
       )}
 
+{donorStatus === 'Existing' && (
+        <Box sx={{ p: 5 }}>
+          <Stack
+            direction={{ xs: 'column', sm: 'row' }}
+            spacing={{ xs: 1, sm: 5 }}
+            useFlexGap
+            sx={{ flexWrap: 'wrap' }}
+          >
+            <Box sx={{ width: '250px' }}>
+              <TextField name="phone" id="phone" label="Phone Number" variant="outlined" fullWidth onChange={handleDonorChange} />
+            </Box>
+            <Box sx={{ width: '250px' }}>
+              <TextField name="firstName" id="firstName" label="First Name" variant="outlined" fullWidth onChange={handleDonorChange} />
+            </Box>
+            <Box sx={{ width: '250px' }}>
+              <TextField name="lastName" id="lastName" label="Last Name" variant="outlined" fullWidth onChange={handleDonorChange} />
+            </Box>
+            <Box sx={{ width: '250px' }}>
+              <TextField name="email" id="email" label="Email" variant="outlined" fullWidth onChange={handleDonorChange} />
+            </Box>
+          </Stack>
+        </Box>
+      )}
+
+      {donorStatus === "Existing" && (
+        <Box sx={{ p: 5 }}>
+        <Typography variant="h5" sx={{ mb: 2 }}>Donor Lookup</Typography>
+  
+        {/* Search and Category Filter */}
+        <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+          <TextField
+            label="Search by Donor Name"
+            variant="outlined"
+            value={searched}
+            onChange={(e) => {
+              setSearched(e.target.value);
+              requestSearch(e.target.value);
+            }}
+            fullWidth
+          />
+          <Button variant="outlined" onClick={cancelSearch}>
+            Clear
+          </Button>
+        </Stack>
+  
+        {/* Table */}
+        <Table style={styles.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell style={styles.tableCellHeader}>Donor Name</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {currentRows.length > 0 ? (
+              currentRows.map((donor) => renderDonationRow(donor))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} align="center">
+                  No donors found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25]}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={({ count, page, rowsPerPage, onPageChange }) => (
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <IconButton
+                      onClick={(event) => onPageChange(event, page - 1)}
+                      disabled={page === 0}
+                    >
+                      <KeyboardArrowLeft />
+                    </IconButton>
+                    <IconButton
+                      onClick={(event) => onPageChange(event, page + 1)}
+                      disabled={page >= Math.ceil(count / rowsPerPage) - 1}
+                    >
+                      <KeyboardArrowRight />
+                    </IconButton>
+                  </Box>
+                )}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </Box>
+      )}
+
       {donorStatus === 'New' && (
         <>
           <Box sx={{ paddingLeft: 5, paddingTop: 5}}>
@@ -158,7 +338,7 @@ export default function AddDonation() {
               sx={{ flexWrap: 'wrap' }}
             >
               <Box sx={{ width: '250px' }}>
-                <TextField id="phone" label="Phone Number" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="phone" id="phone" label="Phone Number" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               {donorData.donorType === 'Individual' && (
                 <>
@@ -180,50 +360,26 @@ export default function AddDonation() {
               )}
 
               <Box sx={{ width: '250px' }}>
-                <TextField id="email" label="Email" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="email" id="email" label="Email" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               <Box sx={{ width: '250px' }}>
-                <TextField id="address" label="Address" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="address" id="address" label="Address" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               <Box sx={{ width: '250px' }}>
-                <TextField id="city" label="City" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="city" id="city" label="City" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               <Box sx={{ width: '250px' }}>
-                <TextField id="state" label="State" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="state" id="state" label="State" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               <Box sx={{ width: '250px' }}>
-                <TextField id="zip" label="Zip" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="zip" id="zip" label="Zip" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
               <Box sx={{ width: '100%' }}>
-                <TextField id="note" label="Donor Note" variant="outlined" fullWidth onChange={handleDonorChange} />
+                <TextField name="note" id="note" label="Donor Note" variant="outlined" fullWidth onChange={handleDonorChange} />
               </Box>
             </Stack>
           </Box>
         </>
-      )}
-
-      {donorStatus === 'Existing' && (
-        <Box sx={{ p: 5 }}>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={{ xs: 1, sm: 5 }}
-            useFlexGap
-            sx={{ flexWrap: 'wrap' }}
-          >
-            <Box sx={{ width: '250px' }}>
-              <TextField id="phone" label="Phone Number" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField id="firstName" label="First Name" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField id="lastName" label="Last Name" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField id="email" label="Email" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-          </Stack>
-        </Box>
       )}
 
       <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donation Info</Box>
@@ -267,7 +423,7 @@ export default function AddDonation() {
             </Box>
           )}
           <Box sx={{ width: '250px' }}>
-            <TextField
+          <TextField
               id="date"
               label="Donation Date"
               type="date"
@@ -279,6 +435,7 @@ export default function AddDonation() {
           </Box>
           <Box sx={{ width: '250px' }}>
             <TextField
+              name="amount"
               id="amount"
               label="Amount"
               variant="outlined"
@@ -292,13 +449,13 @@ export default function AddDonation() {
             />
           </Box>
           <Box sx={{ width: '250px' }}>
-            <TextField id="method" label="Method" variant="outlined" fullWidth onChange={handleDonationChange} />
+            <TextField name="method" id="method" label="Method" variant="outlined" fullWidth onChange={handleDonationChange} />
           </Box>
           <Box sx={{ width: '250px' }}>
-            <TextField id="campaign" label="Campaign Name" variant="outlined" fullWidth onChange={handleDonationChange} />
+            <TextField name="campaign" id="campaign" label="Campaign Name" variant="outlined" fullWidth onChange={handleDonationChange} />
           </Box>
           <Box sx={{ width: '250px' }}>
-            <TextField id="designation" label="Fund Designation" variant="outlined" fullWidth onChange={handleDonationChange} />
+            <TextField name="designation" id="designation" label="Fund Designation" variant="outlined" fullWidth onChange={handleDonationChange} />
           </Box>
           <Box sx={{ width: '250px' }}>
             <Select
@@ -319,7 +476,16 @@ export default function AddDonation() {
           </Box>
           <Box sx={{ width: '250px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span>Donation Matched</span>
-            <Checkbox {...checkbox} defaultChecked id="matched" value="matched" sx={{}}/>
+            <Checkbox
+              {...checkbox}
+              checked={donationData.matched === 'True'}
+              onChange={(e) =>
+                setDonationData((prev) => ({
+                  ...prev,
+                  matched: e.target.checked ? 'True' : 'False',
+                }))
+              }
+            />
           </Box>
         </Stack>
       </Box>
