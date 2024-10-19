@@ -8,68 +8,64 @@ datasource db {
 }
 
 model Constituent {
-  ConstituentID     String         @id @default(uuid())
-  FirstName         String
-  LastName          String
-  StreetAddress     String
-  City              String
-  State             String
-  Zipcode           String
-  Country           String
-  EmailAddress      String         @unique
-  PhoneNumber       String?        @unique
-  AreaCode          String?
-  //Donors            Donor[]
-  Volunteers        Volunteer[]
+  ConstituentID String      @id @default(uuid())
+  FirstName     String
+  LastName      String
+  StreetAddress String
+  City          String
+  State         String
+  Zipcode       String
+  Country       String
+  EmailAddress  String      @unique
+  PhoneNumber   String?     @unique
+  AreaCode      String?
+  Volunteers    Volunteer[]
 }
 
 model Volunteer {
-  VolunteerID         String           @id @default(uuid())
-  DOB                 DateTime
-  Age                 Int
-  EmergencyContact    String?
-  EventsAttended      String[]
-  AgreementToMediaUse Boolean?
-  TrainingCompletion  String?
-  BackgroundCheckCompletion     Boolean?
-  IsOverEighteen        Boolean?
-  ConstituentID       String
-  Constituent         Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
-  VolunteerEvents     VolunteerEvent[]
+  VolunteerID               String           @id @default(uuid())
+  DOB                       DateTime
+  Age                       Int
+  EmergencyContact          String?
+  EventsAttended            String[]
+  AgreementToMediaUse       Boolean?
+  TrainingCompletion        String?
+  BackgroundCheckCompletion Boolean?
+  IsOverEighteen            Boolean?
+  ConstituentID             String
+  Constituent               Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
+  VolunteerEvents           VolunteerEvent[]
 }
 
 model Organization {
-  OrganizationID            String         @id @default(uuid())
+  OrganizationID            String           @id @default(uuid())
   WebsiteForFunder          String?
   StreetAddress             String
   City                      String
   State                     String
   Zipcode                   String
   Country                   String
-  OrganizationName          String      @unique
+  OrganizationName          String           @unique
   PortalForGrantApplication String?
   NotesAboutLoginInfo       String?
   Representative            Representative[]
-  
 }
 
-model Representative{
-
-  ID                        String         @id @default(uuid())
-  FirstName                 String
-  LastName                  String
-  Email                     String      @unique
-  Phone                     String?     @unique
-  PositionInCompany         String
-  Grants                    Grant[]
-  OrganizationID            String
-  Organization              Organization  @relation(fields: [OrganizationID], references: [OrganizationID])
+model Representative {
+  ID                String       @id @default(uuid())
+  FirstName         String
+  LastName          String
+  Email             String       @unique
+  Phone             String?      @unique
+  PositionInCompany String
+  OrganizationID    String
+  Organization      Organization @relation(fields: [OrganizationID], references: [OrganizationID])
+  Grants            Grant[]      @relation("GrantToRepresentative")
 }
 
 model Grant {
-
-  GrantID                 String          @id @default(uuid())
-  GrantName               String       @unique
+  GrantID                 String           @id @default(uuid())
+  GrantName               String           @unique
   AwardStatus             String
   GrantDueDate            DateTime
   ContactType             String
@@ -86,11 +82,11 @@ model Grant {
   AskAmount               Float
   AmountAwarded           Float
   EndOfGrantReportDueDate DateTime
-  Representative          Representative[]
+  Representative          Representative[] @relation("GrantToRepresentative")
 }
 
 model Event {
-  EventID            String             @id @default(uuid())
+  EventID            String           @id @default(uuid())
   NameOfEvent        String
   Date               DateTime
   Time               DateTime
@@ -98,7 +94,7 @@ model Event {
 }
 
 model VolunteerEvent {
-  ID          String      @id @default(uuid())
+  ID          String    @id @default(uuid())
   VolunteerID String
   EventID     String
   LoginTime   DateTime
@@ -108,42 +104,35 @@ model VolunteerEvent {
   Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
 }
 
-// Donation Related
 model Donor {
-  id String @id @default(uuid())   
-  name String
-  type String // Individual, Corporate, Foundation, etc...
-  address Address?
-  phone String
-  email String
-  contactMethod String // Email, Phone, Mail
-  status String // Active, Lapsed, Major Donor, First-Time, etc...
-  notes String // 
-  donations Donation[]
+  email     String
+  id        String    @id @default(uuid())
+  name      String
+  phone     String
+  type      String
+  address   Address?
+  donations Donation?
 }
 
 model Address {
-  id String @id @default(uuid())
-  street String
-  city String
-  state String
-  zip String
+  id      String @id @default(uuid())
+  street  String
+  city    String
+  state   String
+  zipCode String
   donorId String @unique
-  donor Donor @relation(fields: [donorId], references: [id])
+  donor   Donor  @relation(fields: [donorId], references: [id])
 }
 
 model Donation {
-  id String  @id @default(uuid())
-  type String
-  amount Float?
-  item String?
-  paymentMethod String
-  campaign String
-  fund String
-  recurrenceFrequency String
-  source String
-  isMatching Boolean
-  date DateTime
-  donorId String @unique
-  donor Donor @relation(fields: [donorId], references: [id])
+  amount        Float?
+  campaign      String
+  date          DateTime
+  donorId       String   @unique
+  id            String   @id @default(uuid())
+  item          String?
+  itemValue     Float?
+  paymentMethod String?
+  type          String
+  donor         Donor    @relation(fields: [donorId], references: [id])
 }

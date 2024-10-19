@@ -8,9 +8,6 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 import { donors } from "@/app/utils/donationTestData";
 import { useState } from "react";
 
@@ -88,7 +85,7 @@ export default function DonationDetail() {
   const [method, setMethod] = useState<string>(donors[parsedId].method);
   const [campaign, setCampaign] = useState<string>(donors[parsedId].campaign);
   const [fund, setFund] = useState<string>(donors[parsedId].fund);
-  const [date, setDate] = useState<Date>(donors[parsedId].date);
+  const [date, setDate] = useState(donors[parsedId].date);
   const [recurrence, setRecurrence] = useState<string>(
     donors[parsedId].recurrence
   );
@@ -197,18 +194,18 @@ export default function DonationDetail() {
         />
       </Box>
       <Box sx={styles.inputContainer}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DatePicker
-            sx={styles.textField}
-            label="Date"
-            value={date || new Date()}
-            onChange={(newDate) => {
-              if (newDate) {
-                setDate(newDate);
-              }
-            }}
+        <Box sx={{ width: '250px' }}>
+          <TextField
+            id="date"
+            label="Donation Date"
+            type="date"
+            fullWidth
+            value={date || new Date().toISOString().split("T")[0]}
+            onChange={(event: any) =>
+              setDate(event.target.value)
+            }
           />
-        </LocalizationProvider>
+        </Box>
         <TextField
           sx={styles.textField}
           select

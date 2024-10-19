@@ -24,9 +24,10 @@ import Link from "next/link";
 import { useState } from "react";
 import { donors, Donation } from "../../utils/donationTestData";
 
+
 const styles = {
   table: {
-    minWidth: 650,
+    minWidth: 450,
   },
   tableCellHeader: {
     fontWeight: "bold",
@@ -38,73 +39,6 @@ const styles = {
 };
 
 export default function AddDonation() {
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState<Donation[]>(donors);
-  const [searched, setSearched] = useState<string>("");
-
-  const requestSearch = (searchedVal: string) => {
-    const filteredRows = donors.filter((row) =>
-      row.donor.name.toLowerCase().includes(searchedVal.toLowerCase())
-    );
-    setRows(filteredRows);
-  };
-
-  const cancelSearch = () => {
-    setSearched("");
-    setRows(donors);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const currentRows = rows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-  const renderDonationRow = (donor: Donation) => (
-    <TableRow key={donor.id}>
-      <TableCell style={styles.tableCell}>
-        <Button
-            sx={{ marginRight: 5 }}
-            variant="contained"
-            onClick={() => {
-                setDonorData({
-                    firstName: donor.firstName || '',
-                    lastName: donor.lastName || '',
-                    organization: donor.organization || '',
-                    email: donor.email || '',
-                    phone: donor.phone || '',
-                    address: donor.address || '',
-                    donorType: donor.donorType || '',
-                    contactMethod: donor.contactMethod || '',
-                    donorStatus: donor.donorStatus || 'Existing',
-                    notes: donor.notes || '',
-                });
-            }}
-        >
-            Select
-        </Button>
-        <Link href={`/Donations/Detail/${donor.id}`} className="text-blue-500">
-          {donor.donor.name.trim()}
-          {donor.donor.phone}
-        </Link>
-      </TableCell>
-    </TableRow>
-  );
-
-
-
-
-
-
   const [donorData, setDonorData] = React.useState({
     firstName: '',
     lastName: '',
@@ -117,6 +51,8 @@ export default function AddDonation() {
     donorStatus: 'Anonymous',
     notes: '',
   });
+
+  donorData.name = `${donorData.firstName} ${donorData.lastName}`;
 
   const [donationData, setDonationData] = React.useState({
     date: '',
@@ -189,6 +125,67 @@ export default function AddDonation() {
     }
   };
 
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rows, setRows] = useState<Donation[]>(donors);
+  const [searched, setSearched] = useState<string>("");
+
+  const requestSearch = (searchedVal: string) => {
+    const filteredRows = donors.filter((row) =>
+      row.donorName.toLowerCase().includes(searchedVal.toLowerCase())
+    );
+    setRows(filteredRows);
+  };
+
+  const cancelSearch = () => {
+    setSearched("");
+    setRows(donors);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const currentRows = rows.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+
+  const renderDonationRow = (donor: Donor) => (
+    <TableRow key={donor.id}>
+      <TableCell style={styles.tableCell}>
+        <Button
+          sx={{ marginRight: 5 }}
+          variant="contained"
+          onClick={() => {
+            setDonorData({
+              firstName: donor.donorName.split(' ')[0] || '',
+              lastName: donor.donorName.split(' ')[1] || '',
+              organization: donor.type || '',
+              email: donor.email || '',
+              phone: donor.phone || '',
+              address: donor.address?.street || '',
+              donorType: donor.type || 'Individual',
+              contactMethod: donor.contactMethod || '',
+              donorStatus: donor.status || 'Existing',
+              notes: donor.notes || '',
+            });
+          }}
+        >
+            Select
+        </Button>
+        <Link href={`/Donations/Detail/${donor.id}`} className="text-blue-500">
+          {donor.donorName}
+        </Link>
+      </TableCell>
+    </TableRow>
+  );
+
   const checkbox = { inputProps: { 'aria-label': 'Checkbox demo' } };
   
   return (
@@ -207,34 +204,6 @@ export default function AddDonation() {
           <MenuItem value="New">New</MenuItem>
         </Select>
       </Box>
-
-      {donorStatus !== 'Anonymous' && (
-      <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
-      )}
-
-{donorStatus === 'Existing' && (
-        <Box sx={{ p: 5 }}>
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={{ xs: 1, sm: 5 }}
-            useFlexGap
-            sx={{ flexWrap: 'wrap' }}
-          >
-            <Box sx={{ width: '250px' }}>
-              <TextField name="phone" id="phone" label="Phone Number" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField name="firstName" id="firstName" label="First Name" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField name="lastName" id="lastName" label="Last Name" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-            <Box sx={{ width: '250px' }}>
-              <TextField name="email" id="email" label="Email" variant="outlined" fullWidth onChange={handleDonorChange} />
-            </Box>
-          </Stack>
-        </Box>
-      )}
 
       {donorStatus === "Existing" && (
         <Box sx={{ p: 5 }}>
@@ -308,8 +277,9 @@ export default function AddDonation() {
       </Box>
       )}
 
-      {donorStatus === 'New' && (
+      {donorStatus != 'Anonymous' && (
         <>
+          <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
           <Box sx={{ paddingLeft: 5, paddingTop: 5}}>
             <Stack
               direction={{ xs: 'column', sm: 'row' }}
