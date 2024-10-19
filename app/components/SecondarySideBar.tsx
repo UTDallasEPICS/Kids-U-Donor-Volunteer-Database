@@ -1,4 +1,9 @@
 import Link from "next/link";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
+import ListItemText from "@mui/material/ListItemText";
+import Box from "@mui/material/Box";
 
 type ListItem = {
   name: string;
@@ -7,17 +12,33 @@ type ListItem = {
 
 export const SecondarySideBar = ({ items }: { items: ListItem[] }) => {
   return (
-    <div className="bg-gray-700 text-white w-[7rem] min-h-screen flex flex-col">
-      <ul className="flex flex-col space-y-2 p-2">
+    <Box
+      sx={{
+        backgroundColor: "grey.700",
+        color: "white",
+        minHeight: "100vh",
+        justifyContent: "flex-start",
+      }}
+    >
+      <List sx={{ padding: 0 }}>
         {items.map((item, index) => (
-          <li
-            key={index}
-            className="hover:bg-gray-600 p-1 rounded cursor-pointer"
-          >
-            <Link href={item.reference}>{item.name}</Link>
-          </li>
+          <ListItem sx={{ padding: 1 }} key={index}>
+            <ListItemButton
+              component={Link}
+              href={item.reference}
+              sx={{
+                "&:hover": { backgroundColor: "grey.600" },
+                borderRadius: 1,
+                padding: .5,
+                paddingLeft: 1,
+                width:"7rem"
+              }}
+            >
+              <ListItemText primary={item.name} />
+            </ListItemButton>
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
