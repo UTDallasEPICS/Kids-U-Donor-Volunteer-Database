@@ -112,11 +112,14 @@ model VolunteerEvent {
 model Donor {
   id String @id @default(uuid())   
   name String
-  type String
+  type String // Individual, Corporate, Foundation, etc...
   address Address?
   phone String
   email String
-  donation Donation?
+  contactMethod String // Email, Phone, Mail
+  status String // Active, Lapsed, Major Donor, First-Time, etc...
+  notes String // 
+  donations Donation[]
 }
 
 model Address {
@@ -124,7 +127,7 @@ model Address {
   street String
   city String
   state String
-  zipCode String
+  zip String
   donorId String @unique
   donor Donor @relation(fields: [donorId], references: [id])
 }
@@ -134,9 +137,12 @@ model Donation {
   type String
   amount Float?
   item String?
-  itemValue Float?
-  paymentMethod String?
+  paymentMethod String
   campaign String
+  fund String
+  recurrenceFrequency String
+  source String
+  isMatching Boolean
   date DateTime
   donorId String @unique
   donor Donor @relation(fields: [donorId], references: [id])
