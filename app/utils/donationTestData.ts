@@ -1,146 +1,120 @@
 export type Donation = {
   id: string;
-  donorName: string;
   type: string;
   amount: number;
-  method: string;
+  item: string | null;
+  paymentMethod: string | null;
   campaign: string;
-  fund: string;
-  recurrence: string;
-  source: string;
-  matching: string;
+  fundDesignation: string;
   date: Date;
+  recurrenceFrequency: string;
+  source: string;
+  isMatching: boolean;
+  receiptSent: boolean;
+  receiptNumber: string;
+  isAnonymous: boolean;
+  acknowledgementSent: boolean;
+  donorId: string;
+  //donor: Donor;
 };
 
-export const donors: Donation[] = [
+export type Donor = {
+  id: string;
+  type: string;
+  communicationPreference: string;
+  status: string;
+  notes: string;
+  isRetained: boolean;
+  segment: string | null;
+  donationIds: string[];
+  personId: string;
+  //person: Person;
+};
+
+export type Address = {
+  id: string;
+  addressLine1: string;
+  addressLine2: string | null;
+  city: string;
+  state: string;
+  zipCode: string;
+  type: string;
+  //personId: string;
+  //person: Person;
+  //Grantor: Grantor[];
+};
+
+export const donations: Donation[] = [
   {
     id: "0",
-    donorName: "Alice",
     type: "One-Time",
     amount: 150.75,
-    method: "Credit Card",
-    campaign: "Health",
-    fund: "General",
-    recurrence: "N/A",
-    source: "Website",
-    matching: "Yes",
+    item: null,
+    paymentMethod: "Credit Card",
+    campaign: "Food",
+    fundDesignation: "General",
     date: new Date("2024-07-15"),
+    recurrenceFrequency: "No",
+    source: "Website",
+    isMatching: true,
+    receiptSent: true,
+    receiptNumber: "123123",
+    isAnonymous: false,
+    acknowledgementSent: true,
+    donorId: "0",
   },
   {
     id: "1",
-    donorName: "Bob",
-    type: "Recurring",
-    amount: 200.0,
-    method: "Check",
-    campaign: "Education",
-    fund: "Scholarship",
-    recurrence: "Monthly",
-    source: "Social Media",
-    matching: "no",
-    date: new Date("2024-07-16"),
-  },
-  {
-    id: "2",
-    donorName: "Charlie",
-    type: "Pledge",
-    amount: 75.5,
-    method: "Bank Transfer",
-    campaign: "Food",
-    fund: "Emergency Relief",
-    recurrence: "Quarterly",
-    source: "Event",
-    matching: "yes",
-    date: new Date("2024-07-17"),
-  },
-  {
-    id: "3",
-    donorName: "Diana",
-    type: "Recurring",
-    amount: 500.0,
-    method: "Credit Card",
-    campaign: "Health",
-    fund: "Research",
-    recurrence: "Monthly",
-    source: "Email",
-    matching: "yes",
-    date: new Date("2024-07-18"),
-  },
-  {
-    id: "4",
-    donorName: "Evan",
     type: "In-Kind",
-    amount: 100.0,
-    method: "Cash",
-    campaign: "Environment",
-    fund: "Conservation",
-    recurrence: "Annually",
-    source: "Direct Mail",
-    matching: "no",
-    date: new Date("2024-07-19"),
-  },
-  {
-    id: "5",
-    donorName: "Fiona",
-    type: "One-Time",
-    amount: 250.5,
-    method: "PayPal",
-    campaign: "Community",
-    fund: "Support Fund",
-    recurrence: "N/A",
-    source: "Referral",
-    matching: "true",
-    date: new Date("2024-07-20"),
-  },
-  {
-    id: "6",
-    donorName: "George",
-    type: "Recurring",
-    amount: 350.75,
-    method: "ACH",
-    campaign: "Education",
-    fund: "Student Aid",
-    recurrence: "Quarterly",
-    source: "Social Media",
-    matching: "no",
-    date: new Date("2024-07-21"),
-  },
-  {
-    id: "7",
-    donorName: "Hannah",
-    type: "Pledge",
-    amount: 400.0,
-    method: "Venmo",
-    campaign: "Health",
-    fund: "Wellness",
-    recurrence: "Annually",
+    amount: 199.99,
+    item: "10 Bicycles",
+    paymentMethod: null,
+    campaign: "Movement",
+    fundDesignation: "General",
+    date: new Date("2024-07-15"),
+    recurrenceFrequency: "No",
     source: "Website",
-    matching: "yes",
-    date: new Date("2024-07-22"),
-  },
-  {
-    id: "8",
-    donorName: "Isaac",
-    type: "In-Kind",
-    amount: 500.5,
-    method: "Zelle",
-    campaign: "Food",
-    fund: "Food Bank",
-    recurrence: "Monthly",
-    source: "Event",
-    matching: "no",
-    date: new Date("2024-07-23"),
-  },
-  {
-    id: "9",
-    donorName: "Julia",
-    type: "One-Time",
-    amount: 600.0,
-    method: "Check",
-    campaign: "Environment",
-    fund: "Reforestation",
-    recurrence: "N/A",
-    source: "Direct Mail",
-    matching: "yes",
-    date: new Date("2024-07-24"),
+    isMatching: true,
+    receiptSent: true,
+    receiptNumber: "9999",
+    isAnonymous: false,
+    acknowledgementSent: true,
+    donorId: "0",
   },
 ];
+
+export const donors: Donor[] = [
+  {
+    id: "0",
+    type: "Individual",
+    communicationPreference: "Phone",
+    status: "Active",
+    notes: "Notes Notes Notes",
+    isRetained: true,
+    segment: "High-value donor",
+    donationIds: ["1", "2"],
+    personId: "0",
+  },
+];
+
+export const persons: Person[] = [
+  {
+    id: "0",
+    firstName: "Dilly",
+    lastName: "Dally",
+    emailAddress: "random@mail.com",
+    phoneNumber: "123-456-7899",
+  },
+];
+
+export type Person = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  phoneNumber: string | null;
+  //donor: Donor;
+  //representative: Representative
+  //address: Address | null
+  //user: User | null
+};

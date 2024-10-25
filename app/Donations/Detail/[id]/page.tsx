@@ -8,8 +8,30 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
-import { donors } from "@/app/utils/donationTestData";
+import {
+  donors,
+  donations,
+  persons,
+  Donation,
+} from "@/app/utils/donationTestData";
 import { useState } from "react";
+
+type DonationState = {
+  type: string;
+  amount: number;
+  item: string | null;
+  paymentMethod: string | null;
+  campaign: string;
+  fundDesignation: string;
+  date: Date;
+  recurrenceFrequency: string;
+  source: string;
+  isMatching: boolean;
+  receiptSent: boolean;
+  receiptNumber: string;
+  isAnonymous: boolean;
+  acknowledgementSent: boolean;
+};
 
 // Add possible feature to add more types/methods, eventually
 const donationTypes: string[] = ["One-Time", "Recurring", "Pledge", "In-Kind"];
@@ -24,7 +46,7 @@ const paymentMethods: string[] = [
   "Zelle",
 ];
 const recurringFrequencies: string[] = [
-  "N/A",
+  "No",
   "Monthly",
   "Quarterly",
   "Annually",
@@ -37,207 +59,199 @@ const donationSources: string[] = [
   "Direct Mail",
   "Referral",
 ];
-const matchingDonations: string[] = ["Yes", "No"];
-
-export const Footer = () => {
-  return (
-    <Box sx={styles.footerContainer}>
-      <Button
-        sx={styles.buttonContained}
-        variant="contained"
-        onClick={() => {
-          alert("clicked");
-        }}
-      >
-        Save
-      </Button>
-      <Button
-        sx={styles.buttonContained}
-        variant="contained"
-        onClick={() => {
-          alert("clicked");
-        }}
-      >
-        Delete
-      </Button>
-      <Button
-        sx={styles.buttonOutlined}
-        variant="outlined"
-        onClick={() => {
-          alert("clicked");
-        }}
-      >
-        Cancel
-      </Button>
-    </Box>
-  );
-};
 
 export default function DonationDetail() {
   const { id }: { id: string } = useParams();
   const parsedId = parseInt(id, 10);
 
-  const [donorName, setDonorName] = useState<string>(
-    donors[parsedId].donorName
-  );
-  const [type, setType] = useState<string>(donors[parsedId].type);
-  const [amount, setAmount] = useState<number>(donors[parsedId].amount);
-  const [method, setMethod] = useState<string>(donors[parsedId].method);
-  const [campaign, setCampaign] = useState<string>(donors[parsedId].campaign);
-  const [fund, setFund] = useState<string>(donors[parsedId].fund);
-  const [date, setDate] = useState(donors[parsedId].date);
-  const [recurrence, setRecurrence] = useState<string>(
-    donors[parsedId].recurrence
-  );
-  const [source, setSource] = useState<string>(donors[parsedId].source);
-  const [matching, setMatching] = useState<string>(donors[parsedId].matching);
+  if (donations[parsedId] == null) {
+    return <Typography>Donation not found</Typography>;
+  }
 
-  return (
-    <Box sx={styles.container} component="form">
-      <Typography variant="h5">Donation Detail</Typography>
-      <Box sx={styles.inputContainer}>
-        <TextField
-          sx={styles.textField}
-          required
-          id="name"
-          label="Donor"
-          value={donorName}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setDonorName(event.target.value);
-          }}
-        />
-        <TextField
-          sx={styles.textField}
-          required
-          select
-          id="select-type"
-          label="Type"
-          value={type}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setType(event.target.value);
-          }}
-        >
-          {donationTypes.map((type) => (
-            <MenuItem value={type}>{type}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          sx={{
-            ...styles.textField,
-            "& input[type=number]": {
-              MozAppearance: "textfield",
-            },
-            "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
-              {
-                WebkitAppearance: "none",
-                margin: 0,
-              },
-          }}
-          required
-          id="amount"
-          label="Donation Amount"
-          type="number"
-          value={amount}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            if (amount === 0 && !event.target.value.includes(".")) {
-              event.target.value = event.target.value.replace(/^0+/, "");
-            }
-            setAmount(Number(event.target.value));
-          }}
-          slotProps={{
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">$</InputAdornment>
-              ),
-            },
-            inputLabel: {
-              shrink: true,
-            },
-          }}
-        />
-      </Box>
-      <Box sx={styles.inputContainer}>
-        <TextField
-          sx={styles.textField}
-          required
-          select
-          id="select-method"
-          label="Method"
-          value={method}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setMethod(event.target.value);
-          }}
-        >
-          {paymentMethods.map((method) => (
-            <MenuItem value={method}>{method}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          sx={styles.textField}
-          required={true}
-          id="campaign"
-          label="Campaign"
-          value={campaign}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setCampaign(event.target.value);
-          }}
-        />
-        <TextField
-          sx={styles.textField}
-          required
-          id="fund"
-          label="Fund"
-          value={fund}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFund(event.target.value);
-          }}
-        />
-      </Box>
-      <Box sx={styles.inputContainer}>
-        <Box sx={{ width: '250px' }}>
+  const [donation, setDonation] = useState<DonationState>({
+    type: donations[parsedId].type,
+    amount: donations[parsedId].amount,
+    item: donations[parsedId].item,
+    paymentMethod: donations[parsedId].paymentMethod,
+    campaign: donations[parsedId].campaign,
+    fundDesignation: donations[parsedId].fundDesignation,
+    date: donations[parsedId].date,
+    recurrenceFrequency: donations[parsedId].recurrenceFrequency,
+    source: donations[parsedId].source,
+    isMatching: donations[parsedId].isMatching,
+    receiptSent: donations[parsedId].receiptSent,
+    receiptNumber: donations[parsedId].receiptNumber,
+    isAnonymous: donations[parsedId].isAnonymous,
+    acknowledgementSent: donations[parsedId].acknowledgementSent,
+  });
+
+  const Body = () => {
+    return (
+      <Box>
+        <Box sx={styles.inputContainer}>
           <TextField
+            sx={styles.textField}
+            required
+            select
+            id="select-type"
+            label="Type"
+            value={donation.type}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({ ...prev, type: event.target.value }));
+            }}
+          >
+            {donationTypes.map((type) => (
+              <MenuItem value={type}>{type}</MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            sx={{
+              ...styles.textField,
+              "& input[type=number]": {
+                MozAppearance: "textfield",
+              },
+              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                {
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
+            }}
+            required
+            id="amount"
+            label={
+              donation.type !== "In-Kind" ? "Donation Amount" : "Item(s) Worth"
+            }
+            type="number"
+            value={donation.amount}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              if (donation.amount === 0 && !event.target.value.includes(".")) {
+                event.target.value = event.target.value.replace(/^0+/, "");
+              }
+              setDonation((prev) => ({
+                ...prev,
+                amount: Number(event.target.value),
+              }));
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">$</InputAdornment>
+                ),
+              },
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+          />
+          {donation.type !== "In-Kind" ? (
+            <TextField
+              sx={styles.textField}
+              required
+              select
+              id="select-method"
+              label="Method"
+              value={donation.paymentMethod}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDonation((prev) => ({
+                  ...prev,
+                  paymentMethod: event.target.value,
+                }));
+              }}
+            >
+              {paymentMethods.map((method) => (
+                <MenuItem value={method}>{method}</MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField
+              sx={styles.textField}
+              required={true}
+              id="item"
+              label="Item(s)"
+              value={donation.item}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setDonation((prev) => ({
+                  ...prev,
+                  item: event.target.value,
+                }));
+              }}
+            />
+          )}
+        </Box>
+
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            id="campaign"
+            label="Campaign"
+            value={donation.campaign}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                campaign: event.target.value,
+              }));
+            }}
+          />
+          <TextField
+            sx={styles.textField}
+            required
+            id="fund"
+            label="Fund"
+            value={donation.fundDesignation}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                fundDesignation: event.target.value,
+              }));
+            }}
+          />
+          <TextField
+            sx={styles.textField}
+            required
             id="date"
             label="Donation Date"
             type="date"
-            fullWidth
-            value={date || new Date().toISOString().split("T")[0]}
+            value={donation.date || new Date().toISOString().split("T")[0]}
             onChange={(event: any) =>
-              setDate(event.target.value)
+              setDonation((prev) => ({ ...prev, date: event.target.value }))
             }
           />
         </Box>
-        <TextField
-          sx={styles.textField}
-          select
-          id="select-recurrence"
-          label="Recurrence"
-          value={recurrence}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setRecurrence(event.target.value);
-          }}
-        >
-          {recurringFrequencies.map((freq) => (
-            <MenuItem value={freq}>{freq}</MenuItem>
-          ))}
-        </TextField>
-        <TextField
-          sx={styles.textField}
-          required
-          select
-          id="select-source"
-          label="Donation Source"
-          value={source}
-          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setSource(event.target.value);
-          }}
-        >
-          {donationSources.map((source) => (
-            <MenuItem value={source}>{source}</MenuItem>
-          ))}
-        </TextField>
-      </Box>
-      <Box sx={styles.inputContainer}>
-        {
+
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            select
+            id="select-recurrence"
+            label="Recurrence"
+            value={donation.recurrenceFrequency}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                recurrenceFrequency: event.target.value,
+              }));
+            }}
+          >
+            {recurringFrequencies.map((freq) => (
+              <MenuItem value={freq}>{freq}</MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            sx={styles.textField}
+            required
+            select
+            id="select-source"
+            label="Donation Source"
+            value={donation.source}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({ ...prev, source: event.target.value }));
+            }}
+          >
+            {donationSources.map((source) => (
+              <MenuItem value={source}>{source}</MenuItem>
+            ))}
+          </TextField>
           <TextField
             sx={styles.textField}
             required
@@ -245,27 +259,159 @@ export default function DonationDetail() {
             id="select-matching"
             label="Matching Donation?"
             helperText="Is this donation matched by an employer or partner organization?"
-            value={matching}
+            value={donation.isMatching}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setMatching(event.target.value);
+              setDonation((prev) => ({
+                ...prev,
+                isMatching: event.target.value === "true",
+              }));
             }}
           >
-            {matchingDonations.map((matchingDonation) => (
-              <MenuItem value={matchingDonation}>{matchingDonation}</MenuItem>
-            ))}
+            <MenuItem value={"true"}>Yes</MenuItem>
+            <MenuItem value={"false"}>No</MenuItem>
           </TextField>
-        }
-        <TextField
-          sx={{ ...styles.textField, visibility: "hidden" }}
-          id="style"
-          label="styling"
-        />
-        <TextField
-          sx={{ ...styles.textField, visibility: "hidden" }}
-          id="style"
-          label="styling"
-        />
+        </Box>
+
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required
+            select
+            id="select-receiptSent"
+            label="Receipt Sent?"
+            value={donation.receiptSent}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                receiptSent: event.target.value === "true",
+              }));
+            }}
+          >
+            <MenuItem value={"true"}>Yes</MenuItem>
+            <MenuItem value={"false"}>No</MenuItem>
+          </TextField>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            disabled={donation.receiptSent === false}
+            id="receiptNumber"
+            label="Receipt Number"
+            value={donation.receiptNumber}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                receiptNumber: event.target.value,
+              }));
+            }}
+          />
+          <TextField
+            sx={styles.textField}
+            required
+            select
+            id="select-anonymous"
+            label="Anonymous?"
+            value={donation.isAnonymous}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                isAnonymous: event.target.value === "true",
+              }));
+            }}
+          >
+            <MenuItem value={"true"}>Yes</MenuItem>
+            <MenuItem value={"false"}>No</MenuItem>
+          </TextField>
+        </Box>
+
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required
+            select
+            id="select-acknowledgement"
+            label="Acknowledgement Sent?"
+            value={donation.acknowledgementSent}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev) => ({
+                ...prev,
+                acknowledgementSent: event.target.value === "true",
+              }));
+            }}
+          >
+            <MenuItem value={"true"}>Yes</MenuItem>
+            <MenuItem value={"false"}>No</MenuItem>
+          </TextField>
+          <TextField
+            sx={{ ...styles.textField, visibility: "hidden" }}
+            id="style"
+            label="styling"
+          />
+          <TextField
+            sx={{ ...styles.textField, visibility: "hidden" }}
+            id="style"
+            label="styling"
+          />
+        </Box>
       </Box>
+    );
+  };
+
+  const Footer = () => {
+    return (
+      <Box sx={styles.footerContainer}>
+        <Button
+          sx={styles.buttonContained}
+          variant="contained"
+          onClick={() => {
+            alert("clicked");
+          }}
+        >
+          Save
+        </Button>
+        <Button
+          sx={styles.buttonContained}
+          variant="contained"
+          onClick={() => {
+            alert("clicked");
+          }}
+        >
+          Delete
+        </Button>
+        <Button
+          sx={styles.buttonOutlined}
+          variant="outlined"
+          onClick={() => {
+            alert("clicked");
+          }}
+        >
+          Cancel
+        </Button>
+      </Box>
+    );
+  };
+
+  return (
+    <Box sx={styles.container} component="form">
+      <Typography variant="h6">
+        Donation Details for:{" "}
+        {
+          persons[
+            parseInt(
+              donors[parseInt(donations[parsedId].donorId, 10)].personId,
+              10
+            )
+          ].firstName
+        }{" "}
+        {
+          persons[
+            parseInt(
+              donors[parseInt(donations[parsedId].donorId, 10)].personId,
+              10
+            )
+          ].lastName
+        }
+      </Typography>
+      <Body />
       <Footer />
     </Box>
   );
@@ -293,7 +439,7 @@ const styles = {
     flex: 1,
   },
   buttonContained: {
-    backgroundColor: "#455a64",
+    backgroundColor: "#1a345b",
   },
   buttonOutlined: {
     borderColor: "black",

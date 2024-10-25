@@ -1,31 +1,53 @@
 import React from "react";
-import Box from "@mui/material/Box";
-import List from "@mui/material/List";
-import Button from '@mui/material/Button';
+import { List, ListItem, Link } from "@mui/material";
+import NextLink from "next/link";
 
-const sidebarButtonStyle = ({
-  color:"white", 
-  width:"8rem", 
-  justifyContent: "flex-start",
-  padding: 1,
-  "&:hover": { backgroundColor: "grey.600"}
-});
+type ListItem = {
+  name: string;
+  reference: string;
+};
+
+const MainSidebarItems: ListItem[] = [
+  { name: "Dashboard", reference: "/" },
+  { name: "Constituents", reference: "/Constituents" },
+  { name: "Donations", reference: "/Donations" },
+  { name: "Grants", reference: "/Grants" },
+];
 
 export default function MainSidebar() {
   return (
-    <Box sx={{backgroundColor: "grey.800", minHeight: "100vh", padding: 0}}>
-      <List sx={{ padding: 1 }}>
-        <Button sx={sidebarButtonStyle} href="/">Dashboard</Button>
-      </List>
-      <List sx={{ padding: 1 }}>
-        <Button sx={sidebarButtonStyle} href="/Constituents">Constituents</Button>
-        </List>
-      <List sx={{ padding: 1 }}>
-        <Button sx={sidebarButtonStyle} href="/Donations">Donations</Button>
-        </List>
-      <List sx={{ padding: 1 }}>
-        <Button sx={sidebarButtonStyle} href="/Grants">Grants</Button>
-        </List>
-    </Box>
+    <List sx={styles.container}>
+      {MainSidebarItems.map((item, index) => (
+        <ListItem sx={{ px: 0.5 }} key={index}>
+          <Link
+            sx={styles.button}
+            href={item.reference}
+            component={NextLink}
+            underline="none"
+          >
+            {item.name}
+          </Link>
+        </ListItem>
+      ))}
+    </List>
   );
 }
+
+const styles = {
+  container: {
+    backgroundColor: "#09111e",
+    width: "8rem",
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  },
+  button: {
+    color: "white",
+    width: "100%",
+    borderRadius: 1,
+    p: 1,
+    px: 0.5,
+    fontSize: "0.95rem",
+    "&:hover": { backgroundColor: "grey.600" },
+  },
+};

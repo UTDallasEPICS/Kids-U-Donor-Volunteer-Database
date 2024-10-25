@@ -1,9 +1,5 @@
-import Link from "next/link";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import Box from "@mui/material/Box";
+import NextLink from "next/link";
+import { List, ListItem, Link } from "@mui/material";
 
 type ListItem = {
   name: string;
@@ -12,33 +8,38 @@ type ListItem = {
 
 export const SecondarySideBar = ({ items }: { items: ListItem[] }) => {
   return (
-    <Box
-      sx={{
-        backgroundColor: "grey.700",
-        color: "white",
-        minHeight: "100vh",
-        justifyContent: "flex-start",
-      }}
-    >
-      <List sx={{ padding: 0 }}>
-        {items.map((item, index) => (
-          <ListItem sx={{ padding: 1 }} key={index}>
-            <ListItemButton
-              component={Link}
-              href={item.reference}
-              sx={{
-                "&:hover": { backgroundColor: "grey.600" },
-                borderRadius: 1,
-                padding: .5,
-                paddingLeft: 1,
-                width:"7rem"
-              }}
-            >
-              <ListItemText primary={item.name} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
+    <List sx={styles.container}>
+      {items.map((item, index) => (
+        <ListItem sx={{ px: 0.5 }} key={index}>
+          <Link
+            sx={styles.button}
+            href={item.reference}
+            component={NextLink}
+            underline="none"
+          >
+            {item.name}
+          </Link>
+        </ListItem>
+      ))}
+    </List>
   );
+};
+
+const styles = {
+  container: {
+    backgroundColor: "#0d1a2d",
+    width: "7rem",
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  },
+  button: {
+    color: "white",
+    width: "100%",
+    borderRadius: 1,
+    p: 1,
+    px: 0.5,
+    fontSize: "0.95rem",
+    "&:hover": { backgroundColor: "grey.600" },
+  },
 };

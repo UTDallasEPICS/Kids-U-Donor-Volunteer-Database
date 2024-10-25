@@ -1,7 +1,7 @@
 import React from "react";
 import { SecondarySideBar } from "../components/SecondarySideBar";
 
-export default function DonationsLayout({
+export default function DonorsLayout({
   children,
 }: {
   children: React.ReactNode;
