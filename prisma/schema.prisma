@@ -54,10 +54,9 @@ model Address {
 //Grant Related
 model Grantor {
   id                          String           @id @default(uuid())
-  websiteLink                 String?
   name                        String           @unique
-  contactTitle                String
   type                        String
+  websiteLink                 String?
   communicationPreference     String
   recognitionPreference       String
   internalRelationshipManager String
@@ -76,57 +75,49 @@ model Representative {
 }
 
 model Grant {
-  id                         String    @id @default(uuid())
-  name                       String    @unique
-  status                     String
-  amountRequested            Float
-  amountAwarded              Float
-  purpose                    String
-  startDate                  DateTime
-  endDate                    DateTime
-  isMultipleYears            Boolean
-  quarter                    String
-  proposalSubmissionDate     DateTime
-  awardNotificationDate      DateTime
-  fundingArea                String //specific area or general
-  //
-  internalProposalDueDate    DateTime?
-  proposalDueDate            DateTime
-  proposalSummary            String
-  applicationType            String
-  internalOwner              String
-  requiredAttachment         String
-  //
-  fundingRestriction         String?
-  matchingRequirement        String?
-  useArea                    String //specific area or general
-  //
-  finalReportDueDate         String
-  programImpact              String
-  complianceRequirement      String
-  isSiteVisitRequired        Boolean
-  siteVisitDate              DateTime?
-  //
-  budgetAllocation           String
-  totalExpensesIncurred      Float
-  remainingBalance           Float
-  auditRequirement           String?
-  //
-  isEligibleForRenewal       Boolean
-  renewalApplicationDate     DateTime
-  renewalAwardStatus         String
-  futureFundingOpportunities String
-  //
-  programAlignment           String
-  proposalReviewDate         DateTime
-  reportReviewDate           DateTime
-  //
-  acknowledgementSent        Boolean
+  id                      String    @id @default(uuid())
+  name                    String    @unique
+  status                  String
+  amountRequested         Float
+  amountAwarded           Float
+  purpose                 String //specific area or general
+  startDate               DateTime
+  endDate                 DateTime
+  isMultipleYears         Boolean
+  quarter                 String
+  proposalSubmissionDate  DateTime
+  awardNotificationDate   DateTime
+  fundingArea             String //specific area or general
+  internalProposalDueDate DateTime?
+  proposalDueDate         DateTime
+  proposalSummary         String
+  applicationType         String
+  internalOwner           String
+  fundingRestriction      String?
+  matchingRequirement     String?
+  useArea                 String //specific area or general
+  finalReportDueDate      String
+  programImpact           String
+  //complianceRequirement      String
+  isSiteVisitRequired     Boolean
+  siteVisitDate           DateTime?
+  //budgetAllocation           String
+  totalExpensesIncurred   Float
+  remainingBalance        Float
+  //auditRequirement           String?
+  isEligibleForRenewal    Boolean
+  renewalApplicationDate  DateTime
+  renewalAwardStatus      String
+  //futureFundingOpportunities String
+  programAlignment        String
+  proposalReviewDate      DateTime
+  reportReviewDate        DateTime
+  acknowledgementSent     Boolean
 
   representativeGrant RepresentativeGrant[]
   grantExpense        GrantExpense[]
-  grantPurpose        GrantPurpose[]
   grantPayment        GrantPayment[]
+  grantAttachment     GrantAttachment[]
 }
 
 model GrantPayment {
@@ -137,19 +128,19 @@ model GrantPayment {
   grant   Grant    @relation(fields: [grantId], references: [id])
 }
 
-model GrantPurpose {
-  id      String @id @default(uuid())
-  grantId String
-  purpose String
-  grant   Grant  @relation(fields: [grantId], references: [id])
-}
-
 model GrantExpense {
   id          String @id @default(uuid())
   grantId     String
   amount      Float
   description String
   grant       Grant  @relation(fields: [grantId], references: [id])
+}
+
+model GrantAttachment {
+  id       String @id @default(uuid())
+  grantId  String
+  document String
+  Grant    Grant  @relation(fields: [grantId], references: [id])
 }
 
 model RepresentativeGrant {
