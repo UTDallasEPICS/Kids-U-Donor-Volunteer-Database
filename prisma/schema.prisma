@@ -19,6 +19,15 @@ model Person {
   user           User?
 }
 
+model Organization {
+  id           String   @id @default(uuid())
+  name         String
+  emailAddress String   @unique
+  phoneNumber  String?  @unique
+  address      Address?
+  Donor        Donor?
+}
+
 model User {
   id       String  @id @default(uuid())
   role     String
@@ -26,10 +35,26 @@ model User {
   person   Person? @relation(fields: [personId], references: [id])
 }
 
+model Address {
+  id             String        @id @default(uuid())
+  addressLine1   String
+  addressLine2   String
+  city           String
+  state          String
+  zipCode        String
+  type           String
+  personId       String?       @unique
+  grantorId      String?       @unique
+  organizationId String?       @unique
+  person         Person?       @relation(fields: [personId], references: [id])
+  grantor        Grantor?      @relation(fields: [grantorId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+}
+
+//Grant Related
 model Grantor {
   id                          String           @id @default(uuid())
   websiteLink                 String?
-  addressId                   String
   name                        String           @unique
   contactTitle                String
   type                        String
@@ -37,7 +62,7 @@ model Grantor {
   recognitionPreference       String
   internalRelationshipManager String
   representative              Representative[]
-  address                     Address          @relation(fields: [id], references: [id])
+  address                     Address?
 }
 
 model Representative {
@@ -95,10 +120,13 @@ model Grant {
   programAlignment           String
   proposalReviewDate         DateTime
   reportReviewDate           DateTime
+  //
+  acknowledgementSent        Boolean
 
   representativeGrant RepresentativeGrant[]
   grantExpense        GrantExpense[]
   grantPurpose        GrantPurpose[]
+  grantPayment        GrantPayment[]
 }
 
 model GrantPayment {
@@ -106,6 +134,7 @@ model GrantPayment {
   grantId String
   amount  Float
   date    DateTime
+  grant   Grant    @relation(fields: [grantId], references: [id])
 }
 
 model GrantPurpose {
@@ -134,29 +163,18 @@ model RepresentativeGrant {
 
 // Donation Related
 model Donor {
-  id                      String     @id @default(uuid())
+  id                      String        @id @default(uuid())
   type                    String
   communicationPreference String
   status                  String
   notes                   String
-  personId                String     @unique
   isRetained              Boolean
   segment                 String?
+  personId                String?       @unique
+  organizationId          String?       @unique
   donation                Donation[]
-  person                  Person     @relation(fields: [personId], references: [id])
-}
-
-model Address {
-  id           String    @id @default(uuid())
-  addressLine1 String
-  addressLine2 String
-  city         String
-  state        String
-  zipCode      String
-  type         String
-  personId     String    @unique
-  person       Person    @relation(fields: [personId], references: [id])
-  Grantor      Grantor[]
+  person                  Person?       @relation(fields: [personId], references: [id])
+  organization            Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Donation {
@@ -164,17 +182,17 @@ model Donation {
   type                String
   amount              Float?
   item                String?
-  paymentMethod       String? //expand
-  campaign            String
+  paymentMethod       String?
+  campaign            String?
   date                DateTime
   fundDesignation     String
   recurringFrequency  String?
   source              String
   isMatching          Boolean
-  donorId             String   @unique
   receiptSent         Boolean
   receiptNumber       String   @default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
+  donorId             String   @unique
   donor               Donor    @relation(fields: [donorId], references: [id])
 }
