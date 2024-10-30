@@ -1,7 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Volunteer } from "@/prisma";
-import Link from "next/link";
 import { SecondarySideBar } from "../components/SecondarySideBar";
 
 export default function GrantsPage() {
