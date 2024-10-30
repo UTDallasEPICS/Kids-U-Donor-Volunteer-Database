@@ -104,35 +104,60 @@ model VolunteerEvent {
   Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
 }
 
+model Person {
+  id             String          @id @default(uuid())
+  firstName      String
+  lastName       String
+  emailAddress   String          @unique
+  phoneNumber    String?         @unique
+  donor          Donor?
+  //representative Representative?
+  address        Address?
+  //user           User?
+}
+
 model Donor {
-  email     String
-  id        String    @id @default(uuid())
-  name      String
-  phone     String
-  type      String
-  address   Address?
-  donations Donation?
+  id                      String     @id @default(uuid())
+  type                    String
+  communicationPreference String
+  status                  String
+  notes                   String
+  isRetained              Boolean
+  segment                 String?
+  donation                Donation[]
+  personId                String     @unique
+  person                  Person     @relation(fields: [personId], references: [id])
 }
 
 model Address {
-  id      String @id @default(uuid())
-  street  String
-  city    String
-  state   String
-  zipCode String
-  donorId String @unique
-  donor   Donor  @relation(fields: [donorId], references: [id])
+  id           String    @id @default(uuid())
+  addressLine1 String
+  addressLine2 String?
+  city         String
+  state        String
+  zipCode      String
+  type         String
+  personId     String    @unique
+  person       Person    @relation(fields: [personId], references: [id])
+  //Grantor      Grantor[]
 }
 
 model Donation {
-  amount        Float?
-  campaign      String
-  date          DateTime
-  donorId       String   @unique
-  id            String   @id @default(uuid())
-  item          String?
-  itemValue     Float?
-  paymentMethod String?
-  type          String
-  donor         Donor    @relation(fields: [donorId], references: [id])
+  id                  String   @id @default(uuid())
+  type                String
+  amount              Float
+  item                String?
+  paymentMethod       String?
+  campaign            String
+  fundDesignation     String
+  recurringFrequency  String
+  date                DateTime
+  source              String
+  isMatching          Boolean
+  receiptSent         Boolean
+  receiptNumber       String   //@default(uuid())
+  isAnonymous         Boolean
+  acknowledgementSent Boolean
+  donorId             String
+  donor               Donor    @relation(fields: [donorId], references: [id])
 }

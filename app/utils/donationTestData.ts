@@ -26,7 +26,7 @@ export type Donor = {
   notes: string;
   isRetained: boolean;
   segment: string | null;
-  donationIds: string[];
+  //donation: Donation[];
   personId: string;
   //person: Person;
 };
@@ -54,7 +54,7 @@ export const donations: Donation[] = [
     campaign: "Food",
     fundDesignation: "General",
     date: new Date("2024-07-15"),
-    recurrenceFrequency: "No",
+    recurrenceFrequency: "None",
     source: "Website",
     isMatching: true,
     receiptSent: true,
@@ -72,7 +72,7 @@ export const donations: Donation[] = [
     campaign: "Movement",
     fundDesignation: "General",
     date: new Date("2024-07-15"),
-    recurrenceFrequency: "No",
+    recurrenceFrequency: "None",
     source: "Website",
     isMatching: true,
     receiptSent: true,
@@ -92,7 +92,6 @@ export const donors: Donor[] = [
     notes: "Notes Notes Notes",
     isRetained: true,
     segment: "High-value donor",
-    donationIds: ["1", "2"],
     personId: "0",
   },
 ];
