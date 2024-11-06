@@ -1,7 +1,13 @@
+import { Typography } from '@mui/material';
+import Box from '@mui/material/box';
+
 export default function Donations() {
   return (
-    <div>
-      <h1 className="text-xl">Donations Page</h1>
-    </div>
+    <Box>
+      <Typography>
+        hello world
+      </Typography>
+
+    </Box>
   );
 }
