@@ -97,7 +97,7 @@ model Grant {
   matchingRequirement     String?
   useArea                 String //specific area or general
   finalReportDueDate      String
-  programImpact           String
+  //programImpact           String
   //complianceRequirement      String
   isSiteVisitRequired     Boolean
   siteVisitDate           DateTime?
@@ -171,17 +171,18 @@ model Donor {
 model Donation {
   id                  String   @id @default(uuid())
   type                String
-  amount              Float?
+  amount              Float
   item                String?
   paymentMethod       String?
   campaign            String?
   date                DateTime
   fundDesignation     String
-  recurringFrequency  String?
+  recurringFrequency  String
   source              String
   isMatching          Boolean
   receiptSent         Boolean
   receiptNumber       String   @default(uuid())
+  taxDeductableAmount Float
   isAnonymous         Boolean
   acknowledgementSent Boolean
   donorId             String   @unique
