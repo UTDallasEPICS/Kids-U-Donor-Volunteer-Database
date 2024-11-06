@@ -185,6 +185,6 @@ model Donation {
   taxDeductableAmount Float
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String   @unique
+  donorId             String
   donor               Donor    @relation(fields: [donorId], references: [id])
 }
