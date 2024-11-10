@@ -30,10 +30,17 @@ model Organization {
 
 model User {
   id       String  @id @default(uuid())
-  role     String
+  role     Role
   personId String? @unique
   person   Person? @relation(fields: [personId], references: [id])
 }
+
+enum Role {
+  VOLUNTER
+  ADMIN
+}
+
+//Volunter profile and Admin profile
 
 model Address {
   id             String        @id @default(uuid())
@@ -101,9 +108,6 @@ model Grant {
   //complianceRequirement      String
   isSiteVisitRequired     Boolean
   siteVisitDate           DateTime?
-  //budgetAllocation           String
-  totalExpensesIncurred   Float
-  remainingBalance        Float
   //auditRequirement           String?
   isEligibleForRenewal    Boolean
   renewalApplicationDate  DateTime
@@ -115,25 +119,7 @@ model Grant {
   acknowledgementSent     Boolean
 
   representativeGrant RepresentativeGrant[]
-  grantExpense        GrantExpense[]
-  grantPayment        GrantPayment[]
   grantAttachment     GrantAttachment[]
-}
-
-model GrantPayment {
-  id      String   @id @default(uuid())
-  grantId String
-  amount  Float
-  date    DateTime
-  grant   Grant    @relation(fields: [grantId], references: [id])
-}
-
-model GrantExpense {
-  id          String @id @default(uuid())
-  grantId     String
-  amount      Float
-  description String
-  grant       Grant  @relation(fields: [grantId], references: [id])
 }
 
 model GrantAttachment {
@@ -160,7 +146,6 @@ model Donor {
   status                  String
   notes                   String
   isRetained              Boolean
-  segment                 String?
   personId                String?       @unique
   organizationId          String?       @unique
   donation                Donation[]
