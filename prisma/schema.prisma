@@ -7,6 +7,11 @@ datasource db {
   url      = env("PRISMA_DB_URL")
 }
 
+enum Role {
+  VOLUNTER
+  ADMIN
+}
+
 model Person {
   id             String          @id @default(uuid())
   firstName      String
@@ -33,11 +38,6 @@ model User {
   role     Role
   personId String? @unique
   person   Person? @relation(fields: [personId], references: [id])
-}
-
-enum Role {
-  VOLUNTER
-  ADMIN
 }
 
 //Volunter profile and Admin profile
