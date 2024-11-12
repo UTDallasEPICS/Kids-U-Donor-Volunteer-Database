@@ -1,5 +1,6 @@
-// Table.tsx
+// MailTable.tsx
 import React from "react";
+import Link from "next/link";
 
 interface Message {
   ID: number;
@@ -7,8 +8,7 @@ interface Message {
   Schedule: string;
   Subject: string;
   Sent: string;
-  Active: boolean;
-  Edit: string; //this is a button not a string
+  Active: string;
 }
 
 interface TableProps {
@@ -55,7 +55,11 @@ export const MailTable: React.FC<TableProps> = ({ data }) => {
               <td className="py-2 px-4 border-b">{message.Subject}</td>
               <td className="py-2 px-4 border-b">{message.Sent}</td>
               <td className="py-2 px-4 border-b">{message.Active}</td>
-              <td className="py-2 px-4 border-b">{message.Edit}</td>
+              <td className="py-2 px-4 border-b">
+                <a className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  Edit
+                </a>
+              </td>
             </tr>
           ))}
         </tbody>

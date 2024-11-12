@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import Link from "next/link";
 
 interface Message {
@@ -7,8 +8,6 @@ interface Message {
   Schedule: string;
   Subject: string;
   Sent: string;
-  Active: boolean;
-  Edit: string; //this is a button not a string
 }
 
 const NewMail: React.FC = () => {
@@ -24,11 +23,25 @@ const NewMail: React.FC = () => {
     </div>
   );
 
+  const Header = () => (
+    <div className="flex justify-between items-center mb-5">
+      <h1 className="text-2xl font-bold text-gray-800">Mail Message</h1>
+    </div>
+  );
+
+  const Body = () => (
+    <div className="flex justify-between items-center mb-5">
+      <h1>Here</h1>
+      <h3>here</h3>
+    </div>
+  );
+
   return (
     <div className={"flex font-sans"}>
       <div className="flex-grow p-5">
         <Breadcrumb />
-        Here
+        <Header />
+        <Body />
       </div>
     </div>
   );

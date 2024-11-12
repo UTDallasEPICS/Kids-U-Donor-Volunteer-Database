@@ -1,5 +1,7 @@
 "use client";
 import { MailTable } from "./MailTable";
+import EditMail from "./NewMail/page";
+import { useRouter } from "next/router";
 
 import React, { useState, useEffect } from "react";
 // import type { Mail } from "@/prisma";
@@ -11,8 +13,7 @@ interface Message {
   Schedule: string;
   Subject: string;
   Sent: string;
-  Active: boolean;
-  Edit: string; //this is a button not a string
+  Active: string;
 }
 
 const Mail: React.FC = () => {
@@ -20,29 +21,26 @@ const Mail: React.FC = () => {
     {
       ID: 8432,
       Event: "Tutoring",
-      Schedule: "Send 1 month before activity occurrence",
+      Schedule: "Send 1 week after activity occurrence",
       Subject: "Thank you for volunteering!",
       Sent: "7 email(s) sent",
-      Active: true,
-      Edit: "Edit",
+      Active: "Yes",
     },
     {
       ID: 7215,
       Event: "Mentorship Program",
       Schedule: "Send 3 days before activity occurrence",
-      Subject: "Volunteer Reminder",
+      Subject: "Mentorship Program Volunteer Reminder",
       Sent: "No email(s) sent",
-      Active: true,
-      Edit: "Edit",
+      Active: "Yes",
     },
     {
       ID: 7043,
-      Event: "Gala 2024 Volunteer Registration",
-      Schedule: "Send 3 days before activity occurrence",
-      Subject: "Oyster Restoration Directions",
+      Event: "Gala 2024",
+      Schedule: "Send 1 month before activity occurrence",
+      Subject: "Gala 2024 Volunteer Registration",
       Sent: "14 email(s) sent",
-      Active: true,
-      Edit: "Edit",
+      Active: "Yes",
     },
   ];
 
