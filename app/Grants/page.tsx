@@ -76,30 +76,26 @@ export default function GrantsPage() {
             <TableBody>
               {grantsData.map((grant) => (
                 <TableRow
-                  key={grant.GrantID}
+                  key={grant.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell>{grant.Representative
-                    ? grant.Representative[0].FirstName
-                    : "N/A"}
-                  </TableCell>
-                  <TableCell>{<Link href={`/Grants/Detail/${grant.GrantID}`}>
-                    {grant.GrantName}
+                  <TableCell>{<Link href={`/Grants/Detail/${grant.id}`}>
+                    {grant.name}
                   </Link>}</TableCell>
-                  <TableCell>{grant.AwardStatus}</TableCell>
-                  <TableCell>{grant.AskAmount}</TableCell>
-                  <TableCell>{grant.AmountAwarded}</TableCell>
-                  <TableCell>{grant.GrantDueDate
-                    ? new Date(grant.GrantDueDate).toLocaleDateString()
+                  <TableCell>{grant.status}</TableCell>
+                  <TableCell>{grant.}</TableCell>
+                  <TableCell>{grant.}</TableCell>
+                  <TableCell>{grant.
+                    ? new Date(grant.).toLocaleDateString()
                     : "N/A"}
                   </TableCell>
-                  <TableCell>{grant.EndOfGrantReportDueDate
+                  <TableCell>{grant.
                     ? new Date(
-                      grant.EndOfGrantReportDueDate
-                    ).toLocaleDateString()
+                    grant.EndOfGrantReportDueDate
+                  ).toLocaleDateString()
                     : "N/A"}
                   </TableCell>
-                  <TableCell>{grant.FundingRestrictions}</TableCell>
+                  <TableCell>{grant.}</TableCell>
                   <TableCell>{grant.AwardDate
                     ? new Date(grant.AwardDate).toLocaleDateString()
                     : "Not Awarded Yet"}
