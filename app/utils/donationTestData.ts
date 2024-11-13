@@ -1,4 +1,4 @@
-type Donation = {
+export type Donation = {
   id: string;
   date: Date;
   category: string;
