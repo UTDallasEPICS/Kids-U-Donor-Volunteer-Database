@@ -27,10 +27,10 @@ model Person {
 model Organization {
   id           String   @id @default(uuid())
   name         String
-  emailAddress String   @unique
-  phoneNumber  String?  @unique
+  emailAddress String?  @unique
   address      Address?
-  Donor        Donor?
+  grantor      Grantor?
+  donor        Donor?
 }
 
 model User {
@@ -54,21 +54,20 @@ model Address {
   grantorId      String?       @unique
   organizationId String?       @unique
   person         Person?       @relation(fields: [personId], references: [id])
-  grantor        Grantor?      @relation(fields: [grantorId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
 //Grant Related
 model Grantor {
   id                          String           @id @default(uuid())
-  name                        String           @unique
   type                        String
   websiteLink                 String?
   communicationPreference     String
   recognitionPreference       String
   internalRelationshipManager String
+  organizationId              String           @unique
+  organization                Organization     @relation(fields: [organizationId], references: [id])
   representative              Representative[]
-  address                     Address?
 }
 
 model Representative {
@@ -82,8 +81,8 @@ model Representative {
 }
 
 model Grant {
-  id                      String    @id @default(uuid())
-  name                    String    @unique
+  id                      String                @id @default(uuid())
+  name                    String                @unique
   status                  String
   amountRequested         Float
   amountAwarded           Float
@@ -92,34 +91,23 @@ model Grant {
   endDate                 DateTime
   isMultipleYears         Boolean
   quarter                 String
-  proposalSubmissionDate  DateTime
+  acknowledgementSent     Boolean
   awardNotificationDate   DateTime
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
   proposalDueDate         DateTime
   proposalSummary         String
+  proposalSubmissionDate  DateTime
   applicationType         String
   internalOwner           String
   fundingRestriction      String?
   matchingRequirement     String?
   useArea                 String //specific area or general
-  finalReportDueDate      String
-  //programImpact           String
-  //complianceRequirement      String
-  isSiteVisitRequired     Boolean
-  siteVisitDate           DateTime?
-  //auditRequirement           String?
   isEligibleForRenewal    Boolean
   renewalApplicationDate  DateTime
   renewalAwardStatus      String
-  //futureFundingOpportunities String
-  programAlignment        String
-  proposalReviewDate      DateTime
-  reportReviewDate        DateTime
-  acknowledgementSent     Boolean
-
-  representativeGrant RepresentativeGrant[]
-  grantAttachment     GrantAttachment[]
+  representativeGrant     RepresentativeGrant[]
+  grantAttachment         GrantAttachment[]
 }
 
 model GrantAttachment {
