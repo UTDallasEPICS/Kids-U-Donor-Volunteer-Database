@@ -62,15 +62,15 @@ export default function GrantsPage() {
           <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Organization</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Grantor</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Requested Amount</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Awarded Amount</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Due Date</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Report Due Date</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Restrictions</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Award Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Proposal Due Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Proposal Submission Date</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -83,22 +83,15 @@ export default function GrantsPage() {
                     {grant.name}
                   </Link>}</TableCell>
                   <TableCell>{grant.status}</TableCell>
-                  <TableCell>{grant.}</TableCell>
-                  <TableCell>{grant.}</TableCell>
-                  <TableCell>{grant.
-                    ? new Date(grant.).toLocaleDateString()
+                  <TableCell>{grant.amountRequested}</TableCell>
+                  <TableCell>{grant.amountAwarded}</TableCell>
+                  <TableCell>{grant.startDate
+                    ? new Date(grant.startDate).toLocaleDateString()
                     : "N/A"}
                   </TableCell>
-                  <TableCell>{grant.
-                    ? new Date(
-                    grant.EndOfGrantReportDueDate
-                  ).toLocaleDateString()
+                  <TableCell>{grant.endDate
+                    ? new Date(grant.endDate).toLocaleDateString()
                     : "N/A"}
-                  </TableCell>
-                  <TableCell>{grant.}</TableCell>
-                  <TableCell>{grant.AwardDate
-                    ? new Date(grant.AwardDate).toLocaleDateString()
-                    : "Not Awarded Yet"}
                   </TableCell>
                 </TableRow>
               ))}
@@ -109,3 +102,16 @@ export default function GrantsPage() {
     </Box >
   );
 }
+
+const styles = {
+  table: {
+    minWidth: 650,
+  },
+  tableCellHeader: {
+    fontWeight: "bold",
+    border: "1px solid #ccc",
+  },
+  tableCell: {
+    border: "1px solid #ccc",
+  },
+};

@@ -65,6 +65,7 @@ export default function GrantsPage() {
                                 <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Representative</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
                             </TableRow>
                         </TableHead>
                     </Table>

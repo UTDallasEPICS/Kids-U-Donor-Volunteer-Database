@@ -85,7 +85,7 @@ model Grant {
   name                    String                @unique
   status                  String
   amountRequested         Float
-  amountAwarded           Float
+  amountAwarded           Float                 @default(0)
   purpose                 String //specific area or general
   startDate               DateTime
   endDate                 DateTime
