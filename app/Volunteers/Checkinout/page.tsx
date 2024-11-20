@@ -92,15 +92,15 @@ export default function Checkinout() {
   return (
     <div className="p-6">
       <Breadcrumb />
-      <h2 className="text-center mb-4 text-xl font-semibold text-gray-700">
-        If you forgot to check in
+      <h2 className="underline text-center mb-4 text-5xl font-semibold text-gray-700">
+        Check-In / Check-Out
       </h2>
 
       <div className="flex items-start justify-center space-x-12 mt-10">
         {/* Column 1: Automatic Check-In/Check-Out */}
         <div className="flex flex-col items-center space-y-4">
           <h1 className="text-2xl font-semibold text-gray-800">
-            CHECK IN AND CHECKOUT HERE
+            Button Entry
           </h1>
           <button
             onClick={handleCheckIn}
@@ -121,7 +121,7 @@ export default function Checkinout() {
 
         {/* Column 2: Manual Date and Time Entry */}
         <div className="flex flex-col items-center space-y-4">
-          <h2 className="text-xl font-semibold text-gray-800">Manual Entry</h2>
+          <h1 className="text-2xl font-semibold text-gray-800">Manual Entry</h1>
           <div className="flex flex-col space-y-2">
             <input
               type="date"
