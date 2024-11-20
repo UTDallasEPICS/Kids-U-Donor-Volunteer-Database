@@ -1,80 +1,57 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { Box, TextField, Typography, MenuItem } from "@mui/material";
+import { Box, TextField, Typography, MenuItem, Button } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { FormInputTextfield } from "../../../components/formComponents/FormInputTextfield";
 import Loading from "@/app/loading";
-import { states } from "@/app/utils/US";
-import { Footer } from "../../../components/donationHandleFooter";
 import {
-  DonorState,
-  PersonState,
-  AddressState,
-  RequiredDonorPersonState,
-  donorResponse,
-} from "@/app/types/states";
-
-const donorTypes: string[] = ["Individual", "Corporate", "Foundation"];
-
-const donorStatuses: string[] = [
-  "Active",
-  "Lapsed",
-  "Major Donor",
-  "First Time Donor",
-];
-
-const donorSegments: string[] = [
-  "High Value Donor",
-  "Lapsed",
-  "First Time Donor",
-];
-
-const donorCommPrefs: string[] = ["Email", "Mail", "Phone"];
+  addressTypes,
+  DonorFormProps,
+  statesChoices,
+} from "@/app/components/formComponents/FormInputProps";
+import { donorResponse } from "@/app/types/states";
+import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
+import {
+  donorCommPreferences,
+  donorSegments,
+  donorStatuses,
+  donorTypes,
+  choiceYesOrNo,
+} from "@/app/components/formComponents/FormInputProps";
+import { Footer } from "@/app/components/DonationHandleFooter";
 
 export default function DonorDetail() {
   const { id }: { id: string } = useParams();
   const router = useRouter();
 
   /* TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO
-  check if data has been updated, if not then don't send api request https://www.reddit.com/r/reactjs/comments/x4acgb/how_do_i_secure_my_nextjs_api_from_users_that/
-  Not found page, better looking 404
-  Make separate tables for custom adding fields
   receipt number in donations?
+  phone number has to be xxx-xxx-xxxx? maybe +1 and all that too https://stackoverflow.com/questions/60909788/how-to-use-material-ui-textfield-with-react-phone-number-input
   */
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [donor, setDonor] = useState<DonorState>({
-    type: "",
-    communicationPreference: "",
-    status: "",
-    notes: "",
-    isRetained: false,
-    segment: null,
-  });
-  const [person, setPerson] = useState<PersonState>({
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    emailAddress: "",
-  });
-  const [address, setAddress] = useState<AddressState>({
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    type: "",
-  });
   const personNameRef = useRef<string>("");
+  const isOrgRef = useRef<boolean>(false);
 
-  const [requiredError, setRequiredError] = useState({
-    firstName: false,
-    lastName: false,
-    emailAddress: false,
-    addressLine1: false,
-    city: false,
-    zipCode: false,
-    type: false,
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isDirty, isValid, errors },
+  } = useForm<DonorFormProps>({
+    mode: "onChange",
+    defaultValues: {
+      donor: undefined,
+      person: undefined,
+      organization: undefined,
+      address: undefined,
+    },
   });
+
+  useEffect(() => {
+    fetchDonor();
+  }, []);
 
   const fetchDonor = async () => {
     try {
@@ -93,61 +70,60 @@ export default function DonorDetail() {
       }
 
       personNameRef.current = `${data.person.firstName} ${data.person.lastName}`;
+      isOrgRef.current =
+        data.organization !== null ||
+        data.type === "Corporate" ||
+        data.type === "Foundation";
 
-      setDonor({
-        type: data.type,
-        communicationPreference: data.communicationPreference,
-        status: data.status,
-        notes: data.notes,
-        isRetained: data.isRetained,
-        segment: data.segment,
+      reset({
+        donor: {
+          type: data.type,
+          communicationPreference: data.communicationPreference,
+          status: data.status,
+          notes: data.notes,
+          isRetained: data.isRetained,
+          segment: data.segment,
+        },
+        organization: isOrgRef.current
+          ? {
+              name: data.organization.name || "",
+              emailAddress: data.organization.emailAddress || "",
+              phoneNumber: data.organization.phoneNumber || "",
+            }
+          : {},
+        person: isOrgRef.current
+          ? {}
+          : {
+              firstName: data.person.firstName,
+              lastName: data.person.lastName,
+              emailAddress: data.person.emailAddress,
+              phoneNumber: data.person?.phoneNumber,
+            },
+        address: isOrgRef.current
+          ? {
+              addressLine1: data.organization.address?.addressLine1 || "",
+              addressLine2: data.organization.address?.addressLine2 || "",
+              city: data.organization.address?.city || "",
+              state: data.organization.address?.state || "",
+              zipCode: data.organization.address?.zipCode || "",
+              type: data.organization.address?.type || "",
+            }
+          : {
+              addressLine1: data.person.address?.addressLine1,
+              addressLine2: data.person.address?.addressLine2,
+              city: data.person.address?.city,
+              state: data.person.address?.state,
+              zipCode: data.person.address?.zipCode,
+              type: data.person.address?.type,
+            },
       });
 
-      setPerson({
-        firstName: data.person.firstName,
-        lastName: data.person.lastName,
-        phoneNumber: data.person.phoneNumber,
-        emailAddress: data.person.emailAddress,
-      });
-
-      setAddress({
-        addressLine1: data.person.address.addressLine1,
-        addressLine2: data.person.address.addressLine2,
-        city: data.person.address.city,
-        state: data.person.address.state,
-        zipCode: data.person.address.zipCode,
-        type: data.person.address.type,
-      });
       setIsLoading(false);
     } catch (error) {
       console.error(error);
+      router.push("/not-found");
     }
   };
-
-  useEffect(() => {
-    fetchDonor();
-  }, []);
-
-  const handleInput =
-    <T,>(label: keyof T, setState: React.Dispatch<React.SetStateAction<T>>) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.value.trim() === "") {
-        setRequiredError((prev: RequiredDonorPersonState) => ({
-          ...prev,
-          [label]: true,
-        }));
-      } else {
-        setRequiredError((prev: RequiredDonorPersonState) => ({
-          ...prev,
-          [label]: false,
-        }));
-      }
-
-      setState((prev: T) => ({
-        ...prev,
-        [label]: event.target.value.trim(),
-      }));
-    };
 
   return (
     <Box>
@@ -159,83 +135,49 @@ export default function DonorDetail() {
             Donor Details for: {personNameRef.current}
           </Typography>
           <Box sx={styles.inputContainer}>
-            <TextField
-              sx={styles.textField}
+            <FormInputDropdown
+              name={"donor.type"}
+              control={control}
+              label={"Type"}
               required={true}
-              select
-              id="select-type"
-              label="Type"
-              value={donor.type}
-              onChange={handleInput("type", setDonor)}
-            >
-              {donorTypes.map((type, index) => (
-                <MenuItem key={index} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
+              menuItems={donorTypes}
               sx={styles.textField}
+            />
+            <FormInputDropdown
+              name={"donor.communicationPreference"}
+              control={control}
+              label={"Communication Preference"}
               required={true}
-              select
-              id="select-communicationPreference"
-              label="Communication Preference"
-              value={donor.communicationPreference}
-              onChange={handleInput("communicationPreference", setDonor)}
-            >
-              {donorCommPrefs.map((pref, index) => (
-                <MenuItem key={index} value={pref}>
-                  {pref}
-                </MenuItem>
-              ))}
-            </TextField>
-            <TextField
+              menuItems={donorCommPreferences}
               sx={styles.textField}
+            />
+            <FormInputDropdown
+              name={"donor.status"}
+              control={control}
+              label={"Status"}
               required={true}
-              select
-              id="select-status"
-              label="Status"
-              value={donor.status}
-              onChange={handleInput("status", setDonor)}
-            >
-              {donorStatuses.map((status, index) => (
-                <MenuItem key={index} value={status}>
-                  {status}
-                </MenuItem>
-              ))}
-            </TextField>
+              menuItems={donorStatuses}
+              sx={styles.textField}
+            />
           </Box>
 
           <Box sx={styles.inputContainer}>
-            <TextField
-              sx={styles.textField}
+            <FormInputDropdown
+              name={"donor.isRetained"}
+              control={control}
+              label={"Retention"}
               required={true}
-              select
-              id="select-retention"
-              label="Retention"
-              //helperText="Is this donor retained from last year"
-              value={donor.isRetained}
-              onChange={handleInput("isRetained", setDonor)}
-            >
-              <MenuItem value={"true"}>Yes</MenuItem>
-              <MenuItem value={"false"}>No</MenuItem>
-            </TextField>
-            <TextField
+              menuItems={choiceYesOrNo}
               sx={styles.textField}
+            />
+            <FormInputDropdown
+              name={"donor.segment"}
+              control={control}
+              label={"Segmentation"}
               required={true}
-              select
-              id="select-segmentation"
-              label="Segmentation"
-              value={donor.segment}
-              onChange={handleInput("segment", setDonor)}
-            >
-              <MenuItem value={"None"}>None</MenuItem>
-              {donorSegments.map((segment, index) => (
-                <MenuItem key={index} value={segment}>
-                  {segment}
-                </MenuItem>
-              ))}
-            </TextField>
+              menuItems={donorSegments}
+              sx={styles.textField}
+            />
             <TextField
               sx={{ ...styles.textField, visibility: "hidden" }}
               id="style"
@@ -245,178 +187,158 @@ export default function DonorDetail() {
 
           <Typography variant="h6">Donor Notes</Typography>
           <Box sx={styles.inputContainer}>
-            <TextField
-              id="multiline-notes"
-              label="Note"
-              multiline
+            <FormInputTextfield
+              name={"donor.notes"}
+              control={control}
+              label={"Notes"}
+              multiline={true}
               rows={4}
-              fullWidth
-              value={donor.notes}
-              onChange={handleInput("notes", setDonor)}
+              fullWidth={true}
+              sx={styles.textField}
             />
           </Box>
-          {donor.type === "Individual" ? (
-            <Box>
-              <Typography variant="h6">Individual Details</Typography>
-              <Box sx={styles.inputContainer}>
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="firstName"
-                  label="First Name"
-                  value={person.firstName}
-                  onChange={handleInput("firstName", setPerson)}
-                  error={requiredError.firstName}
-                  helperText={
-                    requiredError.firstName ? "Field is required" : ""
-                  }
-                />
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="lastName"
-                  label="Last Name"
-                  value={person.lastName}
-                  onChange={handleInput("lastName", setPerson)}
-                  error={requiredError.lastName}
-                  helperText={requiredError.lastName ? "Field is required" : ""}
-                />
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="email"
-                  label="Email Address"
-                  value={person.emailAddress}
-                  onChange={handleInput("emailAddress", setPerson)}
-                  error={requiredError.emailAddress}
-                  helperText={
-                    requiredError.emailAddress ? "Field is required" : ""
-                  }
-                />
-              </Box>
 
-              <Box sx={styles.inputContainer}>
-                <TextField
-                  sx={styles.textField}
-                  required={false}
-                  id="phoneNumber"
-                  label="Phone Number"
-                  value={person.phoneNumber}
-                  onChange={handleInput("phoneNumber", setPerson)}
-                />
-                <TextField
-                  sx={{ ...styles.textField, visibility: "hidden" }}
-                  id="style"
-                  label="styling"
-                />
-                <TextField
-                  sx={{ ...styles.textField, visibility: "hidden" }}
-                  id="style"
-                  label="styling"
-                />
-              </Box>
+          <Controller
+            name="donor.type"
+            control={control}
+            render={({ field: { value } }) => (
+              <Box>
+                <Typography variant="h6">
+                  {isOrgRef.current ? "Organization" : "Individual"} Details
+                </Typography>
+                {isOrgRef.current ? (
+                  <Box>
+                    <Box sx={styles.inputContainer}>
+                      <FormInputTextfield
+                        name={"organization.name"}
+                        control={control}
+                        label={"Name"}
+                        required={true}
+                        sx={styles.textField}
+                      />
+                      <FormInputTextfield
+                        name={"organization.emailAddress"}
+                        control={control}
+                        label={"Email Address"}
+                        required={true}
+                        sx={styles.textField}
+                      />
+                      <FormInputTextfield
+                        name={"organization.phoneNumber"}
+                        control={control}
+                        label={"Phone Number"}
+                        maxLength={12}
+                        sx={styles.textField}
+                      />
+                    </Box>
+                  </Box>
+                ) : (
+                  <Box>
+                    <Box sx={styles.inputContainer}>
+                      <FormInputTextfield
+                        name={"person.firstName"}
+                        control={control}
+                        label={"First Name"}
+                        required={true}
+                        sx={styles.textField}
+                      />
+                      <FormInputTextfield
+                        name={"person.lastName"}
+                        control={control}
+                        label={"Last Name"}
+                        required={true}
+                        sx={styles.textField}
+                      />
+                      <FormInputTextfield
+                        name={"person.emailAddress"}
+                        control={control}
+                        label={"Email Address"}
+                        required={true}
+                        sx={styles.textField}
+                      />
+                    </Box>
 
-              <Box sx={styles.inputContainer}>
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="address"
-                  label="Address Line 1"
-                  value={address.addressLine1}
-                  onChange={handleInput("addressLine1", setAddress)}
-                  error={requiredError.addressLine1}
-                  helperText={
-                    requiredError.addressLine1 ? "Field is required" : ""
-                  }
-                />
-                <TextField
-                  sx={styles.textField}
-                  required={false}
-                  id="address"
-                  label="Address Line 2"
-                  value={address.addressLine2}
-                  onChange={handleInput("addressLine2", setAddress)}
-                />
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="address"
-                  label="City"
-                  value={address.city}
-                  onChange={handleInput("city", setAddress)}
-                  error={requiredError.city}
-                  helperText={requiredError.city ? "Field is required" : ""}
-                />
-              </Box>
+                    <Box sx={styles.inputContainer}>
+                      <FormInputTextfield
+                        name={"person.phoneNumber"}
+                        control={control}
+                        label={"Phone Number"}
+                        maxLength={12}
+                        sx={styles.textField}
+                      />
+                      <TextField
+                        sx={{ ...styles.textField, visibility: "hidden" }}
+                        id="style"
+                        label="styling"
+                      />
+                      <TextField
+                        sx={{ ...styles.textField, visibility: "hidden" }}
+                        id="style"
+                        label="styling"
+                      />
+                    </Box>
+                  </Box>
+                )}
+                <Box sx={styles.inputContainer}>
+                  <FormInputTextfield
+                    name={"address.addressLine1"}
+                    control={control}
+                    label={"Address Line 1"}
+                    required={true}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"address.addressLine2"}
+                    control={control}
+                    label={"Address Line 2"}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"address.city"}
+                    control={control}
+                    label={"City"}
+                    required={true}
+                    sx={styles.textField}
+                  />
+                </Box>
 
-              <Box sx={styles.inputContainer}>
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  select
-                  id="select-state"
-                  label="State"
-                  value={address.state}
-                  onChange={handleInput("state", setAddress)}
-                >
-                  {states.map((state, index) => (
-                    <MenuItem key={index} value={state.value}>
-                      {state.value}
-                    </MenuItem>
-                  ))}
-                </TextField>
-                <TextField
-                  sx={{
-                    ...styles.textField,
-                    "& input[type=number]": {
-                      MozAppearance: "textfield",
-                    },
-                    "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
-                      {
-                        WebkitAppearance: "none",
-                        margin: 0,
-                      },
-                  }}
-                  required={true}
-                  type="number"
-                  id="address"
-                  label="Zip Code"
-                  value={address.zipCode}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                    setPerson((prev: PersonState) => ({
-                      ...prev,
-                      zipCode: Number(event.target.value),
-                    }));
-                  }}
-                  error={requiredError.zipCode}
-                  helperText={requiredError.zipCode ? "Field is required" : ""}
-                />
-                <TextField
-                  sx={styles.textField}
-                  required={true}
-                  id="type"
-                  label="Address Type"
-                  value={address.type}
-                  onChange={handleInput("type", setAddress)}
-                  error={requiredError.type}
-                  helperText={requiredError.type ? "Field is required" : ""}
-                />
+                <Box sx={styles.inputContainer}>
+                  <FormInputDropdown
+                    name={"address.state"}
+                    control={control}
+                    label={"State"}
+                    required={true}
+                    menuItems={statesChoices}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"address.zipCode"}
+                    control={control}
+                    label={"Zip Code"}
+                    required={true}
+                    sx={styles.textField}
+                    type="zip"
+                  />
+                  <FormInputDropdown
+                    name={"address.type"}
+                    control={control}
+                    label={"Type"}
+                    required={true}
+                    menuItems={addressTypes}
+                    sx={styles.textField}
+                  />
+                </Box>
               </Box>
-            </Box>
-          ) : (
-            <Box>
-              <Typography variant="h6">Organization Details</Typography>
-            </Box>
-          )}
+            )}
+          />
           <Footer
             id={id}
             name={"donor"}
             href={"/Donors"}
             apiUrl={"/v1/donors"}
-            requiredError={requiredError}
-            donor={donor}
-            person={person}
-            address={address}
+            handleSubmit={handleSubmit}
+            isDirty={isDirty}
+            errors={errors}
           />
           <Typography variant="h6">
             Donor Lifetime Value (placeholder calculation)

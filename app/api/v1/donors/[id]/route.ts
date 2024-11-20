@@ -8,7 +8,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const data = await prisma.donor.findUnique({
       where: {
@@ -30,6 +30,15 @@ export async function GET(
           select: {
             firstName: true,
             lastName: true,
+            phoneNumber: true,
+            emailAddress: true,
+            address: true,
+          },
+        },
+        //
+        organization: {
+          select: {
+            name: true,
             phoneNumber: true,
             emailAddress: true,
             address: true,
@@ -57,13 +66,17 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
-    const { donor, person, address } = (await req.json()) as {
-      donor: Donor;
-      person: Person;
-      address: Address;
+    const {
+      data: { donor, person, address },
+    } = (await req.json()) as {
+      data: {
+        donor: Donor;
+        person: Person;
+        address: Address;
+      };
     };
 
     const updatedDonorAndPerson = await prisma.donor.update({
@@ -109,7 +122,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const data = await prisma.donor.delete({

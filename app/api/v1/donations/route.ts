@@ -21,12 +21,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("POST ERROR:", error);
   }
-  ``;
 }
 
 // Read
 export async function GET() {
   const data = await prisma.donation.findMany();
+  console.log(data);
 
   return NextResponse.json(
     { message: "GET REQUEST", data: data },

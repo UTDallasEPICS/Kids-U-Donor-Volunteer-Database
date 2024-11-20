@@ -11,7 +11,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const data = await prisma.donation.findUnique({
       where: {
@@ -57,16 +57,26 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
-    const body = (await req.json()) as Donation;
+    const {
+      data: { donation },
+    } = (await req.json()) as { data: { donation: Donation } };
+
+    console.log(donation);
 
     const updatedDonation = await prisma.donation.update({
       where: {
         id: id,
       },
-      data: body,
+      data: {
+        ...donation,
+        amount:
+          typeof donation.amount === "string"
+            ? parseFloat(donation.amount)
+            : donation.amount,
+      },
     });
 
     return NextResponse.json(

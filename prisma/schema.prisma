@@ -38,17 +38,12 @@ model Volunteer {
 }
 
 model Organization {
-  OrganizationID            String           @id @default(uuid())
-  WebsiteForFunder          String?
-  StreetAddress             String
-  City                      String
-  State                     String
-  Zipcode                   String
-  Country                   String
-  OrganizationName          String           @unique
-  PortalForGrantApplication String?
-  NotesAboutLoginInfo       String?
-  Representative            Representative[]
+  id           String   @id @default(uuid())
+  name         String
+  emailAddress String   @unique
+  phoneNumber  String?  @unique
+  address      Address?
+  Donor        Donor?
 }
 
 model Representative {
@@ -59,7 +54,7 @@ model Representative {
   Phone             String?      @unique
   PositionInCompany String
   OrganizationID    String
-  Organization      Organization @relation(fields: [OrganizationID], references: [OrganizationID])
+  //Organization      Organization @relation(fields: [OrganizationID], references: [OrganizationID])
   Grants            Grant[]      @relation("GrantToRepresentative")
 }
 
@@ -125,8 +120,10 @@ model Donor {
   isRetained              Boolean
   segment                 String?
   donation                Donation[]
-  personId                String     @unique
-  person                  Person     @relation(fields: [personId], references: [id])
+  personId                String?       @unique
+  person                  Person?       @relation(fields: [personId], references: [id])
+  organizationId          String?       @unique
+  organization            Organization? @relation(fields: [organizationId], references: [id])
 }
 
 model Address {
@@ -139,6 +136,9 @@ model Address {
   type         String
   personId     String    @unique
   person       Person    @relation(fields: [personId], references: [id])
+  organizationId String?       @unique
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  //grantorId      String?       @unique
   //Grantor      Grantor[]
 }
 
@@ -154,8 +154,9 @@ model Donation {
   date                DateTime
   source              String
   isMatching          Boolean
-  receiptSent         Boolean
-  receiptNumber       String   //@default(uuid())
+  taxDeductibleAmount Float?
+  receiptSent         Boolean?
+  receiptNumber       String?   @default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
   donorId             String

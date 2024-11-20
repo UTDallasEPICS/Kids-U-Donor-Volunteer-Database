@@ -1,25 +1,20 @@
-import { Box, Button } from "@mui/material";
+import { Box, Button, Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
-import {
-  DonorState,
-  PersonState,
-  AddressState,
-  DonationState,
-  RequiredDonationState,
-  RequiredDonorPersonState,
-} from "../types/states";
 import { useEffect, useState } from "react";
+import { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
+import {
+  DonationFormProps,
+  DonorFormProps,
+} from "./formComponents/FormInputProps";
 
 type FooterProps = {
   id: string;
   name: string;
   href: string;
   apiUrl: string;
-  requiredError: RequiredDonationState | RequiredDonorPersonState;
-  donation?: DonationState;
-  donor?: DonorState;
-  person?: PersonState;
-  address?: AddressState;
+  handleSubmit: UseFormHandleSubmit<DonorFormProps | DonationFormProps>;
+  isDirty: boolean;
+  errors: FieldErrors<DonorFormProps | DonationFormProps>;
 };
 
 export const Footer = ({
@@ -27,43 +22,45 @@ export const Footer = ({
   name,
   href,
   apiUrl,
-  requiredError,
-  donation,
-  donor,
-  person,
-  address,
+  handleSubmit,
+  isDirty,
+  errors,
 }: FooterProps) => {
   const router = useRouter();
 
-  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(false);
+  const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
+  const seconds: number = 4000;
+  const handleButtonDisable = () => {
+    setTimeout(() => {
+      setIsButtonDisabled(false);
+    }, seconds);
+  };
+
+  // Disable button for n seconds on refresh/load
   useEffect(() => {
-    // Disable button after it has been pressed for 6 seconds
-    const handleButtonDisable = () => {
-      setTimeout(() => {
-        setIsButtonDisabled(false);
-      }, 6000);
-    };
+    handleButtonDisable();
+  }, []);
+
+  // Disable button after it has been pressed for n seconds
+  useEffect(() => {
     handleButtonDisable();
   }, [isButtonDisabled]);
 
-  const handleSave = async () => {
-    if (Object.values(requiredError).some((error) => error)) {
-      alert("All fields must be filled.");
+  const handleSave = async (data: DonorFormProps | DonationFormProps) => {
+    // If fields not changed, don't save
+    if (!isDirty || Object.keys(errors).length > 0) {
+      alert(
+        "Cannot save when fields are unchanged or there are validation errors."
+      );
       return;
     }
     try {
       setIsButtonDisabled(true);
 
-      let requestBody: string = "";
+      const requestBody = JSON.stringify({ data });
 
-      if (donor && person && address) {
-        requestBody = JSON.stringify({ donor, person, address });
-      } else if (donation) {
-        requestBody = JSON.stringify(donation);
-      }
-
-      const result = await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`,
         {
           method: "PATCH",
@@ -74,7 +71,7 @@ export const Footer = ({
         }
       );
 
-      if (!result.ok) {
+      if (!response.ok) {
         throw new Error("Error updating data");
       }
       alert("Successfully updated data.");
@@ -112,35 +109,63 @@ export const Footer = ({
   };
 
   const handleCancel = () => {
-    router.push(`/${name}`);
+    router.push(href);
   };
 
   return (
     <Box sx={styles.footerContainer}>
-      <Button
-        sx={styles.buttonContained}
-        variant="contained"
-        onClick={handleSave}
-        disabled={isButtonDisabled}
+      <Tooltip
+        title={
+          !isDirty
+            ? "Cannot save when fields are unchanged."
+            : Object.keys(errors).length > 0
+              ? "Cannot save because there are validation errors."
+              : "Save all changes."
+        }
       >
-        Save
-      </Button>
-      <Button
-        sx={styles.buttonContained}
-        variant="contained"
-        onClick={handleDelete}
-        disabled={isButtonDisabled}
+        <span>
+          <Button
+            sx={styles.buttonContained}
+            variant="contained"
+            onClick={handleSubmit(handleSave)}
+            disabled={
+              isButtonDisabled || !isDirty || Object.keys(errors).length > 0
+            }
+          >
+            Save
+          </Button>
+        </span>
+      </Tooltip>
+      <Tooltip
+        title={isDirty ? "Delete details" : "Please wait after every press."}
       >
-        Delete
-      </Button>
-      <Button
-        sx={styles.buttonOutlined}
-        variant="outlined"
-        onClick={handleCancel}
-        disabled={isButtonDisabled}
+        <span>
+          <Button
+            sx={styles.buttonContained}
+            variant="contained"
+            onClick={handleDelete}
+            disabled={isButtonDisabled}
+          >
+            Delete
+          </Button>
+        </span>
+      </Tooltip>
+      <Tooltip
+        title={
+          isDirty ? "Move back to List page" : "Please wait after every press."
+        }
       >
-        Cancel
-      </Button>
+        <span>
+          <Button
+            sx={styles.buttonOutlined}
+            variant="outlined"
+            onClick={handleCancel}
+            disabled={isButtonDisabled}
+          >
+            Cancel
+          </Button>
+        </span>
+      </Tooltip>
     </Box>
   );
 };
