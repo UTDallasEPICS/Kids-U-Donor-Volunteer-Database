@@ -38,11 +38,17 @@ export default function Checkinout() {
     if (checkInTime) {
       const now = new Date();
       const checkOutMessage = `Check-Out Time: ${now.toLocaleTimeString()}`;
-      const hoursWorked = (
-        (now.getTime() - checkInTime.getTime()) /
-        (1000 * 60 * 60)
-      ).toFixed(2);
-      const hoursMessage = `Hours Volunteered: ${hoursWorked}`;
+
+      const timeDiff = now.getTime() - checkInTime.getTime();
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      let hoursMessage = "";
+      if (minutes != 1) {
+        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minutes`;
+      } else {
+        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minute`;
+      }
+
       console.log(checkOutMessage);
       console.log(hoursMessage);
       setMessage(`${checkOutMessage}\n${hoursMessage}`);
@@ -62,11 +68,16 @@ export default function Checkinout() {
     const checkOut = new Date(`${manualCheckOutDate}T${manualCheckOutTime}`);
 
     if (checkIn && checkOut && checkOut > checkIn) {
-      const hoursWorked = (
-        (checkOut.getTime() - checkIn.getTime()) /
-        (1000 * 60 * 60)
-      ).toFixed(2);
-      const hoursMessage = `Hours Volunteered (Manual Entry): ${hoursWorked}`;
+      const timeDiff = checkOut.getTime() - checkIn.getTime();
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      let hoursMessage = "";
+      if (minutes != 1) {
+        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minutes`;
+      } else {
+        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minute`;
+      }
+
       setMessage(hoursMessage);
       setVisible(true);
       console.log(hoursMessage);
@@ -99,9 +110,7 @@ export default function Checkinout() {
       <div className="flex items-start justify-center space-x-12 mt-10">
         {/* Column 1: Automatic Check-In/Check-Out */}
         <div className="flex flex-col items-center space-y-4">
-          <h1 className="text-2xl font-semibold text-gray-800">
-            Button Entry
-          </h1>
+          <h1 className="text-2xl font-semibold text-gray-800">Button Entry</h1>
           <button
             onClick={handleCheckIn}
             className="bg-blue-500 text-white rounded-sm p-2 w-60"
