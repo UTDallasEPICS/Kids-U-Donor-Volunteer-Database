@@ -9,22 +9,20 @@ export default function AddEvent() {
       <span className="text-gray-400">/</span>
       <span className="font-semibold text-gray-700">Add Event</span>
     </div>
-  );  
-  
+  );
+
   const Header = () => (
-        <div className="flex justify-between items-center mb-5">
-          <h1 className="text-2xl font-bold text-gray-800">Add Events Page</h1>
-        </div>
-      );
+    <div className="flex justify-between items-center mb-5">
+      <h1 className="text-2xl font-bold text-gray-800">Add Events Page</h1>
+    </div>
+  );
 
-
-    return (
-      <div className={"flex font-sans"}>
-        <div className="flex-grow p-5">
+  return (
+    <div className={"flex font-sans"}>
+      <div className="flex-grow p-5">
         <Breadcrumb />
         <Header />
-
-        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
