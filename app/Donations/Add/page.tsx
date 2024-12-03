@@ -48,7 +48,7 @@ const donationSources = [
   "Direct Mail",
   "Referral",
 ];
-const donorStyles = ["Anonymous", "New", "Existing"];
+const donorModes = ["Anonymous", "New", "Existing"];
 const donorTypes = ["Individual", "Corporate", "Foundation"];
 const donorStatuses = ["Active", "Lapsed", "Major Donor", "First Time Donor"];
 const donorCommPrefs = ["Email", "Mail", "Phone"];
@@ -116,7 +116,7 @@ export default function AddDonation() {
   const [address, setAddress] = useState<AddressState>(initialAddressState);
   const [donation, setDonation] = useState<DonationState>(initialDonationState);
   const [requiredError, setRequiredError] = useState(initialRequiredErrorState);
-  const [donorStyle, setDonorStyle] = useState("Anonymous");
+  const [donorMode, setDonorMode] = useState("Anonymous");
 
   const handleInput =
     <T,>(label: keyof T, setState: React.Dispatch<React.SetStateAction<T>>) =>
@@ -135,7 +135,7 @@ export default function AddDonation() {
     }
 
     try {
-      if (donorStyle === "Existing") {
+      if (donorMode === "Existing") {
         const email = person.emailAddress.trim();
 
         // Send a GET request to fetch the donor based on the email
@@ -166,7 +166,7 @@ export default function AddDonation() {
           ...donation,
           donor: { connect: { id: donorId } },
         };
-      } else if (donorStyle === "New") {
+      } else if (donorMode === "New") {
         const donorResponse = await fetch("/api/v1/donors", {
           method: "POST",
           headers: {
@@ -184,7 +184,7 @@ export default function AddDonation() {
           ...donation,
           donor: { connect: { id: donorId } },
         };
-      } else if (donorStyle === "Anonymous") {
+      } else if (donorMode === "Anonymous") {
         const donationWithDonorId = {
           ...donation,
           donorId: null,
@@ -228,12 +228,12 @@ export default function AddDonation() {
           <TextField
             sx={styles.textField}
             select
-            id="select-donor-style"
-            label="Donor Style"
-            value={donorStyle}
-            onChange={(event) => setDonorStyle(event.target.value)}
+            id="select-donor-mode"
+            label="Donor Mode"
+            value={donorMode}
+            onChange={(event) => setDonorMode(event.target.value)}
           >
-            {donorStyles.map((type, index) => (
+            {donorModes.map((type, index) => (
               <MenuItem key={index} value={type}>
                 {type}
               </MenuItem>
@@ -241,7 +241,7 @@ export default function AddDonation() {
           </TextField>
         </Box>
       </Box>
-      {donorStyle === "Existing" && (
+      {donorMode === "Existing" && (
         <>
           <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
           <Box sx={styles.container} component="form">
@@ -259,7 +259,7 @@ export default function AddDonation() {
         </>
       )}
 
-      {donorStyle === "New" && (
+      {donorMode === "New" && (
         <>
           <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
           <Box sx={styles.container} component="form">
