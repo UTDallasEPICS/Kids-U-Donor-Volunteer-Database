@@ -1,614 +1,663 @@
 "use client";
+import * as React from "react";
+import { useParams } from "next/navigation";
+import { states } from "@/app/utils/US";
 import {
-  Checkbox,
   Box,
   TextField,
-  Stack,
-  Button,
-  MenuItem,
-  InputAdornment,
-  Table,
   Typography,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TablePagination,
-  TableFooter,
-  IconButton,
-  Select,
+  InputAdornment,
+  MenuItem,
+  Button,
 } from "@mui/material";
-import * as React from "react";
-import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
-import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
-import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  donors,
-  donations,
-  persons,
-  Donation,
-} from "@/app/utils/donationTestData";
+  DonationState,
+  DonationResponse,
+  RequiredDonationState,
+  DonorState,
+  PersonState,
+  AddressState,
+  RequiredDonorPersonState,
+  donorResponse,
+} from "@/app/types/states";
+import Loading from "@/app/loading";
+import { useRouter } from "next/navigation";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import { Footer } from "@/app/components/donationHandleFooter";
+import { DoNotDisturbOutlined } from "@mui/icons-material";
 
-const styles = {
-  table: {
-    minWidth: 450,
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-    border: "1px solid #ccc",
-  },
-  tableCell: {
-    border: "1px solid #ccc",
-  },
-};
+const donationTypes = ["One-Time", "Recurring", "Pledge", "In-Kind"];
+const paymentMethods = [
+  "Credit Card",
+  "Check",
+  "Bank Transfer",
+  "Cash",
+  "ACH",
+  "PayPal",
+  "Venmo",
+  "Zelle",
+];
+const recurringFrequencies = ["None", "Monthly", "Quarterly", "Annually"];
+const donationSources = [
+  "Website",
+  "Social Media",
+  "Event",
+  "Email",
+  "Direct Mail",
+  "Referral",
+];
+const donorStyles = ["Anonymous", "New", "Existing"];
+const donorTypes = ["Individual", "Corporate", "Foundation"];
+const donorStatuses = ["Active", "Lapsed", "Major Donor", "First Time Donor"];
+const donorCommPrefs = ["Email", "Mail", "Phone"];
 
 export default function AddDonation() {
-  /*
-  const [donorData, setDonorData] = React.useState({
+  const initialDonorState: DonorState = {
+    type: "",
+    communicationPreference: "",
+    status: "",
+    notes: "",
+    isRetained: false,
+    segment: null,
+  };
+
+  const initialPersonState: PersonState = {
     firstName: "",
     lastName: "",
-    organization: "",
-    email: "",
-    phone: "",
-    address: "",
-    donorType: "Individual",
-    contactMethod: "",
-    donorStatus: "Anonymous",
-    notes: "",
-  });
+    phoneNumber: "",
+    emailAddress: "",
+  };
 
-  donorData.name = `${donorData.firstName} ${donorData.lastName}`;
-  */
-  const [donationData, setDonationData] = React.useState({
-    date: "",
-    amount: "",
-    donationType: "",
+  const initialAddressState: AddressState = {
+    addressLine1: "",
+    addressLine2: "",
+    city: "",
+    state: "",
+    zipCode: "",
+    type: "",
+  };
+
+  const initialDonationState: DonationState = {
+    type: "",
+    amount: 0,
+    item: "",
     paymentMethod: "",
-    campaignName: "",
-    designation: "",
-    frequency: "",
+    campaign: "",
+    fundDesignation: "",
+    date: new Date(),
+    recurringFrequency: "None",
     source: "",
-    matched: "False",
-  });
-
-  //const { donorType, donorStatus, contactMethod } = donorData;
-  const { donationType, frequency, source } = donationData;
-  /*
-  const handleDonorChange = (event: any) => {
-    const { name, value } = event.target;
-    setDonorData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    isMatching: false,
+    receiptSent: false,
+    receiptNumber: "",
+    isAnonymous: false,
+    acknowledgementSent: false,
   };
-  */
 
-  const handleDonationChange = (event: any) => {
-    const { name, value } = event.target;
-    setDonationData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+  const initialRequiredErrorState = {
+    firstName: false,
+    lastName: false,
+    emailAddress: false,
+    addressLine1: false,
+    city: false,
+    zipCode: false,
+    type: false,
+    amount: false,
+    item: false,
+    campaign: false,
+    fundDesignation: false,
+    receiptNumber: false,
   };
+
+  const [donor, setDonor] = useState<DonorState>(initialDonorState);
+  const [person, setPerson] = useState<PersonState>(initialPersonState);
+  const [address, setAddress] = useState<AddressState>(initialAddressState);
+  const [donation, setDonation] = useState<DonationState>(initialDonationState);
+  const [requiredError, setRequiredError] = useState(initialRequiredErrorState);
+  const [donorStyle, setDonorStyle] = useState("Anonymous");
+
+  const handleInput =
+    <T,>(label: keyof T, setState: React.Dispatch<React.SetStateAction<T>>) =>
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const value = event.target.value.trim();
+      setRequiredError((prev) => ({ ...prev, [label]: value === "" }));
+      setState((prev) => ({ ...prev, [label]: value }));
+    };
 
   const handleSubmit = async () => {
-    /*
+    let donationWithDonorId;
+
+    if (Object.values(requiredError).some((error) => error)) {
+      alert("Please fill out all required fields.");
+      return;
+    }
+
     try {
-      const donorResponse = await fetch("/api/donors", {
+      if (donorStyle === "Existing") {
+        const email = person.emailAddress.trim();
+
+        // Send a GET request to fetch the donor based on the email
+        const donorResponse = await fetch(`/api/v1/donors/email/${email}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!donorResponse.ok) {
+          if (donorResponse.status === 404) {
+            alert("No donor found with this email address.");
+          } else {
+            throw new Error("Failed to look up donor");
+          }
+          return;
+        }
+
+        const donorData = await donorResponse.json();
+        console.log("Donor found:", donorData);
+        const donorId = donorData.id;
+
+        if (!donorId) {
+          throw new Error("Donor ID is missing from the response.");
+        }
+
+        // Prepare donation data with the found donor ID
+        donationWithDonorId = {
+          ...donation,
+          donor: { connect: { id: donorId } },
+        };
+      } else if (donorStyle === "New") {
+        const donorResponse = await fetch("/api/v1/donors", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ donor, person, address }),
+        });
+
+        if (!donorResponse.ok) throw new Error("Failed to add donor");
+
+        const donorResult = await donorResponse.json();
+        const donorId = donorResult.id;
+
+        donationWithDonorId = {
+          ...donation,
+          donor: { connect: { id: donorId } },
+        };
+      } else if (donorStyle === "Anonymous") {
+        const donationWithDonorId = {
+          ...donation,
+          donorId: null,
+          isAnonymous: true,
+        };
+      }
+
+      console.log("donationWithDonorId: ", donationWithDonorId);
+
+      const donationResponse = await fetch("/api/v1/donations", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(donorData),
+        body: JSON.stringify(donationWithDonorId),
       });
 
-      if (donorResponse.ok) {
-        const result = await donorResponse.json();
-        console.log("Donor successfully added:", result);
-      } else {
-        console.error("Failed to add donor");
+      if (!donationResponse.ok) {
+        console.log("Donation API response:", await donationResponse.text());
+        throw new Error("Failed to add donation");
       }
-    } catch (error) {
-      console.error("Error submitting donor data:", error);
-    }
-      */
 
-    try {
-      const donationResponse = await fetch("/api/donations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(donationData),
-      });
+      const donationResult = await donationResponse.json();
+      console.log("Donation added:", donationResult);
 
-      if (donationResponse.ok) {
-        const result = await donationResponse.json();
-        console.log("Donation successfully added:", result);
-      } else {
-        console.error("Failed to add donation");
-      }
+      // Reset states after successful submission
+      setDonor(initialDonorState);
+      setPerson(initialPersonState);
+      setAddress(initialAddressState);
+      setDonation(initialDonationState);
+      setRequiredError(initialRequiredErrorState);
     } catch (error) {
-      console.error("Error submitting donation data:", error);
+      console.error("Error submitting donation:", error);
     }
   };
-
-  /*
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [rows, setRows] = useState<Donation[]>(donors);
-  const [searched, setSearched] = useState<string>("");
-
-  const requestSearch = (searchedVal: string) => {
-    const filteredRows = donors.filter((row) =>
-      row.firstName.toLowerCase().includes(searchedVal.toLowerCase())
-    );
-    setRows(filteredRows);
-  };
-
-  const cancelSearch = () => {
-    setSearched("");
-    setRows(donors);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
-
-  const currentRows = rows.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
-
-  const renderDonationRow = (donor: Donor) => (
-    <TableRow key={donor.id}>
-      <TableCell style={styles.tableCell}>
-        <Button
-          sx={{ marginRight: 5 }}
-          variant="contained"
-          onClick={() => {
-            setDonorData({
-              firstName: donor.donorName.split(" ")[0] || "",
-              lastName: donor.donorName.split(" ")[1] || "",
-              organization: donor.type || "",
-              email: donor.email || "",
-              phone: donor.phone || "",
-              address: donor.address?.street || "",
-              donorType: donor.type || "Individual",
-              contactMethod: donor.contactMethod || "",
-              donorStatus: donor.status || "Existing",
-              notes: donor.notes || "",
-            });
-          }}
-        >
-          Select
-        </Button>
-        <Link href={`/Donations/Detail/${donor.id}`} className="text-blue-500">
-          {donor.donorName}
-        </Link>
-      </TableCell>
-    </TableRow>
-  );
-  */
-
-  const checkbox = { inputProps: { "aria-label": "Checkbox demo" } };
 
   return (
     <Box>
-      {/*
-      <Box>
-        <Select
-          name="donorStatus"
-          value={donorStatus}
-          onChange={handleDonorChange}
-          displayEmpty
-          sx={{ margin: 5 }}
-        >
-          <MenuItem value="" disabled>
-            Select Donor Status
-          </MenuItem>
-          <MenuItem value="Anonymous">Anonymous</MenuItem>
-          <MenuItem value="Existing">Existing</MenuItem>
-          <MenuItem value="New">New</MenuItem>
-        </Select>
-      </Box>
-      */}
-      {/*donorStatus === "Existing" && (
-        <Box sx={{ p: 5 }}>
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            Donor Lookup
-          </Typography>
-
-          {/* Search Filter */}
-      {/*
-          <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-            <TextField
-              label="Search by Donor Name"
-              variant="outlined"
-              value={searched}
-              onChange={(e) => {
-                setSearched(e.target.value);
-                requestSearch(e.target.value);
-              }}
-              fullWidth
-            />
-            <Button variant="outlined" onClick={cancelSearch}>
-              Clear
-            </Button>
-          </Stack>
-
-          <Table style={styles.table}>
-            <TableHead>
-              <TableRow>
-                <TableCell style={styles.tableCellHeader}>Name</TableCell>
-                <TableCell style={styles.tableCellHeader}>Phone</TableCell>
-                <TableCell style={styles.tableCellHeader}>Email</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {currentRows.length > 0 ? (
-                currentRows.map((donor) => renderDonationRow(donor))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} align="center">
-                    No donors found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25]}
-                  count={rows.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={({
-                    count,
-                    page,
-                    rowsPerPage,
-                    onPageChange,
-                  }) => (
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      <IconButton
-                        onClick={(event) => onPageChange(event, page - 1)}
-                        disabled={page === 0}
-                      >
-                        <KeyboardArrowLeft />
-                      </IconButton>
-                      <IconButton
-                        onClick={(event) => onPageChange(event, page + 1)}
-                        disabled={page >= Math.ceil(count / rowsPerPage) - 1}
-                      >
-                        <KeyboardArrowRight />
-                      </IconButton>
-                    </Box>
-                  )}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
+      <Box sx={styles.container} component="form">
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            select
+            id="select-donor-style"
+            label="Donor Style"
+            value={donorStyle}
+            onChange={(event) => setDonorStyle(event.target.value)}
+          >
+            {donorStyles.map((type, index) => (
+              <MenuItem key={index} value={type}>
+                {type}
+              </MenuItem>
+            ))}
+          </TextField>
         </Box>
-      )}
-
-      {/*donorStatus != "Anonymous" && (
+      </Box>
+      {donorStyle === "Existing" && (
         <>
           <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
-          <Box sx={{ paddingLeft: 5, paddingTop: 5 }}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 5 }}
-              useFlexGap
-              sx={{ flexWrap: "wrap" }}
-            >
-              <Box sx={{ width: "250px" }}>
-                <Select
-                  name="donorType"
-                  value={donorType}
-                  onChange={handleDonorChange}
-                  displayEmpty
-                  sx={{ width: "250px" }}
-                >
-                  <MenuItem value="" disabled>
-                    Select Donor Type
-                  </MenuItem>
-                  <MenuItem value="Individual">Individual</MenuItem>
-                  <MenuItem value="Corporate">Corporate</MenuItem>
-                  <MenuItem value="Foundation">Foundation</MenuItem>
-                </Select>
-              </Box>
-              <Box sx={{ width: "250px" }}>
-                <Select
-                  name="contactMethod"
-                  value={contactMethod}
-                  onChange={handleDonorChange}
-                  displayEmpty
-                  sx={{ width: "250px" }}
-                >
-                  <MenuItem value="" disabled>
-                    Contact Method
-                  </MenuItem>
-                  <MenuItem value="Email">Email</MenuItem>
-                  <MenuItem value="Phone">Phone</MenuItem>
-                  <MenuItem value="Mail">Mail</MenuItem>
-                </Select>
-              </Box>
-            </Stack>
-          </Box>
-          <Box sx={{ p: 5 }}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={{ xs: 1, sm: 5 }}
-              useFlexGap
-              sx={{ flexWrap: "wrap" }}
-            >
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="phone"
-                  id="phone"
-                  label="Phone Number"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              {donorData.donorType === "Individual" && (
-                <>
-                  <Box sx={{ width: "250px" }}>
-                    <TextField
-                      name="firstName"
-                      label="First Name"
-                      variant="outlined"
-                      fullWidth
-                      onChange={handleDonorChange}
-                    />
-                  </Box>
-                  <Box sx={{ width: "250px" }}>
-                    <TextField
-                      name="lastName"
-                      label="Last Name"
-                      variant="outlined"
-                      fullWidth
-                      onChange={handleDonorChange}
-                    />
-                  </Box>
-                </>
-              )}
-
-              {(donorData.donorType === "Corporate" ||
-                donorData.donorType === "Foundation") && (
-                <>
-                  <Box sx={{ width: "250px" }}>
-                    <TextField
-                      name="organization"
-                      label="Organization"
-                      variant="outlined"
-                      fullWidth
-                      onChange={handleDonorChange}
-                    />
-                  </Box>
-                </>
-              )}
-
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="email"
-                  id="email"
-                  label="Email"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="address"
-                  id="address"
-                  label="Address"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="city"
-                  id="city"
-                  label="City"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="state"
-                  id="state"
-                  label="State"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              <Box sx={{ width: "250px" }}>
-                <TextField
-                  name="zip"
-                  id="zip"
-                  label="Zip"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-              <Box sx={{ width: "100%" }}>
-                <TextField
-                  name="note"
-                  id="note"
-                  label="Donor Note"
-                  variant="outlined"
-                  fullWidth
-                  onChange={handleDonorChange}
-                />
-              </Box>
-            </Stack>
+          <Box sx={styles.container} component="form">
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                id="email"
+                label="Email Address"
+                value={person.emailAddress}
+                onChange={handleInput("emailAddress", setPerson)}
+              />
+            </Box>
           </Box>
         </>
-      )*/}
+      )}
+
+      {donorStyle === "New" && (
+        <>
+          <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
+          <Box sx={styles.container} component="form">
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                select
+                id="select-type"
+                label="Type"
+                value={donor.type}
+                onChange={handleInput("type", setDonor)}
+              >
+                {donorTypes.map((type, index) => (
+                  <MenuItem key={index} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                select
+                id="select-communicationPreference"
+                label="Communication Preference"
+                value={donor.communicationPreference}
+                onChange={handleInput("communicationPreference", setDonor)}
+              >
+                {donorCommPrefs.map((pref, index) => (
+                  <MenuItem key={index} value={pref}>
+                    {pref}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                select
+                id="select-status"
+                label="Status"
+                value={donor.status}
+                onChange={handleInput("status", setDonor)}
+              >
+                {donorStatuses.map((status, index) => (
+                  <MenuItem key={index} value={status}>
+                    {status}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={false}
+                id="phoneNumber"
+                label="Phone Number"
+                value={person.phoneNumber}
+                onChange={handleInput("phoneNumber", setPerson)}
+              />
+            </Box>
+            {donor.type === "Individual" && (
+              <>
+                <Box sx={styles.inputContainer}>
+                  <TextField
+                    sx={styles.textField}
+                    required={true}
+                    id="firstName"
+                    label="First Name"
+                    value={person.firstName}
+                    onChange={handleInput("firstName", setPerson)}
+                    error={requiredError.firstName}
+                    helperText={
+                      requiredError.firstName ? "Field is required" : ""
+                    }
+                  />
+                </Box>
+                <Box sx={styles.inputContainer}>
+                  <TextField
+                    sx={styles.textField}
+                    required={true}
+                    id="lastName"
+                    label="Last Name"
+                    value={person.lastName}
+                    onChange={handleInput("lastName", setPerson)}
+                    error={requiredError.lastName}
+                    helperText={
+                      requiredError.lastName ? "Field is required" : ""
+                    }
+                  />
+                </Box>
+              </>
+            )}
+
+            {(donor.type === "Corporate" || donor.type === "Foundation") && (
+              <>
+                <Box sx={styles.inputContainer}>
+                  <TextField
+                    sx={styles.textField}
+                    required={true}
+                    id="firstName"
+                    label="First Name"
+                    value={person.firstName}
+                    onChange={handleInput("firstName", setPerson)}
+                    error={requiredError.firstName}
+                    helperText={
+                      requiredError.firstName ? "Field is required" : ""
+                    }
+                  />
+                </Box>
+              </>
+            )}
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                id="email"
+                label="Email Address"
+                value={person.emailAddress}
+                onChange={handleInput("emailAddress", setPerson)}
+                error={requiredError.emailAddress}
+                helperText={
+                  requiredError.emailAddress ? "Field is required" : ""
+                }
+              />
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                id="address-line1"
+                label="Address Line 1"
+                value={address.addressLine1}
+                onChange={handleInput("addressLine1", setAddress)}
+                error={requiredError.addressLine1}
+                helperText={
+                  requiredError.addressLine1 ? "Field is required" : ""
+                }
+              />
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={false}
+                id="address-line2"
+                label="Address Line 2"
+                value={address.addressLine2}
+                onChange={handleInput("addressLine2", setAddress)}
+              />
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                id="address-city"
+                label="City"
+                value={address.city}
+                onChange={handleInput("city", setAddress)}
+                error={requiredError.city}
+                helperText={requiredError.city ? "Field is required" : ""}
+              />
+            </Box>
+
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={true}
+                select
+                id="select-state"
+                label="State"
+                value={address.state}
+                onChange={handleInput("state", setAddress)}
+              >
+                {states.map((state, index) => (
+                  <MenuItem key={index} value={state.value}>
+                    {state.value}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                sx={styles.textField}
+                required={false}
+                id="address-zipcode"
+                type="number"
+                label="Zip Code"
+                value={address.zipCode}
+                onChange={handleInput("zipCode", setAddress)}
+              />
+            </Box>
+            <Box sx={styles.inputContainer}>
+              <TextField
+                id="multiline-notes"
+                label="Note"
+                multiline
+                rows={4}
+                fullWidth
+                value={donor.notes}
+                onChange={handleInput("notes", setDonor)}
+              />
+            </Box>
+            <Box sx={styles.inputContainer}></Box>
+          </Box>
+        </>
+      )}
 
       <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donation Info</Box>
-
-      <Box sx={{ p: 5 }}>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={{ xs: 1, sm: 5 }}
-          useFlexGap
-          sx={{ flexWrap: "wrap" }}
-        >
-          <Box sx={{ width: "250px" }}>
-            <Select
-              name="donationType"
-              value={donationType}
-              onChange={handleDonationChange}
-              displayEmpty
-              sx={{ width: "250px" }}
-            >
-              <MenuItem value="" disabled>
-                Donation Type
+      <Box sx={styles.container} component="form">
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            select
+            id="select-type"
+            label="Type"
+            value={donation.type}
+            onChange={handleInput("type", setDonation)}
+          >
+            {donationTypes.map((type, index) => (
+              <MenuItem key={index} value={type}>
+                {type}
               </MenuItem>
-              <MenuItem value="One-Time">One-Time</MenuItem>
-              <MenuItem value="Recurring">Recurring</MenuItem>
-              <MenuItem value="Pledge">Pledge</MenuItem>
-              <MenuItem value="In-Kind">In-Kind</MenuItem>
-            </Select>
-          </Box>
-          {donationType === "recurring" && (
-            <Box sx={{ width: "250px" }}>
-              <Select
-                name="frequency"
-                value={frequency}
-                onChange={handleDonationChange}
-                displayEmpty
-                sx={{ width: "250px" }}
-              >
-                <MenuItem value="" disabled>
-                  Recurring Frequency
+            ))}
+          </TextField>
+        </Box>
+        {donation.type === "recurring" && (
+          <Box sx={styles.inputContainer}>
+            <TextField
+              sx={styles.textField}
+              select
+              id="select-recurrence"
+              label="Recurrence"
+              value={donation.recurringFrequency}
+              onChange={handleInput("recurringFrequency", setDonation)}
+            >
+              {recurringFrequencies.map((freq, index) => (
+                <MenuItem key={index} value={freq}>
+                  {freq}
                 </MenuItem>
-                <MenuItem value="Monthly">Monthly</MenuItem>
-                <MenuItem value="Quarterly">Quarterly</MenuItem>
-                <MenuItem value="Annually">Annually</MenuItem>
-              </Select>
-            </Box>
-          )}
-          <Box sx={{ width: "250px" }}>
-            <TextField
-              id="date"
-              label="Donation Date"
-              type="date"
-              variant="outlined"
-              fullWidth
-              onChange={handleDonationChange}
-              defaultValue={new Date().toISOString().split("T")[0]}
-            />
+              ))}
+            </TextField>
           </Box>
-          <Box sx={{ width: "250px" }}>
-            <TextField
-              name="amount"
-              id="amount"
-              label="Amount"
-              variant="outlined"
-              fullWidth
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ),
-                },
+        )}
+        <Box sx={styles.inputContainer}>
+          <LocalizationProvider dateAdapter={AdapterDateFns}>
+            <DatePicker
+              sx={styles.textField}
+              label="Date"
+              value={new Date(donation.date)}
+              onChange={(newDate: any) => {
+                setDonation((prev: DonationState) => ({
+                  ...prev,
+                  date: newDate.toISOString(),
+                }));
               }}
-              onChange={handleDonationChange}
             />
-          </Box>
-          <Box sx={{ width: "250px" }}>
-            <TextField
-              name="method"
-              id="method"
-              label="Method"
-              variant="outlined"
-              fullWidth
-              onChange={handleDonationChange}
-            />
-          </Box>
-          <Box sx={{ width: "250px" }}>
-            <TextField
-              name="campaign"
-              id="campaign"
-              label="Campaign Name"
-              variant="outlined"
-              fullWidth
-              onChange={handleDonationChange}
-            />
-          </Box>
-          <Box sx={{ width: "250px" }}>
-            <TextField
-              name="designation"
-              id="designation"
-              label="Fund Designation"
-              variant="outlined"
-              fullWidth
-              onChange={handleDonationChange}
-            />
-          </Box>
-          <Box sx={{ width: "250px" }}>
-            <Select
-              name="source"
-              value={source}
-              onChange={handleDonationChange}
-              displayEmpty
-              sx={{ width: "250px" }}
-            >
-              <MenuItem value="" disabled>
-                Source
-              </MenuItem>
-              <MenuItem value="Website">Website</MenuItem>
-              <MenuItem value="Social Media">Social Media</MenuItem>
-              <MenuItem value="Event">Event</MenuItem>
-              <MenuItem value="Email">Email</MenuItem>
-              <MenuItem value="Mail">Direct Mail</MenuItem>
-              <MenuItem value="Referral">Referral</MenuItem>
-            </Select>
-          </Box>
-          <Box
+          </LocalizationProvider>
+        </Box>
+        <Box sx={styles.inputContainer}>
+          <TextField
             sx={{
-              width: "250px",
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
+              ...styles.textField,
+              "& input[type=number]": {
+                MozAppearance: "textfield",
+              },
+              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
+                {
+                  WebkitAppearance: "none",
+                  margin: 0,
+                },
+            }}
+            required={true}
+            id="amount"
+            label={
+              donation.type !== "In-Kind" ? "Donation Amount" : "Item(s) Worth"
+            }
+            type="number"
+            value={donation.amount}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              if (donation.amount === 0 && !event.target.value.includes(".")) {
+                event.target.value = event.target.value.replace(/^0+/, "");
+              }
+              setDonation((prev: DonationState) => ({
+                ...prev,
+                amount: Number(event.target.value),
+              }));
+            }}
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">$</InputAdornment>
+                ),
+              },
+              inputLabel: {
+                shrink: true,
+              },
+            }}
+            error={requiredError.amount}
+            helperText={requiredError.amount ? "Field is required" : ""}
+          />
+        </Box>
+        <Box sx={styles.inputContainer}>
+          {donation.type !== "In-Kind" ? (
+            <TextField
+              sx={styles.textField}
+              required={true}
+              select
+              id="select-method"
+              label="Method"
+              value={donation.paymentMethod}
+              onChange={handleInput("paymentMethod", setDonation)}
+            >
+              {paymentMethods.map((method, index) => (
+                <MenuItem key={index} value={method}>
+                  {method}
+                </MenuItem>
+              ))}
+            </TextField>
+          ) : (
+            <TextField
+              sx={styles.textField}
+              required={true}
+              id="item"
+              label="Item(s)"
+              value={donation.item}
+              onChange={handleInput("item", setDonation)}
+              error={requiredError.item}
+              helperText={requiredError.item ? "Field is required" : ""}
+            />
+          )}
+        </Box>
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            id="campaign"
+            label="Campaign"
+            value={donation.campaign}
+            onChange={handleInput("campaign", setDonation)}
+            error={requiredError.campaign}
+            helperText={requiredError.campaign ? "Field is required" : ""}
+          />
+        </Box>
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            id="fund"
+            label="Fund"
+            value={donation.fundDesignation}
+            onChange={handleInput("fundDesignation", setDonation)}
+            error={requiredError.fundDesignation}
+            helperText={
+              requiredError.fundDesignation ? "Field is required" : ""
+            }
+          />
+        </Box>
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            select
+            id="select-source"
+            label="Donation Source"
+            value={donation.source}
+            onChange={handleInput("source", setDonation)}
+          >
+            {donationSources.map((source, index) => (
+              <MenuItem key={index} value={source}>
+                {source}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+        <Box sx={styles.inputContainer}>
+          <TextField
+            sx={styles.textField}
+            required={true}
+            select
+            id="select-matching"
+            label="Matching Donation?"
+            value={donation.isMatching}
+            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+              setDonation((prev: DonationState) => ({
+                ...prev,
+                isMatching: event.target.value === "true",
+              }));
             }}
           >
-            <span>Donation Matched</span>
-            <Checkbox
-              {...checkbox}
-              checked={donationData.matched === "True"}
-              onChange={(e) =>
-                setDonationData((prev) => ({
-                  ...prev,
-                  matched: e.target.checked ? "True" : "False",
-                }))
-              }
-            />
-          </Box>
-        </Stack>
+            <MenuItem value={"true"}>Yes</MenuItem>
+            <MenuItem value={"false"}>No</MenuItem>
+          </TextField>
+        </Box>
       </Box>
-
       <Box sx={{ display: "flex", justifyContent: "flex-end", p: 5 }}>
         <Button variant="contained" onClick={handleSubmit}>
           Add Donation
@@ -617,3 +666,21 @@ export default function AddDonation() {
     </Box>
   );
 }
+
+const styles = {
+  container: {
+    p: 4,
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 2,
+    width: "100%",
+  },
+  inputContainer: {
+    display: "flex",
+    flexDirection: "column",
+    my: 2,
+  },
+  textField: {
+    width: "100%",
+  },
+};

@@ -4,13 +4,28 @@ const prisma = new PrismaClient()
 
 // Make sure to empty database before using.
 
+async function ensureAnonymousDonor() {
+  await prisma.donor.upsert({
+    where: { id: 'anonymous-id' },
+    update: {}, // No updates needed
+    create: {
+      id: 'anonymous-id',
+      type: 'Individual',
+      status: 'Active',
+      communicationPreference: 'None',
+      isRetained: false,
+      notes: 'Anonymous Donor',
+    },
+  });
+}
+
 async function main() {
     //Grant stuff below this block. This is constituents and organization mock data.
 
     //Create one mock constituient.
     /*const newConstituent = await prisma.constituent.create({
         data: {
-          FirstName: 'first',
+          FirstName: 'first'
           LastName: 'last',
           StreetAddress: '123 Something St.',
           City: 'SomewhereCity',

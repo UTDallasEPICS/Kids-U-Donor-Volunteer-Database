@@ -158,6 +158,6 @@ model Donation {
   receiptNumber       String   //@default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String
-  donor               Donor    @relation(fields: [donorId], references: [id])
+  donorId             String?
+  donor               Donor?    @relation(fields: [donorId], references: [id])
 }
