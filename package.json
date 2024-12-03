@@ -21,7 +21,7 @@
     "eslint": "8.50.0",
     "eslint-config-next": "13.5.2",
     "express": "^4.19.2",
-    "next": "^14.2.12",
+    "next": "^15.0.4-canary.19",
     "prettier": "^3.3.3",
     "react": "^18.3.1",
     "react-router-dom": "^6.27.0",
