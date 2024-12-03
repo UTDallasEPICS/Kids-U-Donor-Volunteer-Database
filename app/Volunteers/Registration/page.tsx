@@ -33,6 +33,17 @@ export default function Registration() {
     },
   ];
 
+  const testUser = {
+    username: "testUser",
+    role: "admin",
+    email: "testuser@example.com",
+    firstName: "Test",
+    lastName: "User",
+  };
+
+  // Example usage:
+  console.log(testUser);
+
   const Breadcrumb = () => (
     <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
       <span className="hover:text-blue-500 cursor-pointer transition-colors duration-200">
@@ -61,7 +72,12 @@ export default function Registration() {
       <div className="flex-grow p-5">
         <Breadcrumb />
         <Header />
-        <AdminRegTable data={eventTestData} />
+        {testUser.role === "admin" ? (
+          <AdminRegTable data={eventTestData} />
+        ) : (
+          // <VolRegTable data={eventTestData} />
+          <div>here</div>
+        )}
       </div>
     </div>
   );
