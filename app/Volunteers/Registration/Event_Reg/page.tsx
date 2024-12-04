@@ -1,14 +1,17 @@
 "use client";
 
-export default async function EventPage({
+export default async function Page({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
 
-  // Simulate fetching event data dynamically based on slug
-  const eventData = {
+  // Define event data with an index signature
+  const eventData: Record<
+    string,
+    { name: string; location: string; date: string; description: string }
+  > = {
     "event-1": {
       name: "Event 1",
       location: "Location 1",
@@ -29,6 +32,8 @@ export default async function EventPage({
   if (!event) {
     return <div>Event not found!</div>;
   }
+
+  
 
   return (
     <div className="p-5">

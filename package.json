@@ -18,6 +18,7 @@
     "@types/node": "20.6.5",
     "@types/react": "18.2.22",
     "axios": "^1.6.8",
+    "date-fns": "^4.1.0",
     "eslint": "8.50.0",
     "eslint-config-next": "13.5.2",
     "express": "^4.19.2",
