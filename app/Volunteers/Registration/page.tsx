@@ -1,8 +1,14 @@
 "use client";
-import React, { useState } from "react";
-import Link from "@/node_modules/next/link";
-import { FormControl, TextField } from "@/node_modules/@mui/material/index";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+import { FormControl, TextField } from "@mui/material";
+import { data } from "@remix-run/router";
+import router from "next/router";
+
 import { AdminRegTable } from "./AdminRegTable";
+import RegistrationQuestions from "./RegistrationQuestions";
 
 interface Event {
   ID: number;
@@ -35,7 +41,7 @@ export default function Registration() {
 
   const testUser = {
     username: "testUser",
-    role: "admin",
+    role: "admin", //admin or volunteer
     email: "testuser@example.com",
     firstName: "Test",
     lastName: "User",
@@ -51,7 +57,10 @@ export default function Registration() {
           <AdminRegTable data={eventTestData} />
         ) : (
           // <VolRegTable data={eventTestData} />
-          <div>here</div>
+          <div>
+            After clicking reg on user side
+            <RegistrationQuestions />
+          </div>
         )}
       </div>
     </div>
