@@ -1,11 +1,7 @@
 import React from "react";
 import { SecondarySideBar } from "../components/SecondarySideBar";
 
-export default function DonationsLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DonationsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex">
       <SecondarySideBar

@@ -43,8 +43,8 @@ export type DonationState = {
   source: string;
   isMatching: boolean;
   taxDeductibleAmount?: number | null;
-  receiptSent: boolean;
-  receiptNumber: string;
+  receiptSent?: boolean | null;
+  receiptNumber?: string | null;
   isAnonymous: boolean;
   acknowledgementSent: boolean;
 };
@@ -60,7 +60,7 @@ export type DonationResponse = {
   };
 };
 
-export type donorResponse = {
+export type DonorResponse = {
   data: Donor & {
     person: {
       firstName: string;
@@ -75,7 +75,8 @@ export type donorResponse = {
       amount: number;
       item?: string | null;
       paymentMethod?: string | null;
-    };
+      date: Date;
+    }[];
     organization: {
       name: string;
       emailAddress: string;
@@ -83,4 +84,13 @@ export type donorResponse = {
       address?: Address | null;
     };
   };
+};
+
+export type DonationTableState = {
+  id: string;
+  type: string;
+  amount: number;
+  item: string;
+  paymentMethod: string;
+  date: Date;
 };

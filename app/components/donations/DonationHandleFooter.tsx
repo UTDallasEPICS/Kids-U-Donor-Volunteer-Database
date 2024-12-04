@@ -2,10 +2,7 @@ import { Box, Button, Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import {
-  DonationFormProps,
-  DonorFormProps,
-} from "./formComponents/FormInputProps";
+import { DonationFormProps, DonorFormProps } from "../formComponents/FormInputProps";
 
 type FooterProps = {
   id: string;
@@ -17,15 +14,7 @@ type FooterProps = {
   errors: FieldErrors<DonorFormProps | DonationFormProps>;
 };
 
-export const Footer = ({
-  id,
-  name,
-  href,
-  apiUrl,
-  handleSubmit,
-  isDirty,
-  errors,
-}: FooterProps) => {
+export const Footer = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }: FooterProps) => {
   const router = useRouter();
 
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
@@ -50,9 +39,7 @@ export const Footer = ({
   const handleSave = async (data: DonorFormProps | DonationFormProps) => {
     // If fields not changed, don't save
     if (!isDirty || Object.keys(errors).length > 0) {
-      alert(
-        "Cannot save when fields are unchanged or there are validation errors."
-      );
+      alert("Cannot save when fields are unchanged or there are validation errors.");
       return;
     }
     try {
@@ -60,16 +47,13 @@ export const Footer = ({
 
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: requestBody,
-        }
-      );
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: requestBody,
+      });
 
       if (!response.ok) {
         throw new Error("Error updating data");
@@ -82,19 +66,14 @@ export const Footer = ({
   };
 
   const handleDelete = async () => {
-    const remove = confirm(
-      `Are you sure you would like to delete this ${name}?\nThis cannot be undone.`
-    );
+    const remove = confirm(`Are you sure you would like to delete this ${name}?\nThis cannot be undone.`);
 
     if (remove) {
       try {
         setIsButtonDisabled(true);
-        const result = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`,
-          {
-            method: "DELETE",
-          }
-        );
+        const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
+          method: "DELETE",
+        });
 
         if (!result.ok) {
           throw new Error(`Error deleting ${name} data`);
@@ -128,40 +107,22 @@ export const Footer = ({
             sx={styles.buttonContained}
             variant="contained"
             onClick={handleSubmit(handleSave)}
-            disabled={
-              isButtonDisabled || !isDirty || Object.keys(errors).length > 0
-            }
+            disabled={isButtonDisabled || !isDirty || Object.keys(errors).length > 0}
           >
             Save
           </Button>
         </span>
       </Tooltip>
-      <Tooltip
-        title={isDirty ? "Delete details" : "Please wait after every press."}
-      >
+      <Tooltip title={"Delete details"}>
         <span>
-          <Button
-            sx={styles.buttonContained}
-            variant="contained"
-            onClick={handleDelete}
-            disabled={isButtonDisabled}
-          >
+          <Button sx={styles.buttonContained} variant="contained" onClick={handleDelete} disabled={isButtonDisabled}>
             Delete
           </Button>
         </span>
       </Tooltip>
-      <Tooltip
-        title={
-          isDirty ? "Move back to List page" : "Please wait after every press."
-        }
-      >
+      <Tooltip title={"Move back to List page"}>
         <span>
-          <Button
-            sx={styles.buttonOutlined}
-            variant="outlined"
-            onClick={handleCancel}
-            disabled={isButtonDisabled}
-          >
+          <Button sx={styles.buttonOutlined} variant="outlined" onClick={handleCancel} disabled={isButtonDisabled}>
             Cancel
           </Button>
         </span>

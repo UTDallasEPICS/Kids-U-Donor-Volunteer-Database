@@ -1,16 +1,12 @@
 "use client";
 import { useParams, useRouter } from "next/navigation";
-import { Box, TextField, Typography, MenuItem, Button } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FormInputTextfield } from "../../../components/formComponents/FormInputTextfield";
 import Loading from "@/app/loading";
-import {
-  addressTypes,
-  DonorFormProps,
-  statesChoices,
-} from "@/app/components/formComponents/FormInputProps";
-import { donorResponse } from "@/app/types/states";
+import { addressTypes, DonorFormProps, statesChoices } from "@/app/components/formComponents/FormInputProps";
+import { DonationTableState, DonorResponse } from "@/app/types/states";
 import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
 import {
   donorCommPreferences,
@@ -19,20 +15,34 @@ import {
   donorTypes,
   choiceYesOrNo,
 } from "@/app/components/formComponents/FormInputProps";
-import { Footer } from "@/app/components/DonationHandleFooter";
+import { Footer } from "@/app/components/donations/DonationHandleFooter";
+import { MiniDonationsTable } from "@/app/components/donations/MiniDonationTable";
+import { grey } from "@mui/material/colors";
 
 export default function DonorDetail() {
   const { id }: { id: string } = useParams();
   const router = useRouter();
 
-  /* TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO TO DO
-  receipt number in donations?
-  phone number has to be xxx-xxx-xxxx? maybe +1 and all that too https://stackoverflow.com/questions/60909788/how-to-use-material-ui-textfield-with-react-phone-number-input
-  */
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const personNameRef = useRef<string>("");
   const isOrgRef = useRef<boolean>(false);
+
+  /**
+   * personal notes stuff
+   *  IF TYPE IS CHANGED AND SAVED, REFRESH PAGE FOR NEW DATA
+   *  singleton prismax
+   *  */
+
+  const [donationInfo, setDonationInfo] = useState<DonationTableState[]>([
+    {
+      id: "",
+      type: "",
+      amount: 0,
+      item: "",
+      paymentMethod: "",
+      date: new Date(),
+    },
+  ]);
 
   const {
     handleSubmit,
@@ -55,14 +65,11 @@ export default function DonorDetail() {
 
   const fetchDonor = async () => {
     try {
-      const result = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/donors/${id}`,
-        {
-          method: "GET",
-        }
-      );
+      const result = await fetch(`/api/v1/donors/${id}`, {
+        method: "GET",
+      });
 
-      const { data } = (await result.json()) as donorResponse;
+      const { data } = (await result.json()) as DonorResponse;
 
       if (!result.ok) {
         router.push("/not-found");
@@ -70,19 +77,27 @@ export default function DonorDetail() {
       }
 
       personNameRef.current = `${data.person.firstName} ${data.person.lastName}`;
-      isOrgRef.current =
-        data.organization !== null ||
-        data.type === "Corporate" ||
-        data.type === "Foundation";
+      isOrgRef.current = data.organization !== null || data.type === "Corporate" || data.type === "Foundation";
+
+      setDonationInfo(
+        data.donation.map((donation) => ({
+          id: donation.id,
+          type: donation.type || "One-Time",
+          amount: donation.amount || 0,
+          item: donation.item || "placeholder",
+          paymentMethod: donation.paymentMethod || "placeholder",
+          date: new Date(donation.date) || new Date(),
+        }))
+      );
 
       reset({
         donor: {
-          type: data.type,
-          communicationPreference: data.communicationPreference,
-          status: data.status,
-          notes: data.notes,
-          isRetained: data.isRetained,
-          segment: data.segment,
+          type: data.type || "Individual",
+          communicationPreference: data.communicationPreference || "Email",
+          status: data.status || "Active",
+          notes: data.notes || "",
+          isRetained: data.isRetained || false,
+          segment: data.segment || "High Value Donor",
         },
         organization: isOrgRef.current
           ? {
@@ -94,10 +109,10 @@ export default function DonorDetail() {
         person: isOrgRef.current
           ? {}
           : {
-              firstName: data.person.firstName,
-              lastName: data.person.lastName,
-              emailAddress: data.person.emailAddress,
-              phoneNumber: data.person?.phoneNumber,
+              firstName: data.person.firstName || "",
+              lastName: data.person.lastName || "",
+              emailAddress: data.person.emailAddress || "",
+              phoneNumber: data.person?.phoneNumber || "",
             },
         address: isOrgRef.current
           ? {
@@ -109,12 +124,12 @@ export default function DonorDetail() {
               type: data.organization.address?.type || "",
             }
           : {
-              addressLine1: data.person.address?.addressLine1,
-              addressLine2: data.person.address?.addressLine2,
-              city: data.person.address?.city,
+              addressLine1: data.person.address?.addressLine1 || "",
+              addressLine2: data.person.address?.addressLine2 || "",
+              city: data.person.address?.city || "",
               state: data.person.address?.state,
-              zipCode: data.person.address?.zipCode,
-              type: data.person.address?.type,
+              zipCode: data.person.address?.zipCode || "",
+              type: data.person.address?.type || "Residential",
             },
       });
 
@@ -131,9 +146,15 @@ export default function DonorDetail() {
         <Loading />
       ) : (
         <Box sx={styles.container} component="form">
-          <Typography variant="h6">
-            Donor Details for: {personNameRef.current}
-          </Typography>
+          <Box sx={{ paddingBottom: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              Donor Details
+            </Typography>
+            <Typography variant="h6" sx={{ color: grey[700] }}>
+              {personNameRef.current}
+            </Typography>
+          </Box>
+
           <Box sx={styles.inputContainer}>
             <FormInputDropdown
               name={"donor.type"}
@@ -178,11 +199,7 @@ export default function DonorDetail() {
               menuItems={donorSegments}
               sx={styles.textField}
             />
-            <TextField
-              sx={{ ...styles.textField, visibility: "hidden" }}
-              id="style"
-              label="styling"
-            />
+            <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
           </Box>
 
           <Typography variant="h6">Donor Notes</Typography>
@@ -192,7 +209,7 @@ export default function DonorDetail() {
               control={control}
               label={"Notes"}
               multiline={true}
-              rows={4}
+              rows={5}
               fullWidth={true}
               sx={styles.textField}
             />
@@ -203,9 +220,7 @@ export default function DonorDetail() {
             control={control}
             render={({ field: { value } }) => (
               <Box>
-                <Typography variant="h6">
-                  {isOrgRef.current ? "Organization" : "Individual"} Details
-                </Typography>
+                <Typography variant="h6">{isOrgRef.current ? "Organization" : "Individual"} Details</Typography>
                 {isOrgRef.current ? (
                   <Box>
                     <Box sx={styles.inputContainer}>
@@ -266,16 +281,8 @@ export default function DonorDetail() {
                         maxLength={12}
                         sx={styles.textField}
                       />
-                      <TextField
-                        sx={{ ...styles.textField, visibility: "hidden" }}
-                        id="style"
-                        label="styling"
-                      />
-                      <TextField
-                        sx={{ ...styles.textField, visibility: "hidden" }}
-                        id="style"
-                        label="styling"
-                      />
+                      <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                      <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
                     </Box>
                   </Box>
                 )}
@@ -335,17 +342,14 @@ export default function DonorDetail() {
             id={id}
             name={"donor"}
             href={"/Donors"}
-            apiUrl={"/v1/donors"}
+            apiUrl={"/donors"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}
             errors={errors}
           />
-          <Typography variant="h6">
-            Donor Lifetime Value (placeholder calculation)
-          </Typography>
-          <Typography variant="h6">
-            Donation History (Click for more)
-          </Typography>
+          <Typography variant="h6">Donor Lifetime Value (placeholder)</Typography>
+          <Typography variant="h6">Donation History</Typography>
+          <MiniDonationsTable donations={donationInfo} />
         </Box>
       )}
     </Box>

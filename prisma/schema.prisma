@@ -47,15 +47,15 @@ model Organization {
 }
 
 model Representative {
-  ID                String       @id @default(uuid())
+  ID                String  @id @default(uuid())
   FirstName         String
   LastName          String
-  Email             String       @unique
-  Phone             String?      @unique
+  Email             String  @unique
+  Phone             String? @unique
   PositionInCompany String
   OrganizationID    String
   //Organization      Organization @relation(fields: [OrganizationID], references: [OrganizationID])
-  Grants            Grant[]      @relation("GrantToRepresentative")
+  Grants            Grant[] @relation("GrantToRepresentative")
 }
 
 model Grant {
@@ -100,19 +100,19 @@ model VolunteerEvent {
 }
 
 model Person {
-  id             String          @id @default(uuid())
-  firstName      String
-  lastName       String
-  emailAddress   String          @unique
-  phoneNumber    String?         @unique
-  donor          Donor?
+  id           String   @id @default(uuid())
+  firstName    String
+  lastName     String
+  emailAddress String   @unique
+  phoneNumber  String?  @unique
+  donor        Donor?
   //representative Representative?
-  address        Address?
+  address      Address?
   //user           User?
 }
 
 model Donor {
-  id                      String     @id @default(uuid())
+  id                      String        @id @default(uuid())
   type                    String
   communicationPreference String
   status                  String
@@ -127,15 +127,15 @@ model Donor {
 }
 
 model Address {
-  id           String    @id @default(uuid())
-  addressLine1 String
-  addressLine2 String?
-  city         String
-  state        String
-  zipCode      String
-  type         String
-  personId     String    @unique
-  person       Person    @relation(fields: [personId], references: [id])
+  id             String        @id @default(uuid())
+  addressLine1   String
+  addressLine2   String?
+  city           String
+  state          String
+  zipCode        String
+  type           String
+  personId       String        @unique
+  person         Person        @relation(fields: [personId], references: [id])
   organizationId String?       @unique
   organization   Organization? @relation(fields: [organizationId], references: [id])
   //grantorId      String?       @unique
@@ -156,9 +156,9 @@ model Donation {
   isMatching          Boolean
   taxDeductibleAmount Float?
   receiptSent         Boolean?
-  receiptNumber       String?   @default(uuid())
+  receiptNumber       String?  @default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String
-  donor               Donor    @relation(fields: [donorId], references: [id])
+  donorId             String?
+  donor               Donor?   @relation(fields: [donorId], references: [id])
 }

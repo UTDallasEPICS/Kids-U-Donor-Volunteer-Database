@@ -4,10 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 // Fetch single Donor based on id, Ex. http://localhost:3000/api/v1/donors/[id]
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
   try {
     const data = await prisma.donor.findUnique({
@@ -23,6 +20,7 @@ export async function GET(
             amount: true,
             item: true,
             paymentMethod: true,
+            date: true,
           },
         },
         // Include the person info, but only first/last names, phone, email, and address
@@ -51,10 +49,7 @@ export async function GET(
       return NextResponse.json({ message: "Donor not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { message: `Successfully fetched donor with ID: ${id}`, data: data },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: `Successfully fetched donor with ID: ${id}`, data: data }, { status: 200 });
   } catch (error) {
     console.error(`Error fetching donor with ID: ${id}\n`, error);
     return NextResponse.json({ message: "Donor not found" }, { status: 404 });
@@ -62,10 +57,7 @@ export async function GET(
 }
 
 // Update a single Donor based on id, and only fields that require updating
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
 
   try {
@@ -118,10 +110,7 @@ export async function PATCH(
 }
 
 // Delete single Donor based on id
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
 
   try {
@@ -131,10 +120,7 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json(
-      { message: "Deleted data: ", data: data },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Deleted data: ", data: data }, { status: 200 });
   } catch (error) {
     console.error(`Error deleting donor with ID: ${id}`, error);
     return NextResponse.json({ message: "Donor not found" }, { status: 404 });

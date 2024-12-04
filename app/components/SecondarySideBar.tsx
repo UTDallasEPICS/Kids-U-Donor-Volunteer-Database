@@ -11,12 +11,7 @@ export const SecondarySideBar = ({ items }: { items: ListItem[] }) => {
     <List sx={styles.container}>
       {items.map((item, index) => (
         <ListItem sx={{ px: 0.5 }} key={index}>
-          <Link
-            sx={styles.button}
-            href={item.reference}
-            component={NextLink}
-            underline="none"
-          >
+          <Link sx={styles.button} href={item.reference} component={NextLink} underline="none">
             {item.name}
           </Link>
         </ListItem>

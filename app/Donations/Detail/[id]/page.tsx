@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { DonationResponse } from "@/app/types/states";
 import Loading from "@/app/loading";
 import { useRouter } from "next/navigation";
-import { Footer } from "@/app/components/DonationHandleFooter";
+import { Footer } from "@/app/components/donations/DonationHandleFooter";
 import {
   choiceYesOrNo,
   DonationFormProps,
@@ -18,6 +18,7 @@ import { Controller, useForm } from "react-hook-form";
 import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
 import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
 import { FormInputDate } from "@/app/components/formComponents/FormInputDate";
+import { grey } from "@mui/material/colors";
 
 export default function DonationDetail() {
   const { id }: { id: string } = useParams();
@@ -25,6 +26,7 @@ export default function DonationDetail() {
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const donorNameRef = useRef<string>("");
+  const isAnonymousRef = useRef<boolean>(false);
 
   const {
     handleSubmit,
@@ -60,12 +62,9 @@ export default function DonationDetail() {
 
   const fetchDonation = async () => {
     try {
-      const result = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/v1/donations/${id}`,
-        {
-          method: "GET",
-        }
-      );
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/${id}`, {
+        method: "GET",
+      });
 
       const { data } = (await result.json()) as DonationResponse;
 
@@ -74,25 +73,28 @@ export default function DonationDetail() {
         throw new Error("Error fetching donation");
       }
 
-      donorNameRef.current = `${data.donor.person.firstName} ${data.donor.person.lastName}`;
+      if (data.donor && !data.isAnonymous) {
+        donorNameRef.current = `${data.donor.person.firstName} ${data.donor.person.lastName}`;
+      }
+      isAnonymousRef.current = data.isAnonymous;
 
       reset({
         donation: {
-          type: data.type,
+          type: data.type || "One-Time",
           amount: data.amount || 0,
-          item: data?.item,
-          paymentMethod: data.paymentMethod,
-          campaign: data.campaign,
-          fundDesignation: data.fundDesignation,
-          date: data.date,
-          recurringFrequency: data.recurringFrequency,
-          source: data.source,
-          isMatching: data.isMatching,
+          item: data?.item || "",
+          paymentMethod: data.paymentMethod || "Credit Card",
+          campaign: data.campaign || "",
+          fundDesignation: data.fundDesignation || "",
+          date: data.date || new Date(),
+          recurringFrequency: data.recurringFrequency || "None",
+          source: data.source || "Website",
+          isMatching: data.isMatching || false,
           taxDeductibleAmount: data?.taxDeductibleAmount || 0,
-          receiptSent: data.receiptSent,
-          receiptNumber: data.receiptNumber,
-          isAnonymous: data.isAnonymous,
-          acknowledgementSent: data.acknowledgementSent,
+          receiptSent: data.receiptSent || false,
+          receiptNumber: data.receiptNumber || "",
+          isAnonymous: data.isAnonymous || false,
+          acknowledgementSent: data.acknowledgementSent || false,
         },
       });
 
@@ -108,9 +110,14 @@ export default function DonationDetail() {
         <Loading />
       ) : (
         <Box sx={styles.container} component="form">
-          <Typography variant="h6">
-            Donation Details for: {donorNameRef.current}
-          </Typography>
+          <Box sx={{ paddingBottom: 2 }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+              Donation Details
+            </Typography>
+            <Typography variant="h6" sx={{ color: grey[700] }}>
+              {isAnonymousRef.current ? "Anonymous Donor" : donorNameRef.current}
+            </Typography>
+          </Box>
           <Box sx={styles.inputContainer}>
             <FormInputDropdown
               name={"donation.type"}
@@ -124,8 +131,7 @@ export default function DonationDetail() {
               name="donation.type"
               control={control}
               render={({ field: { value } }) => {
-                const label =
-                  value !== "In-Kind" ? "Donation Amount" : "Item(s) Worth";
+                const label = value !== "In-Kind" ? "Donation Amount" : "Item(s) Value";
                 return (
                   <FormInputTextfield
                     name={"donation.amount"}
@@ -247,7 +253,7 @@ export default function DonationDetail() {
               name={"donation.isAnonymous"}
               control={control}
               label={"Anonymous?"}
-              required={true}
+              readOnly={true}
               menuItems={choiceYesOrNo}
               sx={styles.textField}
             />
@@ -259,17 +265,13 @@ export default function DonationDetail() {
               menuItems={choiceYesOrNo}
               sx={styles.textField}
             />
-            <TextField
-              sx={{ ...styles.textField, visibility: "hidden" }}
-              id="style"
-              label="styling"
-            />
+            <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
           </Box>
           <Footer
             id={id}
             name={"donation"}
             href={"/Donations"}
-            apiUrl={"/v1/donations"}
+            apiUrl={"/donations"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}
             errors={errors}
