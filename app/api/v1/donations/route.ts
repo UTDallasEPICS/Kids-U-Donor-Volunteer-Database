@@ -1,27 +1,33 @@
-import { PrismaClient } from "@prisma/client";
+import { Donation, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
-
-// Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
 
 const prisma = new PrismaClient();
 
-// Create
+// Add new donation
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    //console.log(body);
+
+    const newDonation = await prisma.donation.create({
+      data: body,
+    });
 
     return NextResponse.json(
       {
-        message: "POST REQUEST",
-        receivedData: body,
+        message: `Successfully added donation`,
+        data: newDonation,
       },
-      { status: 200 }
+      { status: 201 }
     );
   } catch (error) {
-    console.error("POST ERROR:", error);
+    console.error(`Error adding donation\n`, error);
+    return NextResponse.json(
+      { message: "Error adding donation" },
+      { status: 500 }
+    );
   }
 }
+
 
 // Read
 export async function GET() {
