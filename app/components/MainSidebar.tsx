@@ -17,6 +17,9 @@ export default function MainSidebar() {
         <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
           <Link href="/Grants">Grants</Link>
         </li>
+        <li className="hover:bg-gray-600 p-1 rounded cursor-pointer">
+          <Link href="/Volunteers">Volunteers</Link>
+        </li>
       </ul>
     </div>
   );
