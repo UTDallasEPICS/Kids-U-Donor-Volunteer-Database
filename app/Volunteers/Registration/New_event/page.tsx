@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import Link from "@/node_modules/next/link";
+import Link from "next/link";
 
 export default function AddEvent() {
   const Breadcrumb = () => (
@@ -109,7 +109,7 @@ export default function AddEvent() {
             type="submit"
             id="submit"
             name="submit"
-            className="w-full text-gray-800 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1"
           ></input>
         </div>
       </form>
@@ -117,7 +117,7 @@ export default function AddEvent() {
   );
 
   return (
-    <div className="flex font-sans min-h-screen bg-gray-100">
+    <div className="flex font-sans min-h-screen">
       <div className="flex-grow p-5">
         <Breadcrumb />
         <Header />

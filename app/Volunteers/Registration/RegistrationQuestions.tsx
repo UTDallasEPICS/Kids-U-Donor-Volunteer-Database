@@ -5,6 +5,7 @@ const RegistrationQuestions = () => {
     <div className="space-y-6">
       <form className="space-y-4">
         <div className="w-full border-t-4 border-[#1F2839] my-4"></div>
+        <h2 className="font-bold text-xl">Event Form</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2">
           <div className="sm:col-span-1">
             <div className="flex flex-col mb-2">
@@ -451,7 +452,7 @@ const RegistrationQuestions = () => {
             type="submit"
             id="submit"
             name="submit"
-            className="w-full text-gray-800 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1"
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1"
           ></input>
         </div>
       </form>

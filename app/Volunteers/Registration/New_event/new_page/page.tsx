@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import Link from "@/node_modules/next/link";
-import { FormControl, TextField } from "@/node_modules/@mui/material/index";
+import Link from "next/link";
 
 export default function NewPage() {
   const Breadcrumb = () => (
@@ -41,7 +40,6 @@ export default function NewPage() {
         <Breadcrumb />
         <Header />
         <Form />
-        hello there
       </div>
     </div>
   );
