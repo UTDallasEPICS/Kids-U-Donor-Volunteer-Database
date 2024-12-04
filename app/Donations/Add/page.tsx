@@ -121,7 +121,7 @@ export default function AddDonation() {
   const handleInput =
     <T,>(label: keyof T, setState: React.Dispatch<React.SetStateAction<T>>) =>
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value.trim();
+      const value = event.target.value;
       setRequiredError((prev) => ({ ...prev, [label]: value === "" }));
       setState((prev) => ({ ...prev, [label]: value }));
     };
