@@ -30,10 +30,7 @@ const NewMail: React.FC = () => {
   );
 
   const Body = () => (
-    <div className="flex justify-between items-center mb-5">
-      <h1>Here</h1>
-      <h3>here</h3>
-    </div>
+    <div className="flex justify-between items-center mb-5"></div>
   );
 
   return (
