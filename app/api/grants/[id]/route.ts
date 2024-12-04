@@ -15,7 +15,7 @@ export async function GET(
   try {
     const data = await prisma.grant.findUnique({
       where: {
-        GrantID: id,
+        id: id,
       },
     });
     console.log(data);
@@ -72,7 +72,7 @@ export async function DELETE(
   try {
     const data = await prisma.grant.delete({
       where: {
-        GrantID: id,
+        id: id,
       },
     });
 

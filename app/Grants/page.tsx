@@ -1,18 +1,20 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import type { Grant } from "@/prisma";
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import {
+  Box,
+  TextField,
+  Typography,
+  Breadcrumbs,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
+} from "@mui/material"
+import Link from "next/link"
 
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
@@ -35,15 +37,6 @@ export default function GrantsPage() {
     <Box>
       <Box>
         <Breadcrumbs aria-label="breadcrumb">
-          <Link underline="hover" color="inherit" href="/">
-            Home
-          </Link>
-          <Link
-            underline="hover"
-            color="inherit"
-          >
-            Grants
-          </Link>
           <Typography sx={{ color: 'text.primary' }}>Grant List</Typography>
         </Breadcrumbs>
       </Box>
@@ -62,15 +55,17 @@ export default function GrantsPage() {
           <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Grantor</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Proposal Due Date</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Proposal Submission Date</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
+                <TableCell style={styles.tableCellHeader}>Grantor</TableCell>
+                <TableCell style={styles.tableCellHeader}>Name</TableCell>
+                <TableCell style={styles.tableCellHeader}>Status</TableCell>
+                <TableCell style={styles.tableCellHeader}>Purpose</TableCell>
+                <TableCell style={styles.tableCellHeader}>Start Date</TableCell>
+                <TableCell style={styles.tableCellHeader}>End Date</TableCell>
+                <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>
+                <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>
+                <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>
+                <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>
+                <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -79,19 +74,25 @@ export default function GrantsPage() {
                   key={grant.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell>{<Link href={`/Grants/Detail/${grant.id}`}>
-                    {grant.name}
-                  </Link>}</TableCell>
-                  <TableCell>{grant.status}</TableCell>
-                  <TableCell>{grant.amountRequested}</TableCell>
-                  <TableCell>{grant.amountAwarded}</TableCell>
-                  <TableCell>{grant.startDate
-                    ? new Date(grant.startDate).toLocaleDateString()
-                    : "N/A"}
+                  <TableCell style={styles.tableCell}>{"N/A"}</TableCell>
+                  <TableCell style={styles.tableCell}>{
+                    <Link href={`/Grants/Detail/${grant.id}`}>
+                      {grant.name}</Link>}
                   </TableCell>
-                  <TableCell>{grant.endDate
-                    ? new Date(grant.endDate).toLocaleDateString()
-                    : "N/A"}
+                  <TableCell style={styles.tableCell}>{grant.status}</TableCell>
+                  <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>
+                  <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>
+                  <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>
+                  <TableCell style={styles.tableCell}>{
+                    grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString()
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>
+                  <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>
+                  <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>
+                  <TableCell style={styles.tableCell}>{
+                    grant.awardNotificationDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString()
+                      : "N/A"}
                   </TableCell>
                 </TableRow>
               ))}

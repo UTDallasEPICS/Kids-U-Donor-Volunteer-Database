@@ -1,50 +1,41 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Grant } from "@/prisma";
-import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Breadcrumbs from '@mui/material/Breadcrumbs';
-import Link from '@mui/material/Link';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
+import { Grantor, Representative } from "@/prisma"
+import {
+    Box,
+    TextField,
+    Typography,
+    Breadcrumbs,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Paper
+} from '@mui/material'
+import Link from "next/link"
+export default function GrantorsPage() {
+    const [grantorsData, setGrantorsData] = useState<Grantor[]>([]); // State to store grants data
 
-export default function GrantsPage() {
-    /*const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
-  
     useEffect(() => {
-      fetchGrantsData();
+        fetchGrantorsData();
     }, []);
-  
-    const fetchGrantsData = async () => {
-      try {
-        const response = await fetch("/api/grants/");
-        const result = await response.json();
-        setGrantsData(result.data);
-      } catch (error) {
-        console.error("Error fetching grants:", error);
-      }
-    };*/
+
+    const fetchGrantorsData = async () => {
+        try {
+            const response = await fetch("/api/grants/grantors");
+            const result = await response.json();
+            setGrantorsData(result.data);
+        } catch (error) {
+            console.error("Error fetching grantors:", error);
+        }
+    };
 
     return (
         <Box>
             <Box>
                 <Breadcrumbs aria-label="breadcrumb">
-                    <Link underline="hover" color="inherit" href="/">
-                        Home
-                    </Link>
-                    <Link
-                        underline="hover"
-                        color="inherit"
-                    >
-                        Grants
-                    </Link>
-                    <Typography sx={{ color: 'text.primary' }}>Grantor List</Typography>
                 </Breadcrumbs>
             </Box>
             <Box>
@@ -68,9 +59,33 @@ export default function GrantsPage() {
                                 <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
                             </TableRow>
                         </TableHead>
+                        <TableBody>
+                            {grantorsData.map((grantors) => (
+                                <TableRow
+                                    key={grantors.id}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                >
+                                    <TableCell style={styles.tableCell}>{grantors.websiteLink}</TableCell>
+
+                                </TableRow>
+                            ))}
+                        </TableBody>
                     </Table>
                 </TableContainer>
             </Box>
         </Box >
     );
 }
+
+const styles = {
+    table: {
+        minWidth: 650,
+    },
+    tableCellHeader: {
+        fontWeight: "bold",
+        border: "1px solid #ccc",
+    },
+    tableCell: {
+        border: "1px solid #ccc",
+    },
+};

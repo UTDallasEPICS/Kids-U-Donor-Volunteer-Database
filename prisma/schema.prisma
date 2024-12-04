@@ -8,7 +8,7 @@ datasource db {
 }
 
 enum Role {
-  VOLUNTER
+  VOLUNTEER
   ADMIN
 }
 
@@ -40,7 +40,7 @@ model User {
   person   Person? @relation(fields: [personId], references: [id])
 }
 
-//Volunter profile and Admin profile
+//Volunteer profile and Admin profile
 
 model Address {
   id             String        @id @default(uuid())
@@ -92,20 +92,20 @@ model Grant {
   isMultipleYears         Boolean
   quarter                 String
   acknowledgementSent     Boolean
-  awardNotificationDate   DateTime
+  awardNotificationDate   DateTime?
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
   proposalDueDate         DateTime
   proposalSummary         String
-  proposalSubmissionDate  DateTime
+  proposalSubmissionDate  DateTime?
   applicationType         String
   internalOwner           String
   fundingRestriction      String?
   matchingRequirement     String?
   useArea                 String //specific area or general
   isEligibleForRenewal    Boolean
-  renewalApplicationDate  DateTime
-  renewalAwardStatus      String
+  renewalApplicationDate  DateTime?
+  renewalAwardStatus      String?
   representativeGrant     RepresentativeGrant[]
   grantAttachment         GrantAttachment[]
 }
