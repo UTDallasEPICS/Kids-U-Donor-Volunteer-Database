@@ -57,7 +57,8 @@ export default async function Page({
           <Header />
           <div>
             <h2 className="font-bold text-xl">Event Information</h2>
-            <p>Location:</p>
+            <p>Name: </p>
+            <p>Location: </p>
             <p>Date:</p>
             <p>Description:</p>
           </div>

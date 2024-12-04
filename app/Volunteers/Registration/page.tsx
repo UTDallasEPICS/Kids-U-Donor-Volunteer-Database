@@ -46,7 +46,7 @@ export default function Registration() {
   //test user object
   const testUser = {
     username: "testUser",
-    role: "admin", //admin or volunteer
+    role: "volunteer", //admin or volunteer
     email: "testuser@example.com",
     firstName: "Test",
     lastName: "User",
