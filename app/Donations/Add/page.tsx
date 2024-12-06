@@ -1,15 +1,8 @@
 "use client";
 import * as React from "react";
 import { useParams } from "next/navigation";
-import { states } from "@/app/utils/US";
-import {
-  Box,
-  TextField,
-  Typography,
-  InputAdornment,
-  MenuItem,
-  Button,
-} from "@mui/material";
+import { statesChoices } from "@/app/components/formComponents/FormInputProps";
+import { Box, TextField, Typography, InputAdornment, MenuItem, Button } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import {
   DonationState,
@@ -25,29 +18,12 @@ import Loading from "@/app/loading";
 import { useRouter } from "next/navigation";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
-import { Footer } from "@/app/components/donationHandleFooter";
 import { DoNotDisturbOutlined } from "@mui/icons-material";
 
 const donationTypes = ["One-Time", "Recurring", "Pledge", "In-Kind"];
-const paymentMethods = [
-  "Credit Card",
-  "Check",
-  "Bank Transfer",
-  "Cash",
-  "ACH",
-  "PayPal",
-  "Venmo",
-  "Zelle",
-];
+const paymentMethods = ["Credit Card", "Check", "Bank Transfer", "Cash", "ACH", "PayPal", "Venmo", "Zelle"];
 const recurringFrequencies = ["None", "Monthly", "Quarterly", "Annually"];
-const donationSources = [
-  "Website",
-  "Social Media",
-  "Event",
-  "Email",
-  "Direct Mail",
-  "Referral",
-];
+const donationSources = ["Website", "Social Media", "Event", "Email", "Direct Mail", "Referral"];
 const donorModes = ["Anonymous", "New", "Existing"];
 const donorTypes = ["Individual", "Corporate", "Foundation"];
 const donorStatuses = ["Active", "Lapsed", "Major Donor", "First Time Donor"];
@@ -335,9 +311,7 @@ export default function AddDonation() {
                     value={person.firstName}
                     onChange={handleInput("firstName", setPerson)}
                     error={requiredError.firstName}
-                    helperText={
-                      requiredError.firstName ? "Field is required" : ""
-                    }
+                    helperText={requiredError.firstName ? "Field is required" : ""}
                   />
                 </Box>
                 <Box sx={styles.inputContainer}>
@@ -349,9 +323,7 @@ export default function AddDonation() {
                     value={person.lastName}
                     onChange={handleInput("lastName", setPerson)}
                     error={requiredError.lastName}
-                    helperText={
-                      requiredError.lastName ? "Field is required" : ""
-                    }
+                    helperText={requiredError.lastName ? "Field is required" : ""}
                   />
                 </Box>
               </>
@@ -368,9 +340,7 @@ export default function AddDonation() {
                     value={person.firstName}
                     onChange={handleInput("firstName", setPerson)}
                     error={requiredError.firstName}
-                    helperText={
-                      requiredError.firstName ? "Field is required" : ""
-                    }
+                    helperText={requiredError.firstName ? "Field is required" : ""}
                   />
                 </Box>
               </>
@@ -384,9 +354,7 @@ export default function AddDonation() {
                 value={person.emailAddress}
                 onChange={handleInput("emailAddress", setPerson)}
                 error={requiredError.emailAddress}
-                helperText={
-                  requiredError.emailAddress ? "Field is required" : ""
-                }
+                helperText={requiredError.emailAddress ? "Field is required" : ""}
               />
             </Box>
             <Box sx={styles.inputContainer}>
@@ -398,9 +366,7 @@ export default function AddDonation() {
                 value={address.addressLine1}
                 onChange={handleInput("addressLine1", setAddress)}
                 error={requiredError.addressLine1}
-                helperText={
-                  requiredError.addressLine1 ? "Field is required" : ""
-                }
+                helperText={requiredError.addressLine1 ? "Field is required" : ""}
               />
             </Box>
             <Box sx={styles.inputContainer}>
@@ -436,7 +402,7 @@ export default function AddDonation() {
                 value={address.state}
                 onChange={handleInput("state", setAddress)}
               >
-                {states.map((state, index) => (
+                {statesChoices.map((state: any, index: number) => (
                   <MenuItem key={index} value={state.value}>
                     {state.value}
                   </MenuItem>
@@ -529,17 +495,14 @@ export default function AddDonation() {
               "& input[type=number]": {
                 MozAppearance: "textfield",
               },
-              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button":
-                {
-                  WebkitAppearance: "none",
-                  margin: 0,
-                },
+              "& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button": {
+                WebkitAppearance: "none",
+                margin: 0,
+              },
             }}
             required={true}
             id="amount"
-            label={
-              donation.type !== "In-Kind" ? "Donation Amount" : "Item(s) Worth"
-            }
+            label={donation.type !== "In-Kind" ? "Donation Amount" : "Item(s) Worth"}
             type="number"
             value={donation.amount}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -553,9 +516,7 @@ export default function AddDonation() {
             }}
             slotProps={{
               input: {
-                startAdornment: (
-                  <InputAdornment position="start">$</InputAdornment>
-                ),
+                startAdornment: <InputAdornment position="start">$</InputAdornment>,
               },
               inputLabel: {
                 shrink: true,
@@ -616,9 +577,7 @@ export default function AddDonation() {
             value={donation.fundDesignation}
             onChange={handleInput("fundDesignation", setDonation)}
             error={requiredError.fundDesignation}
-            helperText={
-              requiredError.fundDesignation ? "Field is required" : ""
-            }
+            helperText={requiredError.fundDesignation ? "Field is required" : ""}
           />
         </Box>
         <Box sx={styles.inputContainer}>
