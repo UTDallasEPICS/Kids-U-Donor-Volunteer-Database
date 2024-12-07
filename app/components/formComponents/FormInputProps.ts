@@ -1,16 +1,19 @@
 import { Control } from "react-hook-form";
 import { SxProps, Theme } from "@mui/material";
-import {
-  AddressState,
-  DonationState,
-  DonorState,
-  OrganizationState,
-  PersonState,
-} from "@/app/types/states";
+import { AddressState, DonationState, DonorState, OrganizationState, PersonState } from "@/app/types/states";
 
-export type MenuItemType = {
+export type MenuItem = {
   label: string;
   value: string;
+};
+
+export type CheckBoxItem = {
+  label: string;
+  value: boolean;
+};
+
+export type DonationFormProps = {
+  donation: DonationState;
 };
 
 export type DonorFormProps = {
@@ -20,9 +23,7 @@ export type DonorFormProps = {
   address: AddressState;
 };
 
-export type DonationFormProps = {
-  donation: DonationState;
-};
+export type AddDonationDonorFormProps = DonationFormProps & DonorFormProps;
 
 export type FormInputProps = {
   name: string;
@@ -43,10 +44,10 @@ export type FormInputTextProps = FormInputProps & {
 };
 
 export type FormInputSelectProps = FormInputProps & {
-  menuItems: MenuItemType[];
+  menuItems: MenuItem[];
 };
 
-export const donorTypes: MenuItemType[] = [
+export const donorTypes: MenuItem[] = [
   {
     label: "Individual",
     value: "Individual",
@@ -61,7 +62,7 @@ export const donorTypes: MenuItemType[] = [
   },
 ];
 
-export const donorCommPreferences: MenuItemType[] = [
+export const donorCommPreferences: MenuItem[] = [
   {
     label: "Email",
     value: "Email",
@@ -76,7 +77,7 @@ export const donorCommPreferences: MenuItemType[] = [
   },
 ];
 
-export const donorStatuses: MenuItemType[] = [
+export const donorStatuses: MenuItem[] = [
   {
     label: "Active",
     value: "Active",
@@ -95,7 +96,7 @@ export const donorStatuses: MenuItemType[] = [
   },
 ];
 
-export const donorSegments: MenuItemType[] = [
+export const donorSegments: MenuItem[] = [
   {
     label: "High Value Donor",
     value: "High Value Donor",
@@ -110,7 +111,7 @@ export const donorSegments: MenuItemType[] = [
   },
 ];
 
-export const addressTypes: MenuItemType[] = [
+export const addressTypes: MenuItem[] = [
   {
     label: "Residential",
     value: "Residential",
@@ -121,18 +122,7 @@ export const addressTypes: MenuItemType[] = [
   },
 ];
 
-export const choiceYesOrNo: MenuItemType[] = [
-  {
-    label: "Yes",
-    value: "true",
-  },
-  {
-    label: "No",
-    value: "false",
-  },
-];
-
-export const statesChoices: MenuItemType[] = [
+export const statesChoices: MenuItem[] = [
   { value: "AL", label: "AL - Alabama" },
   { value: "AK", label: "AK - Alaska" },
   { value: "AZ", label: "AZ - Arizona" },
@@ -188,7 +178,7 @@ export const statesChoices: MenuItemType[] = [
   { value: "WY", label: "WY - Wyoming" },
 ];
 
-export const donationTypes: MenuItemType[] = [
+export const donationTypes: MenuItem[] = [
   {
     label: "One-Time",
     value: "One-Time",
@@ -207,7 +197,7 @@ export const donationTypes: MenuItemType[] = [
   },
 ];
 
-export const paymentMethods: MenuItemType[] = [
+export const paymentMethods: MenuItem[] = [
   {
     label: "Credit Card",
     value: "Credit Card",
@@ -242,7 +232,7 @@ export const paymentMethods: MenuItemType[] = [
   },
 ];
 
-export const recurringFrequencies: MenuItemType[] = [
+export const recurringFrequencies: MenuItem[] = [
   {
     label: "None",
     value: "None",
@@ -261,7 +251,7 @@ export const recurringFrequencies: MenuItemType[] = [
   },
 ];
 
-export const donationSources: MenuItemType[] = [
+export const donationSources: MenuItem[] = [
   {
     label: "Website",
     value: "Website",
@@ -290,4 +280,10 @@ export const donationSources: MenuItemType[] = [
     label: "Other",
     value: "Other",
   },
+];
+
+export const donorModes: MenuItem[] = [
+  { label: "Anonymous", value: "Anonymous" },
+  { label: "New", value: "New" },
+  { label: "Existing", value: "Existing" },
 ];

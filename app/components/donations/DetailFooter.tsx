@@ -14,7 +14,7 @@ type FooterProps = {
   errors: FieldErrors<DonorFormProps | DonationFormProps>;
 };
 
-export const Footer = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }: FooterProps) => {
+export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }: FooterProps) => {
   const router = useRouter();
 
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
@@ -56,11 +56,13 @@ export const Footer = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }
       });
 
       if (!response.ok) {
-        throw new Error("Error updating data");
+        const errorData = await response.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
       }
       alert("Successfully updated data.");
     } catch (error) {
-      alert("Error updating data");
+      alert(error);
       console.error(error);
     }
   };
@@ -71,17 +73,19 @@ export const Footer = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }
     if (remove) {
       try {
         setIsButtonDisabled(true);
-        const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
           method: "DELETE",
         });
 
-        if (!result.ok) {
-          throw new Error(`Error deleting ${name} data`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          const message = errorData?.message || "Something went wrong";
+          throw new Error(message);
         }
         alert(`Successfully deleted ${name} data`);
-        router.push(`/${href}`);
+        router.push(href);
       } catch (error) {
-        alert(`Error deleting ${href} data`);
+        alert(error);
         console.error(error);
       }
     }
@@ -136,6 +140,7 @@ const styles = {
     display: "flex",
     gap: 1,
     py: 2,
+    gridColumn: "span 3",
   },
   buttonContained: {
     backgroundColor: "#1a345b",

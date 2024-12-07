@@ -1,344 +1,226 @@
 "use client";
-import { Box, TextField, Button, MenuItem, Select } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import * as React from "react";
-import { states } from "@/app/utils/US";
-import { useEffect, useRef, useState } from "react";
+import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
+import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
+import { Controller, useForm } from "react-hook-form";
 import {
-  DonorState,
-  PersonState,
-  AddressState,
-  RequiredDonorPersonState,
-  donorResponse,
-} from "@/app/types/states";
-
-const donorTypes: string[] = ["Individual", "Corporate", "Foundation"];
-
-const donorStatuses: string[] = [
-  "Active",
-  "Lapsed",
-  "Major Donor",
-  "First Time Donor",
-];
-
-const donorCommPrefs: string[] = ["Email", "Mail", "Phone"];
+  addressTypes,
+  donorCommPreferences,
+  DonorFormProps,
+  donorSegments,
+  donorStatuses,
+  donorTypes,
+  statesChoices,
+} from "@/app/components/formComponents/FormInputProps";
+import { AddDonorFooter } from "@/app/components/donations/add/AddDonorFooter";
+import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
 
 export default function AddDonor() {
-  const [donor, setDonor] = useState<DonorState>({
-    type: "",
-    communicationPreference: "",
-    status: "",
-    notes: "",
-    isRetained: false,
-    segment: null,
-  });
-  const [person, setPerson] = useState<PersonState>({
-    firstName: "",
-    lastName: "",
-    phoneNumber: "",
-    emailAddress: "",
-  });
-  const [address, setAddress] = useState<AddressState>({
-    addressLine1: "",
-    addressLine2: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    type: "",
-  });
-  //const { donorType, donorStatus, contactMethod } = donor;
-
-  const [requiredError, setRequiredError] = useState({
-    firstName: false,
-    lastName: false,
-    emailAddress: false,
-    addressLine1: false,
-    city: false,
-    zipCode: false,
-    type: false,
-  });
-
-  const handleInput =
-    <T,>(label: keyof T, setState: React.Dispatch<React.SetStateAction<T>>) =>
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      if (event.target.value.trim() === "") {
-        setRequiredError((prev: RequiredDonorPersonState) => ({
-          ...prev,
-          [label]: true,
-        }));
-      } else {
-        setRequiredError((prev: RequiredDonorPersonState) => ({
-          ...prev,
-          [label]: false,
-        }));
-      }
-
-      setState((prev: T) => ({
-        ...prev,
-        [label]: event.target.value.trim(),
-      }));
-    };
-
-  const handleSubmit = async () => {
-    if (Object.values(requiredError).some((error) => error)) {
-      alert("Please fill out all required fields.");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/v1/donors", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ donor, person, address }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add donor");
-      }
-
-      const result = await response.json();
-
-      setDonor({
-        type: "",
+  const {
+    handleSubmit,
+    control,
+    setValue,
+    formState: { isDirty, isValid, errors },
+  } = useForm<DonorFormProps>({
+    mode: "onChange",
+    defaultValues: {
+      donor: {
+        type: "Individual",
         communicationPreference: "",
         status: "",
         notes: "",
         isRetained: false,
-        segment: null,
-      });
-      setPerson({
-        firstName: "",
-        lastName: "",
-        phoneNumber: "",
-        emailAddress: "",
-      });
-      setAddress({
-        addressLine1: "",
-        addressLine2: "",
-        city: "",
-        state: "",
-        zipCode: "",
-        type: "",
-      });
-      setRequiredError({
-        firstName: false,
-        lastName: false,
-        emailAddress: false,
-        addressLine1: false,
-        city: false,
-        zipCode: false,
-        type: false,
-      });
-
-      console.log("Donor added:", result);
-    } catch (error) {
-      console.error("Error adding donor:", error);
-      alert("An error occurred while adding the donor.");
-    }
-  };
+        segment: "",
+      },
+      person: { firstName: "", lastName: "", emailAddress: "", phoneNumber: "" },
+      organization: { name: "", emailAddress: "", phoneNumber: "" },
+      address: { addressLine1: "", addressLine2: "", city: "", state: "", zipCode: "", type: "" },
+    },
+  });
 
   return (
-    <Box>
-      <Box sx={{ paddingLeft: 5, fontSize: 24 }}>Donor Info</Box>
-      <Box sx={styles.container} component="form">
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            select
-            id="select-type"
-            label="Type"
-            value={donor.type}
-            onChange={handleInput("type", setDonor)}
-          >
-            {donorTypes.map((type, index) => (
-              <MenuItem key={index} value={type}>
-                {type}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            select
-            id="select-communicationPreference"
-            label="Communication Preference"
-            value={donor.communicationPreference}
-            onChange={handleInput("communicationPreference", setDonor)}
-          >
-            {donorCommPrefs.map((pref, index) => (
-              <MenuItem key={index} value={pref}>
-                {pref}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            select
-            id="select-status"
-            label="Status"
-            value={donor.status}
-            onChange={handleInput("status", setDonor)}
-          >
-            {donorStatuses.map((status, index) => (
-              <MenuItem key={index} value={status}>
-                {status}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={false}
-            id="phoneNumber"
-            label="Phone Number"
-            value={person.phoneNumber}
-            onChange={handleInput("phoneNumber", setPerson)}
-          />
-        </Box>
-        {donor.type === "Individual" && (
-          <>
-            <Box sx={styles.inputContainer}>
-              <TextField
-                sx={styles.textField}
-                required={true}
-                id="firstName"
-                label="First Name"
-                value={person.firstName}
-                onChange={handleInput("firstName", setPerson)}
-                error={requiredError.firstName}
-                helperText={requiredError.firstName ? "Field is required" : ""}
-              />
-            </Box>
-            <Box sx={styles.inputContainer}>
-              <TextField
-                sx={styles.textField}
-                required={true}
-                id="lastName"
-                label="Last Name"
-                value={person.lastName}
-                onChange={handleInput("lastName", setPerson)}
-                error={requiredError.lastName}
-                helperText={requiredError.lastName ? "Field is required" : ""}
-              />
-            </Box>
-          </>
-        )}
-
-        {(donor.type === "Corporate" || donor.type === "Foundation") && (
-          <>
-            <Box sx={styles.inputContainer}>
-              <TextField
-                sx={styles.textField}
-                required={true}
-                id="firstName"
-                label="First Name"
-                value={person.firstName}
-                onChange={handleInput("firstName", setPerson)}
-                error={requiredError.firstName}
-                helperText={requiredError.firstName ? "Field is required" : ""}
-              />
-            </Box>
-          </>
-        )}
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            id="email"
-            label="Email Address"
-            value={person.emailAddress}
-            onChange={handleInput("emailAddress", setPerson)}
-            error={requiredError.emailAddress}
-            helperText={requiredError.emailAddress ? "Field is required" : ""}
-          />
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            id="address-line1"
-            label="Address Line 1"
-            value={address.addressLine1}
-            onChange={handleInput("addressLine1", setAddress)}
-            error={requiredError.addressLine1}
-            helperText={requiredError.addressLine1 ? "Field is required" : ""}
-          />
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={false}
-            id="address-line2"
-            label="Address Line 2"
-            value={address.addressLine2}
-            onChange={handleInput("addressLine2", setAddress)}
-          />
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            id="address-city"
-            label="City"
-            value={address.city}
-            onChange={handleInput("city", setAddress)}
-            error={requiredError.city}
-            helperText={requiredError.city ? "Field is required" : ""}
-          />
-        </Box>
-
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={true}
-            select
-            id="select-state"
-            label="State"
-            value={address.state}
-            onChange={handleInput("state", setAddress)}
-          >
-            {states.map((state, index) => (
-              <MenuItem key={index} value={state.value}>
-                {state.value}
-              </MenuItem>
-            ))}
-          </TextField>
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            sx={styles.textField}
-            required={false}
-            id="address-zipcode"
-            type="number"
-            label="Zip Code"
-            value={address.zipCode}
-            onChange={handleInput("zipCode", setAddress)}
-          />
-        </Box>
-        <Box sx={styles.inputContainer}>
-          <TextField
-            id="multiline-notes"
-            label="Note"
-            multiline
-            rows={4}
-            fullWidth
-            value={donor.notes}
-            onChange={handleInput("notes", setDonor)}
-          />
-        </Box>
+    <Box sx={styles.container} component="form">
+      <Box sx={styles.title}>
+        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+          Add Donation
+        </Typography>
       </Box>
-      <Box sx={{ display: "flex", justifyContent: "flex-end", p: 5 }}>
-        <Button variant="contained" onClick={handleSubmit}>
-          Add Donor
-        </Button>
+      <Box sx={styles.innerContainer}>
+        <Box sx={styles.title}>
+          <Typography variant="h5" style={styles.titleText}>
+            Donor Info
+          </Typography>
+        </Box>
+
+        <FormInputDropdown
+          name={"donor.type"}
+          control={control}
+          label={"Type"}
+          required
+          menuItems={donorTypes}
+          sx={styles.textField}
+        />
+        <FormInputDropdown
+          name={"donor.communicationPreference"}
+          control={control}
+          label={"Communication Preference"}
+          required
+          menuItems={donorCommPreferences}
+          sx={styles.textField}
+        />
+        <FormInputDropdown
+          name={"donor.status"}
+          control={control}
+          label={"Status"}
+          required
+          menuItems={donorStatuses}
+          sx={styles.textField}
+        />
+        <FormInputCheckbox
+          control={control}
+          setValue={setValue}
+          name={"donor.isRetained"}
+          label={"Retention"}
+          required
+        />
+        <FormInputDropdown
+          name={"donor.segment"}
+          control={control}
+          label={"Segmentation"}
+          required
+          menuItems={donorSegments}
+          sx={styles.textField}
+        />
+        <Box sx={{ gridColumn: "span 3" }}>
+          <FormInputTextfield
+            name={"donor.notes"}
+            control={control}
+            label={"Notes"}
+            multiline
+            rows={5}
+            fullWidth
+            sx={styles.textField}
+          />
+        </Box>
+
+        <Controller
+          name="donor.type"
+          control={control}
+          render={({ field: { value } }) => (
+            <Box sx={styles.innerContainer}>
+              <Box sx={styles.title}>
+                <Typography variant="h6" sx={styles.titleText}>
+                  {value !== "Individual" ? "Organization" : "Individual"} Details
+                </Typography>
+              </Box>
+
+              {value !== "Individual" ? (
+                <>
+                  <FormInputTextfield
+                    name={"organization.name"}
+                    control={control}
+                    label={"Name"}
+                    required
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"organization.emailAddress"}
+                    control={control}
+                    label={"Email Address"}
+                    required
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"organization.phoneNumber"}
+                    control={control}
+                    label={"Phone Number"}
+                    maxLength={12}
+                    sx={styles.textField}
+                  />
+                </>
+              ) : (
+                <>
+                  <FormInputTextfield
+                    name={"person.firstName"}
+                    control={control}
+                    label={"First Name"}
+                    required
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"person.lastName"}
+                    control={control}
+                    label={"Last Name"}
+                    required
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"person.emailAddress"}
+                    control={control}
+                    label={"Email Address"}
+                    required
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"person.phoneNumber"}
+                    control={control}
+                    label={"Phone Number"}
+                    maxLength={12}
+                    sx={styles.textField}
+                  />
+                  <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                  <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                </>
+              )}
+              <FormInputTextfield
+                name={"address.addressLine1"}
+                control={control}
+                label={"Address Line 1"}
+                required
+                sx={styles.textField}
+              />
+              <FormInputTextfield
+                name={"address.addressLine2"}
+                control={control}
+                label={"Address Line 2"}
+                sx={styles.textField}
+              />
+              <FormInputTextfield
+                name={"address.city"}
+                control={control}
+                label={"City"}
+                required
+                sx={styles.textField}
+              />
+              <FormInputDropdown
+                name={"address.state"}
+                control={control}
+                label={"State"}
+                required
+                menuItems={statesChoices}
+                sx={styles.textField}
+              />
+              <FormInputTextfield
+                name={"address.zipCode"}
+                control={control}
+                label={"Zip Code"}
+                required
+                sx={styles.textField}
+                type="zip"
+              />
+              <FormInputDropdown
+                name={"address.type"}
+                control={control}
+                label={"Type"}
+                required
+                menuItems={addressTypes}
+                sx={styles.textField}
+              />
+            </Box>
+          )}
+        />
+        <AddDonorFooter handleSubmit={handleSubmit} isDirty={isDirty} errors={errors} />
       </Box>
     </Box>
   );
@@ -352,12 +234,20 @@ const styles = {
     gap: 2,
     width: "100%",
   },
-  inputContainer: {
-    display: "flex",
-    flexDirection: "column",
-    my: 2,
+  innerContainer: {
+    gridColumn: "span 3",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    display: "grid",
+    gap: 2,
+  },
+  title: {
+    gridColumn: "span 3",
+    mb: 1,
+  },
+  titleText: {
+    fontWeight: "bold",
   },
   textField: {
-    width: "100%",
+    flex: 1,
   },
 };

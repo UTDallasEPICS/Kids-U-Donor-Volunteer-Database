@@ -97,24 +97,6 @@ export type DonationTableState = {
 
 ////////
 
-export type RequiredDonorPersonState = {
-  firstName: boolean;
-  lastName: boolean;
-  emailAddress: boolean;
-  addressLine1: boolean;
-  city: boolean;
-  zipCode: boolean;
-  type: boolean;
-};
-
-export type RequiredDonationState = {
-  amount: boolean;
-  item: boolean;
-  campaign: boolean;
-  fundDesignation: boolean;
-  receiptNumber: boolean;
-};
-
 export type donorResponse = {
   data: Donor & {
     person: {

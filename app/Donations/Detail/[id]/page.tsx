@@ -1,13 +1,12 @@
 "use client";
 import { useParams } from "next/navigation";
-import { Box, TextField, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { DonationResponse } from "@/app/types/states";
 import Loading from "@/app/loading";
 import { useRouter } from "next/navigation";
-import { Footer } from "@/app/components/donations/DonationHandleFooter";
+import { DetailFooter } from "@/app/components/donations/DetailFooter";
 import {
-  choiceYesOrNo,
   DonationFormProps,
   donationSources,
   donationTypes,
@@ -19,6 +18,7 @@ import { FormInputDropdown } from "@/app/components/formComponents/FormInputDrop
 import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
 import { FormInputDate } from "@/app/components/formComponents/FormInputDate";
 import { grey } from "@mui/material/colors";
+import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
 
 export default function DonationDetail() {
   const { id }: { id: string } = useParams();
@@ -32,6 +32,7 @@ export default function DonationDetail() {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { isDirty, isValid, errors },
   } = useForm<DonationFormProps>({
     mode: "onChange",
@@ -69,8 +70,9 @@ export default function DonationDetail() {
       const { data } = (await result.json()) as DonationResponse;
 
       if (!result.ok) {
-        router.push("/not-found");
-        throw new Error("Error fetching donation");
+        const errorData = await result.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
       }
 
       if (data.donor && !data.isAnonymous) {
@@ -101,6 +103,7 @@ export default function DonationDetail() {
       setIsLoading(false);
     } catch (error) {
       console.error(error);
+      router.push("/not-found");
     }
   };
 
@@ -110,7 +113,7 @@ export default function DonationDetail() {
         <Loading />
       ) : (
         <Box sx={styles.container} component="form">
-          <Box sx={{ paddingBottom: 2 }}>
+          <Box sx={styles.title}>
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               Donation Details
             </Typography>
@@ -118,156 +121,142 @@ export default function DonationDetail() {
               {isAnonymousRef.current ? "Anonymous Donor" : donorNameRef.current}
             </Typography>
           </Box>
-          <Box sx={styles.inputContainer}>
-            <FormInputDropdown
-              name={"donation.type"}
-              control={control}
-              label={"Type"}
-              required={true}
-              menuItems={donationTypes}
-              sx={styles.textField}
-            />
-            <Controller
-              name="donation.type"
-              control={control}
-              render={({ field: { value } }) => {
-                const label = value !== "In-Kind" ? "Donation Amount" : "Item(s) Value";
-                return (
-                  <FormInputTextfield
-                    name={"donation.amount"}
-                    control={control}
-                    label={label}
-                    required={true}
-                    type={"currency"}
-                    sx={styles.textField}
-                  />
-                );
-              }}
-            />
-            <Controller
-              name="donation.type"
-              control={control}
-              render={({ field: { value } }) =>
-                value !== "In-Kind" ? (
-                  <FormInputDropdown
-                    name={"donation.paymentMethod"}
-                    control={control}
-                    label={"Method"}
-                    menuItems={paymentMethods}
-                    sx={styles.textField}
-                  />
-                ) : (
-                  <FormInputTextfield
-                    name={"donation.item"}
-                    control={control}
-                    label={"Item(s)"}
-                    required={true}
-                    sx={styles.textField}
-                  />
-                )
-              }
-            />
-          </Box>
+          <FormInputDropdown
+            name={"donation.type"}
+            control={control}
+            label={"Type"}
+            required={true}
+            menuItems={donationTypes}
+            sx={styles.textField}
+          />
+          <Controller
+            name="donation.type"
+            control={control}
+            render={({ field: { value } }) => {
+              const label = value !== "In-Kind" ? "Donation Amount" : "Item(s) Value";
+              return (
+                <FormInputTextfield
+                  name={"donation.amount"}
+                  control={control}
+                  label={label}
+                  required={true}
+                  type={"currency"}
+                  sx={styles.textField}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="donation.type"
+            control={control}
+            render={({ field: { value } }) =>
+              value !== "In-Kind" ? (
+                <FormInputDropdown
+                  name={"donation.paymentMethod"}
+                  control={control}
+                  label={"Method"}
+                  menuItems={paymentMethods}
+                  sx={styles.textField}
+                />
+              ) : (
+                <FormInputTextfield
+                  name={"donation.item"}
+                  control={control}
+                  label={"Item(s)"}
+                  required={true}
+                  sx={styles.textField}
+                />
+              )
+            }
+          />
 
-          <Box sx={styles.inputContainer}>
-            <FormInputTextfield
-              name={"donation.campaign"}
-              control={control}
-              label={"Campaign"}
-              required={true}
-              sx={styles.textField}
-            />
-            <FormInputTextfield
-              name={"donation.fundDesignation"}
-              control={control}
-              label={"Fund"}
-              required={true}
-              sx={styles.textField}
-            />
-            <FormInputDate
-              name={"donation.date"}
-              control={control}
-              label={"Date"}
-              required={true}
-              sx={styles.textField}
-            />
-          </Box>
+          <FormInputTextfield
+            name={"donation.campaign"}
+            control={control}
+            label={"Campaign"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputTextfield
+            name={"donation.fundDesignation"}
+            control={control}
+            label={"Fund"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputDate
+            name={"donation.date"}
+            control={control}
+            label={"Date"}
+            required={true}
+            sx={styles.textField}
+          />
 
-          <Box sx={styles.inputContainer}>
-            <FormInputDropdown
-              name={"donation.recurringFrequency"}
-              control={control}
-              label={"Recurrence"}
-              required={true}
-              menuItems={recurringFrequencies}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donation.source"}
-              control={control}
-              label={"Donation Source"}
-              required={true}
-              menuItems={donationSources}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donation.isMatching"}
-              control={control}
-              required={true}
-              label={"Matching Donation?"}
-              menuItems={choiceYesOrNo}
-              sx={styles.textField}
-            />
-          </Box>
+          <FormInputDropdown
+            name={"donation.recurringFrequency"}
+            control={control}
+            label={"Recurrence"}
+            required={true}
+            menuItems={recurringFrequencies}
+            sx={styles.textField}
+          />
+          <FormInputDropdown
+            name={"donation.source"}
+            control={control}
+            label={"Donation Source"}
+            required={true}
+            menuItems={donationSources}
+            sx={styles.textField}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.isMatching"}
+            label={"Matching Donation?"}
+            required
+          />
 
-          <Typography variant="h6">Tax Information</Typography>
+          <Typography variant="h5" sx={styles.title}>
+            Tax Information
+          </Typography>
 
-          <Box sx={styles.inputContainer}>
-            <FormInputTextfield
-              name={"donation.taxDeductibleAmount"}
-              control={control}
-              label={"Tax Deductible Amount"}
-              type={"currency"}
-              required={true}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donation.receiptSent"}
-              control={control}
-              label={"Receipt Sent?"}
-              readOnly={true}
-              menuItems={choiceYesOrNo}
-              sx={styles.textField}
-            />
-            <FormInputTextfield
-              name={"donation.receiptNumber"}
-              control={control}
-              label={"Receipt Number"}
-              readOnly={true}
-              sx={styles.textField}
-            />
-          </Box>
-
-          <Box sx={styles.inputContainer}>
-            <FormInputDropdown
-              name={"donation.isAnonymous"}
-              control={control}
-              label={"Anonymous?"}
-              readOnly={true}
-              menuItems={choiceYesOrNo}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donation.acknowledgementSent"}
-              control={control}
-              label={"Acknowledgement Sent?"}
-              required={true}
-              menuItems={choiceYesOrNo}
-              sx={styles.textField}
-            />
-            <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
-          </Box>
-          <Footer
+          <FormInputTextfield
+            name={"donation.taxDeductibleAmount"}
+            control={control}
+            label={"Tax Deductible Amount"}
+            type={"currency"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.receiptSent"}
+            label={"Receipt Sent?"}
+            required
+          />
+          <FormInputTextfield
+            name={"donation.receiptNumber"}
+            control={control}
+            label={"Receipt Number"}
+            readOnly={true}
+            sx={styles.textField}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.isAnonymous"}
+            label={"Anonymous?"}
+            readOnly={true}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.acknowledgementSent"}
+            label={"Acknowledgement Sent?"}
+            required
+          />
+          <DetailFooter
             id={id}
             name={"donation"}
             href={"/Donations"}
@@ -285,15 +274,15 @@ export default function DonationDetail() {
 const styles = {
   container: {
     p: 4,
-    display: "flex",
-    flexDirection: "column",
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 2,
     width: "100%",
   },
-  inputContainer: {
-    display: "flex",
-    flexDirection: "row",
-    gap: 2,
-    my: 2,
+  title: {
+    gridColumn: "span 3",
+    fontWeight: "bold",
+    mb: 1,
   },
   textField: {
     flex: 1,

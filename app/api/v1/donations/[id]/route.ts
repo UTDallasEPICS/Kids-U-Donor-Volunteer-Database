@@ -47,9 +47,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   try {
     const {
       data: { donation },
-    } = (await req.json()) as { data: { donation: Donation } };
-
-    console.log(donation);
+    } = await req.json();
 
     const updatedDonation = await prisma.donation.update({
       where: {
@@ -58,6 +56,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       data: {
         ...donation,
         amount: typeof donation.amount === "string" ? parseFloat(donation.amount) : donation.amount,
+        taxDeductibleAmount:
+          typeof donation.taxDeductibleAmount === "string"
+            ? parseFloat(donation.taxDeductibleAmount)
+            : donation.taxDeductibleAmount,
       },
     });
 

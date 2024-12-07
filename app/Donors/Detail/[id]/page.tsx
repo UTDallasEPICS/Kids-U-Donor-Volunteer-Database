@@ -13,11 +13,11 @@ import {
   donorSegments,
   donorStatuses,
   donorTypes,
-  choiceYesOrNo,
 } from "@/app/components/formComponents/FormInputProps";
-import { Footer } from "@/app/components/donations/DonationHandleFooter";
+import { DetailFooter } from "@/app/components/donations/DetailFooter";
 import { MiniDonationsTable } from "@/app/components/donations/MiniDonationTable";
 import { grey } from "@mui/material/colors";
+import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
 
 export default function DonorDetail() {
   const { id }: { id: string } = useParams();
@@ -26,12 +26,6 @@ export default function DonorDetail() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const personNameRef = useRef<string>("");
   const isOrgRef = useRef<boolean>(false);
-
-  /**
-   * personal notes stuff
-   *  IF TYPE IS CHANGED AND SAVED, REFRESH PAGE FOR NEW DATA
-   *  singleton prismax
-   *  */
 
   const [donationInfo, setDonationInfo] = useState<DonationTableState[]>([
     {
@@ -48,6 +42,7 @@ export default function DonorDetail() {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { isDirty, isValid, errors },
   } = useForm<DonorFormProps>({
     mode: "onChange",
@@ -72,11 +67,14 @@ export default function DonorDetail() {
       const { data } = (await result.json()) as DonorResponse;
 
       if (!result.ok) {
-        router.push("/not-found");
-        throw new Error("Error fetching donor");
+        const errorData = await result.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
       }
 
-      personNameRef.current = `${data.person.firstName} ${data.person.lastName}`;
+      if (data.person) {
+        personNameRef.current = `${data.person.firstName} ${data.person.lastName}`;
+      }
       isOrgRef.current = data.organization !== null || data.type === "Corporate" || data.type === "Foundation";
 
       setDonationInfo(
@@ -146,7 +144,7 @@ export default function DonorDetail() {
         <Loading />
       ) : (
         <Box sx={styles.container} component="form">
-          <Box sx={{ paddingBottom: 2 }}>
+          <Box sx={styles.title}>
             <Typography variant="h4" sx={{ fontWeight: "bold" }}>
               Donor Details
             </Typography>
@@ -155,62 +153,56 @@ export default function DonorDetail() {
             </Typography>
           </Box>
 
-          <Box sx={styles.inputContainer}>
-            <FormInputDropdown
-              name={"donor.type"}
-              control={control}
-              label={"Type"}
-              required={true}
-              menuItems={donorTypes}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donor.communicationPreference"}
-              control={control}
-              label={"Communication Preference"}
-              required={true}
-              menuItems={donorCommPreferences}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donor.status"}
-              control={control}
-              label={"Status"}
-              required={true}
-              menuItems={donorStatuses}
-              sx={styles.textField}
-            />
-          </Box>
+          <FormInputDropdown
+            name={"donor.type"}
+            control={control}
+            label={"Type"}
+            required={true}
+            readOnly={true}
+            menuItems={donorTypes}
+            sx={styles.textField}
+          />
+          <FormInputDropdown
+            name={"donor.communicationPreference"}
+            control={control}
+            label={"Communication Preference"}
+            required={true}
+            menuItems={donorCommPreferences}
+            sx={styles.textField}
+          />
+          <FormInputDropdown
+            name={"donor.status"}
+            control={control}
+            label={"Status"}
+            required={true}
+            menuItems={donorStatuses}
+            sx={styles.textField}
+          />
 
-          <Box sx={styles.inputContainer}>
-            <FormInputDropdown
-              name={"donor.isRetained"}
-              control={control}
-              label={"Retention"}
-              required={true}
-              menuItems={choiceYesOrNo}
-              sx={styles.textField}
-            />
-            <FormInputDropdown
-              name={"donor.segment"}
-              control={control}
-              label={"Segmentation"}
-              required={true}
-              menuItems={donorSegments}
-              sx={styles.textField}
-            />
-            <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
-          </Box>
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donor.isRetained"}
+            label={"Retention"}
+            required
+          />
+          <FormInputDropdown
+            name={"donor.segment"}
+            control={control}
+            label={"Segmentation"}
+            required={true}
+            menuItems={donorSegments}
+            sx={styles.textField}
+          />
 
-          <Typography variant="h6">Donor Notes</Typography>
-          <Box sx={styles.inputContainer}>
+          <Box sx={{ gridColumn: "span 3" }}>
             <FormInputTextfield
               name={"donor.notes"}
               control={control}
               label={"Notes"}
-              multiline={true}
+              multiline
               rows={5}
-              fullWidth={true}
+              fullWidth
               sx={styles.textField}
             />
           </Box>
@@ -219,126 +211,121 @@ export default function DonorDetail() {
             name="donor.type"
             control={control}
             render={({ field: { value } }) => (
-              <Box>
-                <Typography variant="h6">{isOrgRef.current ? "Organization" : "Individual"} Details</Typography>
+              <Box sx={styles.innerContainer}>
+                <Box sx={styles.title}>
+                  <Typography variant="h6" sx={styles.titleText}>
+                    {isOrgRef.current ? "Organization" : "Individual"} Details
+                  </Typography>
+                </Box>
+
                 {isOrgRef.current ? (
-                  <Box>
-                    <Box sx={styles.inputContainer}>
-                      <FormInputTextfield
-                        name={"organization.name"}
-                        control={control}
-                        label={"Name"}
-                        required={true}
-                        sx={styles.textField}
-                      />
-                      <FormInputTextfield
-                        name={"organization.emailAddress"}
-                        control={control}
-                        label={"Email Address"}
-                        required={true}
-                        sx={styles.textField}
-                      />
-                      <FormInputTextfield
-                        name={"organization.phoneNumber"}
-                        control={control}
-                        label={"Phone Number"}
-                        maxLength={12}
-                        sx={styles.textField}
-                      />
-                    </Box>
-                  </Box>
+                  <>
+                    <FormInputTextfield
+                      name={"organization.name"}
+                      control={control}
+                      label={"Name"}
+                      required={true}
+                      sx={styles.textField}
+                    />
+                    <FormInputTextfield
+                      name={"organization.emailAddress"}
+                      control={control}
+                      label={"Email Address"}
+                      required={true}
+                      sx={styles.textField}
+                    />
+                    <FormInputTextfield
+                      name={"organization.phoneNumber"}
+                      control={control}
+                      label={"Phone Number"}
+                      maxLength={12}
+                      sx={styles.textField}
+                    />
+                  </>
                 ) : (
-                  <Box>
-                    <Box sx={styles.inputContainer}>
-                      <FormInputTextfield
-                        name={"person.firstName"}
-                        control={control}
-                        label={"First Name"}
-                        required={true}
-                        sx={styles.textField}
-                      />
-                      <FormInputTextfield
-                        name={"person.lastName"}
-                        control={control}
-                        label={"Last Name"}
-                        required={true}
-                        sx={styles.textField}
-                      />
-                      <FormInputTextfield
-                        name={"person.emailAddress"}
-                        control={control}
-                        label={"Email Address"}
-                        required={true}
-                        sx={styles.textField}
-                      />
-                    </Box>
+                  <>
+                    <FormInputTextfield
+                      name={"person.firstName"}
+                      control={control}
+                      label={"First Name"}
+                      required={true}
+                      sx={styles.textField}
+                    />
+                    <FormInputTextfield
+                      name={"person.lastName"}
+                      control={control}
+                      label={"Last Name"}
+                      required={true}
+                      sx={styles.textField}
+                    />
+                    <FormInputTextfield
+                      name={"person.emailAddress"}
+                      control={control}
+                      label={"Email Address"}
+                      required={true}
+                      sx={styles.textField}
+                    />
 
-                    <Box sx={styles.inputContainer}>
-                      <FormInputTextfield
-                        name={"person.phoneNumber"}
-                        control={control}
-                        label={"Phone Number"}
-                        maxLength={12}
-                        sx={styles.textField}
-                      />
-                      <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
-                      <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
-                    </Box>
-                  </Box>
+                    <FormInputTextfield
+                      name={"person.phoneNumber"}
+                      control={control}
+                      label={"Phone Number"}
+                      maxLength={12}
+                      sx={styles.textField}
+                    />
+                    <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                    <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                  </>
                 )}
-                <Box sx={styles.inputContainer}>
-                  <FormInputTextfield
-                    name={"address.addressLine1"}
-                    control={control}
-                    label={"Address Line 1"}
-                    required={true}
-                    sx={styles.textField}
-                  />
-                  <FormInputTextfield
-                    name={"address.addressLine2"}
-                    control={control}
-                    label={"Address Line 2"}
-                    sx={styles.textField}
-                  />
-                  <FormInputTextfield
-                    name={"address.city"}
-                    control={control}
-                    label={"City"}
-                    required={true}
-                    sx={styles.textField}
-                  />
-                </Box>
+                <FormInputTextfield
+                  name={"address.addressLine1"}
+                  control={control}
+                  label={"Address Line 1"}
+                  required={true}
+                  sx={styles.textField}
+                />
+                <FormInputTextfield
+                  name={"address.addressLine2"}
+                  control={control}
+                  label={"Address Line 2"}
+                  sx={styles.textField}
+                />
+                <FormInputTextfield
+                  name={"address.city"}
+                  control={control}
+                  label={"City"}
+                  required={true}
+                  sx={styles.textField}
+                />
 
-                <Box sx={styles.inputContainer}>
-                  <FormInputDropdown
-                    name={"address.state"}
-                    control={control}
-                    label={"State"}
-                    required={true}
-                    menuItems={statesChoices}
-                    sx={styles.textField}
-                  />
-                  <FormInputTextfield
-                    name={"address.zipCode"}
-                    control={control}
-                    label={"Zip Code"}
-                    required={true}
-                    sx={styles.textField}
-                    type="zip"
-                  />
-                  <FormInputDropdown
-                    name={"address.type"}
-                    control={control}
-                    label={"Type"}
-                    required={true}
-                    menuItems={addressTypes}
-                    sx={styles.textField}
-                  />
-                </Box>
+                <FormInputDropdown
+                  name={"address.state"}
+                  control={control}
+                  label={"State"}
+                  required={true}
+                  menuItems={statesChoices}
+                  sx={styles.textField}
+                />
+                <FormInputTextfield
+                  name={"address.zipCode"}
+                  control={control}
+                  label={"Zip Code"}
+                  required={true}
+                  sx={styles.textField}
+                  type="zip"
+                />
+                <FormInputDropdown
+                  name={"address.type"}
+                  control={control}
+                  label={"Type"}
+                  required={true}
+                  menuItems={addressTypes}
+                  sx={styles.textField}
+                />
               </Box>
             )}
           />
-          <Footer
+          <DetailFooter
             id={id}
             name={"donor"}
             href={"/Donors"}
@@ -347,9 +334,19 @@ export default function DonorDetail() {
             isDirty={isDirty}
             errors={errors}
           />
-          <Typography variant="h6">Donor Lifetime Value (placeholder)</Typography>
-          <Typography variant="h6">Donation History</Typography>
-          <MiniDonationsTable donations={donationInfo} />
+          <Box sx={styles.title}>
+            <Typography variant="h6" sx={styles.titleText}>
+              Donor Lifetime Value (placeholder)
+            </Typography>
+          </Box>
+          <Box sx={styles.title}>
+            <Typography variant="h6" sx={styles.titleText}>
+              Donation History
+            </Typography>
+          </Box>
+          <Box sx={{ gridColumn: "span 3" }}>
+            <MiniDonationsTable donations={donationInfo} />
+          </Box>
         </Box>
       )}
     </Box>
@@ -359,15 +356,23 @@ export default function DonorDetail() {
 const styles = {
   container: {
     p: 4,
-    display: "flex",
-    flexDirection: "column",
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 2,
     width: "100%",
   },
-  inputContainer: {
-    display: "flex",
-    flexDirection: "row",
+  innerContainer: {
+    gridColumn: "span 3",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    display: "grid",
     gap: 2,
-    my: 2,
+  },
+  title: {
+    gridColumn: "span 3",
+    mb: 1,
+  },
+  titleText: {
+    fontWeight: "bold",
   },
   textField: {
     flex: 1,

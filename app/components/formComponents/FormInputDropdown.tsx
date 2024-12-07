@@ -16,16 +16,15 @@ export const FormInputDropdown: React.FC<FormInputSelectProps> = ({
     <Controller
       name={name}
       control={control}
-      render={({
-        field: { onChange, value },
-        fieldState: { invalid, isDirty, error },
-        formState,
-      }) => (
+      rules={{ required: required ? "This field is required." : false }}
+      render={({ field: { onChange, value }, fieldState: { invalid, isDirty, error }, formState }) => (
         <TextField
           sx={sx}
           label={label}
           required={required}
           select
+          error={!!error}
+          helperText={error ? error.message : null}
           onChange={onChange}
           value={value}
           slotProps={{

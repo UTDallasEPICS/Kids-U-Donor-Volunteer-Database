@@ -134,8 +134,8 @@ model Address {
   state          String
   zipCode        String
   type           String
-  personId       String        @unique
-  person         Person        @relation(fields: [personId], references: [id])
+  personId       String?       @unique
+  person         Person?       @relation(fields: [personId], references: [id])
   organizationId String?       @unique
   organization   Organization? @relation(fields: [organizationId], references: [id])
   //grantorId      String?       @unique

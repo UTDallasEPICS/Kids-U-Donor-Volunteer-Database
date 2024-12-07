@@ -1,4 +1,4 @@
-import { Address, Donor, Person, PrismaClient } from "@prisma/client";
+import { Address, Donor, Person, Prisma, PrismaClient } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
@@ -56,7 +56,6 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
   }
 }
 
-
 // Update a single Donor based on id, and only fields that require updating
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
@@ -105,7 +104,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       { status: 200 }
     );
   } catch (error) {
-    console.error(`Error updating donor with ID: ${id}\n`, error);
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
+      const meta = error.meta as { target?: string[] };
+      const fields = meta?.target || ["field"];
+      const fieldList = fields.join(", ");
+      return NextResponse.json(
+        {
+          message: `A donor with the same ${fieldList} already exists. Please use enter a different one.`,
+        },
+        { status: 400 }
+      );
+    }
     return NextResponse.json({ message: "Donor not found" }, { status: 404 });
   }
 }
