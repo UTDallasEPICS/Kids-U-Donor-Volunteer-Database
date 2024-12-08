@@ -24,7 +24,44 @@ export async function POST(req: NextRequest) {
 
 // Read
 export async function GET() {
-  const data = await prisma.grant.findMany();
+  const data = await prisma.grant.findMany({
+    select: {
+      representativeGrant: {
+        select: {
+          representative: {
+            select: {
+              person: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                }
+              },
+              grantor: {
+                select: {
+                  organization: {
+                    select: {
+                      name: true,
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      id: true,
+      name: true,
+      status: true,
+      purpose: true,
+      startDate: true,
+      endDate: true,
+      awardNotificationDate: true,
+      amountAwarded: true,
+      amountRequested: true,
+      proposalDueDate: true,
+      proposalSubmissionDate: true,
+    }
+  });
 
   return NextResponse.json(
     { message: 'GET REQUEST', data: data },

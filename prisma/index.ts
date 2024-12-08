@@ -1,7 +1,10 @@
 import {
   Person as PPerson,
   Organization as POrganization,
+  User as PUser,
+  Address as PAddress,
   Grant as PGrant,
+  GrantAttachment as PGrantAttachment,
   Representative as PRepresentative,
   Grantor as PGrantor,
   RepresentativeGrant as PRepresentativeGrant,
@@ -9,30 +12,60 @@ import {
   Donation as PDonation
 } from "@prisma/client";
 
-import { Donor, Address, Donation } from "@prisma/client";
+//import { Donor, Address, Donation } from "@prisma/client";
 
 export type Grant = PGrant & {
-  Representative: Representative[];
+  RepresentativeGrant: RepresentativeGrant[];
+  GrantAttachment: GrantAttachment[];
 };
+
+export type GrantAttachment = PGrantAttachment & {
+  Grantor: Grantor;
+}
 
 export type Grantor = PGrantor & {
   Organization: Organization;
-  Representative: Representative[];
+  Representatives: Representative[];
 };
 
 export type Representative = PRepresentative & {
+  Person: Person;
+  Grantor: Grantor;
+  RepresentativeGrant: RepresentativeGrant[];
 };
 
 
 export type RepresentativeGrant = PRepresentativeGrant & {
-  Grant: Grant;
-  Representative: Representative;
-};
-
-export type Organization = POrganization & {
+  Grants: Grant[];
   Representatives: Representative[];
 };
 
-export type Person = PPerson & {
-  Donors: Donor;
+export type Donation = PDonation & {
+  Donor: Donor;
+}
+
+export type Donor = PDonor & {
+  Donation: Donation[];
+}
+
+export type Organization = POrganization & {
+  Grantor: Grantor;
+  Address: Address;
+  Donor: Donor;
 };
+
+export type Person = PPerson & {
+  Donor: Donor;
+  Representative: Representative;
+  Address: Address;
+  User: User;
+};
+
+export type User = PUser & {
+  Person: Person;
+}
+
+export type Address = PAddress & {
+  Person: Person;
+  Organization: Organization;
+}

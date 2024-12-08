@@ -51,7 +51,6 @@ model Address {
   zipCode        String
   type           String
   personId       String?       @unique
-  grantorId      String?       @unique
   organizationId String?       @unique
   person         Person?       @relation(fields: [personId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])

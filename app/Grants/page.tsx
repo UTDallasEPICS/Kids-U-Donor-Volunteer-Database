@@ -12,12 +12,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Paper
+  Paper,
+  CircularProgress
 } from "@mui/material"
 import Link from "next/link"
+import { alignProperty } from "@mui/material/styles/cssUtils";
 
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     fetchGrantsData();
@@ -28,10 +31,17 @@ export default function GrantsPage() {
       const response = await fetch("/api/grants/");
       const result = await response.json();
       setGrantsData(result.data);
+      console.log(result.data);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching grants:", error);
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return <CircularProgress style={styles.center} />
+  }
 
   return (
     <Box>
@@ -56,6 +66,7 @@ export default function GrantsPage() {
             <TableHead>
               <TableRow>
                 <TableCell style={styles.tableCellHeader}>Grantor</TableCell>
+                <TableCell style={styles.tableCellHeader}>Representative</TableCell>
                 <TableCell style={styles.tableCellHeader}>Name</TableCell>
                 <TableCell style={styles.tableCellHeader}>Status</TableCell>
                 <TableCell style={styles.tableCellHeader}>Purpose</TableCell>
@@ -74,7 +85,8 @@ export default function GrantsPage() {
                   key={grant.id}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell style={styles.tableCell}>{"N/A"}</TableCell>
+                  <TableCell style={styles.tableCell}>{"n"}</TableCell>
+                  <TableCell style={styles.tableCell}>{"n"}</TableCell>
                   <TableCell style={styles.tableCell}>{
                     <Link href={`/Grants/Detail/${grant.id}`}>
                       {grant.name}</Link>}
@@ -91,7 +103,7 @@ export default function GrantsPage() {
                   <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>
                   <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>
                   <TableCell style={styles.tableCell}>{
-                    grant.awardNotificationDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString()
+                    grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString()
                       : "N/A"}
                   </TableCell>
                 </TableRow>
@@ -115,4 +127,12 @@ const styles = {
   tableCell: {
     border: "1px solid #ccc",
   },
+  center: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    height: "100vh",
+    marginLeft: "auto",
+    marginRight: "auto",
+  }
 };

@@ -24,7 +24,7 @@ export default function GrantorsPage() {
 
     const fetchGrantorsData = async () => {
         try {
-            const response = await fetch("/api/grants/grantors");
+            const response = await fetch("/api/grantors");
             const result = await response.json();
             setGrantorsData(result.data);
         } catch (error) {
@@ -53,10 +53,10 @@ export default function GrantorsPage() {
                     <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Representative</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}></TableCell>
+                                <TableCell style={styles.tableCellHeader}>Name</TableCell>
+                                <TableCell style={styles.tableCellHeader}>Representative</TableCell>
+                                <TableCell style={styles.tableCellHeader}>Type</TableCell>
+                                <TableCell style={styles.tableCellHeader}></TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -88,4 +88,12 @@ const styles = {
     tableCell: {
         border: "1px solid #ccc",
     },
+    center: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+        marginLeft: "auto",
+        marginRight: "auto",
+    }
 };
