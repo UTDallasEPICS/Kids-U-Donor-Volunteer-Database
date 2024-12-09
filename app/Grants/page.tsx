@@ -25,28 +25,28 @@ import {
   ListItemText,
   SelectChangeEvent,
 } from "@mui/material"
-import Grid from '@mui/material/Grid2';
+import Grid from "@mui/material/Grid2";
 import Link from "next/link"
 
 const columns = [
-  'grantor',
-  'representative',
-  'name',
-  'status',
-  'purpose',
-  'startDate',
-  'endDate',
-  'awardNotificationDate',
-  'amountAwarded',
-  'amountRequested',
-  'proposalDueDate',
-  'proposalSubmissionDate',
+  "grantor",
+  "representative",
+  "name",
+  "status",
+  "purpose",
+  "startDate",
+  "endDate",
+  "awardNotificationDate",
+  "amountAwarded",
+  "amountRequested",
+  "proposalDueDate",
+  "proposalSubmissionDate",
 ];
 
 const searchOptions = [
-  'name',
-  'status',
-  'grantor'
+  "name",
+  "status",
+  "grantor"
 ];
 
 export default function GrantsPage() {
@@ -86,7 +86,7 @@ export default function GrantsPage() {
       target: { value },
     } = event;
     setSelectedColumns(
-      typeof value === 'string' ? value.split(',') : value,
+      typeof value === "string" ? value.split(",") : value,
     );
   };
 
@@ -98,10 +98,15 @@ export default function GrantsPage() {
     setSearchCriteria(event.target.value as string);
   };
 
-  //localStorage for selected columns
+  //sessionStorage for selected columns
+  if (sessionStorage.getItem("page") !== "grantList") {
+    sessionStorage.clear();
+  }
+  sessionStorage.setItem("page", "grantList");
+
   useEffect(() => {
-    if (typeof window !== 'undefined') { //This ensures the code runs only in the browser
-      const savedColumns = localStorage.getItem('selectedColumns');
+    if (typeof window !== "undefined") { //This ensures the code runs only in the browser
+      const savedColumns = sessionStorage.getItem("selectedColumns");
       if (savedColumns) {
         setSelectedColumns(JSON.parse(savedColumns));
       } else {
@@ -111,8 +116,8 @@ export default function GrantsPage() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && selectedColumns.length > 0) {
-      localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+    if (typeof window !== "undefined" && selectedColumns.length > 0) {
+      sessionStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
     }
   }, [selectedColumns]);
 
@@ -129,13 +134,14 @@ export default function GrantsPage() {
       <Box>
         <Breadcrumbs style={styles.breadcrumb}>
           <Link href={"/"}>Dashboard</Link>
+          <Typography>Grants</Typography>
           <Typography>Grant List</Typography>
         </Breadcrumbs>
       </Box>
       <Box>
         <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
           <Grid>
-            <FormControl variant="outlined" sx={{ width: 100 }}>
+            <FormControl variant="outlined" sx={{ width: 150 }}>
               <InputLabel>Search By</InputLabel>
               <Select
                 label="Search By"
@@ -168,7 +174,7 @@ export default function GrantsPage() {
                 value={selectedColumns}
                 onChange={handleColumnChange}
                 input={<OutlinedInput label="Included Columns" />}
-                renderValue={(selected) => selected.join(', ')}
+                renderValue={(selected) => selected.join(", ")}
               >
                 {columns.map((col) => (
                   <MenuItem key={col} value={col}>
@@ -186,35 +192,35 @@ export default function GrantsPage() {
           <Table sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
-                {selectedColumns.includes('grantor') && <TableCell style={styles.tableCellHeader}>Grantor</TableCell>}
-                {selectedColumns.includes('representative') && <TableCell style={styles.tableCellHeader}>Representative</TableCell>}
-                {selectedColumns.includes('name') && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
-                {selectedColumns.includes('status') && <TableCell style={styles.tableCellHeader}>Status</TableCell>}
-                {selectedColumns.includes('purpose') && <TableCell style={styles.tableCellHeader}>Purpose</TableCell>}
-                {selectedColumns.includes('startDate') && <TableCell style={styles.tableCellHeader}>Start Date</TableCell>}
-                {selectedColumns.includes('endDate') && <TableCell style={styles.tableCellHeader}>End Date</TableCell>}
-                {selectedColumns.includes('awardNotificationDate') && <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>}
-                {selectedColumns.includes('amountAwarded') && <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>}
-                {selectedColumns.includes('amountRequested') && <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>}
-                {selectedColumns.includes('proposalDueDate') && <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>}
-                {selectedColumns.includes('proposalSubmissionDate') && <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>}
+                {selectedColumns.includes("grantor") && <TableCell style={styles.tableCellHeader}>Grantor</TableCell>}
+                {selectedColumns.includes("representative") && <TableCell style={styles.tableCellHeader}>Representative</TableCell>}
+                {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
+                {selectedColumns.includes("status") && <TableCell style={styles.tableCellHeader}>Status</TableCell>}
+                {selectedColumns.includes("purpose") && <TableCell style={styles.tableCellHeader}>Purpose</TableCell>}
+                {selectedColumns.includes("startDate") && <TableCell style={styles.tableCellHeader}>Start Date</TableCell>}
+                {selectedColumns.includes("endDate") && <TableCell style={styles.tableCellHeader}>End Date</TableCell>}
+                {selectedColumns.includes("awardNotificationDate") && <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>}
+                {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>}
+                {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>}
+                {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>}
+                {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
               {grantsData.map((grant) => (
                 <TableRow key={grant.id}>
-                  {selectedColumns.includes('grantor') && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.grantor.organization.name}</TableCell>}
-                  {selectedColumns.includes('representative') && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}</TableCell>}
-                  {selectedColumns.includes('name') && <TableCell style={styles.tableCell}><Link href={`/Grants/Detail/${grant.id}`}>{grant.name}</Link></TableCell>}
-                  {selectedColumns.includes('status') && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
-                  {selectedColumns.includes('purpose') && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
-                  {selectedColumns.includes('startDate') && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes('endDate') && <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes('awardNotificationDate') && <TableCell style={styles.tableCell}>{grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString() : "N/A"}</TableCell>}
-                  {selectedColumns.includes('amountAwarded') && <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>}
-                  {selectedColumns.includes('amountRequested') && <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>}
-                  {selectedColumns.includes('proposalDueDate') && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes('proposalSubmissionDate') && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
+                  {selectedColumns.includes("grantor") && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.grantor.organization.name}</TableCell>}
+                  {selectedColumns.includes("representative") && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}</TableCell>}
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/Grants/Detail/${grant.id}`}>{grant.name}</Link></TableCell>}
+                  {selectedColumns.includes("status") && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
+                  {selectedColumns.includes("purpose") && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
+                  {selectedColumns.includes("startDate") && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes("endDate") && <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes("awardNotificationDate") && <TableCell style={styles.tableCell}>{grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString() : "N/A"}</TableCell>}
+                  {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>}
+                  {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>}
+                  {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
                 </TableRow>
               ))}
             </TableBody>
@@ -247,7 +253,8 @@ const styles = {
   },
   tableCellHeader: {
     fontWeight: "bold",
-    border: "1px solid #ccc",
+    border: "1px solid #aaa",
+    backgroundColor: "#ccc",
   },
   tableCell: {
     border: "1px solid #ccc",
@@ -264,6 +271,7 @@ const styles = {
     display: "flex",
     justifyContent: "left",
     width: "100%",
+    backgroundColor: "#ccc",
   },
   breadcrumb: {
     marginLeft: "5px",
