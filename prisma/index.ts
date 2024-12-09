@@ -15,57 +15,57 @@ import {
 //import { Donor, Address, Donation } from "@prisma/client";
 
 export type Grant = PGrant & {
-  RepresentativeGrant: RepresentativeGrant[];
-  GrantAttachment: GrantAttachment[];
+  representativeGrant: RepresentativeGrant[];
+  grantAttachment: GrantAttachment[];
 };
 
 export type GrantAttachment = PGrantAttachment & {
-  Grantor: Grantor;
+  grantor: Grantor;
 }
 
 export type Grantor = PGrantor & {
-  Organization: Organization;
-  Representatives: Representative[];
+  organization: Organization;
+  representatives: Representative[];
 };
 
 export type Representative = PRepresentative & {
-  Person: Person;
-  Grantor: Grantor;
-  RepresentativeGrant: RepresentativeGrant[];
+  person: Person;
+  grantor: Grantor;
+  representativeGrant: RepresentativeGrant[];
 };
 
 
 export type RepresentativeGrant = PRepresentativeGrant & {
-  Grants: Grant[];
-  Representatives: Representative[];
+  grant: Grant;
+  representative: Representative;
 };
 
 export type Donation = PDonation & {
-  Donor: Donor;
+  donor: Donor;
 }
 
 export type Donor = PDonor & {
-  Donation: Donation[];
+  donations: Donation[];
 }
 
 export type Organization = POrganization & {
-  Grantor: Grantor;
-  Address: Address;
-  Donor: Donor;
+  grantor: Grantor;
+  address: Address;
+  donor: Donor;
 };
 
 export type Person = PPerson & {
-  Donor: Donor;
-  Representative: Representative;
-  Address: Address;
-  User: User;
+  donor: Donor;
+  representative: Representative;
+  address: Address;
+  user: User;
 };
 
 export type User = PUser & {
-  Person: Person;
+  person: Person;
 }
 
 export type Address = PAddress & {
-  Person: Person;
-  Organization: Organization;
+  person: Person;
+  organization: Organization;
 }

@@ -12,32 +12,113 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TablePagination,
   Paper,
-  CircularProgress
+  CircularProgress,
+  TableFooter,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  OutlinedInput,
+  Checkbox,
+  ListItemText,
+  SelectChangeEvent,
 } from "@mui/material"
+import Grid from '@mui/material/Grid2';
 import Link from "next/link"
-import { alignProperty } from "@mui/material/styles/cssUtils";
+
+const columns = [
+  'grantor',
+  'representative',
+  'name',
+  'status',
+  'purpose',
+  'startDate',
+  'endDate',
+  'awardNotificationDate',
+  'amountAwarded',
+  'amountRequested',
+  'proposalDueDate',
+  'proposalSubmissionDate',
+];
+
+const searchOptions = [
+  'name',
+  'status',
+  'grantor'
+];
 
 export default function GrantsPage() {
-  const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
+  const [grantsData, setGrantsData] = useState<Grant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
-  useEffect(() => {
-    fetchGrantsData();
-  }, []);
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [totalCount, setTotalCount] = React.useState(0);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState("");
+  const [searchCriteria, setSearchCriteria] = useState("");
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch("/api/grants/");
+      const response = await fetch(`/api/grants?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
       setGrantsData(result.data);
-      console.log(result.data);
+      setTotalCount(result.count);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grants:", error);
       setLoading(false);
     }
   };
+
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0); //Bring back to first page
+  };
+
+  const handleColumnChange = (event: SelectChangeEvent<typeof selectedColumns>) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedColumns(
+      typeof value === 'string' ? value.split(',') : value,
+    );
+  };
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setSearchValue(event.target.value as string);
+  };
+
+  const handleCriteriaChange = (event: SelectChangeEvent<string>) => {
+    setSearchCriteria(event.target.value as string);
+  };
+
+  //localStorage for selected columns
+  useEffect(() => {
+    if (typeof window !== 'undefined') { //This ensures the code runs only in the browser
+      const savedColumns = localStorage.getItem('selectedColumns');
+      if (savedColumns) {
+        setSelectedColumns(JSON.parse(savedColumns));
+      } else {
+        setSelectedColumns(columns);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && selectedColumns.length > 0) {
+      localStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
+    }
+  }, [selectedColumns]);
+
+  useEffect(() => {
+    fetchGrantsData();
+  }, [page, rowsPerPage, searchValue, searchCriteria]);
 
   if (loading) {
     return <CircularProgress style={styles.center} />
@@ -46,69 +127,113 @@ export default function GrantsPage() {
   return (
     <Box>
       <Box>
-        <Breadcrumbs aria-label="breadcrumb">
-          <Typography sx={{ color: 'text.primary' }}>Grant List</Typography>
+        <Breadcrumbs style={styles.breadcrumb}>
+          <Link href={"/"}>Dashboard</Link>
+          <Typography>Grant List</Typography>
         </Breadcrumbs>
       </Box>
       <Box>
-        <Box
-          component="form"
-          sx={{ '& > :not(style)': { m: 1, width: '25ch' } }}
-          noValidate
-          autoComplete="off"
-        >
-          <TextField id="outlined-basic" label="Search" variant="outlined" size="small" />
-        </Box>
+        <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
+          <Grid>
+            <FormControl variant="outlined" sx={{ width: 100 }}>
+              <InputLabel>Search By</InputLabel>
+              <Select
+                label="Search By"
+                value={searchCriteria}
+                onChange={handleCriteriaChange}
+              >
+                {searchOptions.map((option) => (
+                  <MenuItem key={option} value={option}>
+                    <ListItemText>{option}</ListItemText>
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid>
+            <TextField
+              label="Search Value"
+              variant="outlined"
+              name="value"
+              value={searchValue}
+              onChange={handleSearchChange}
+              disabled={!searchCriteria} //Disable search input until something is selected
+            />
+          </Grid>
+          <Grid>
+            <FormControl sx={{ width: 500 }}>
+              <InputLabel>Included Columns</InputLabel>
+              <Select
+                multiple
+                value={selectedColumns}
+                onChange={handleColumnChange}
+                input={<OutlinedInput label="Included Columns" />}
+                renderValue={(selected) => selected.join(', ')}
+              >
+                {columns.map((col) => (
+                  <MenuItem key={col} value={col}>
+                    <Checkbox checked={selectedColumns.includes(col)} />
+                    <ListItemText primary={col} />
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
       </Box>
       <Box>
         <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+          <Table sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
-                <TableCell style={styles.tableCellHeader}>Grantor</TableCell>
-                <TableCell style={styles.tableCellHeader}>Representative</TableCell>
-                <TableCell style={styles.tableCellHeader}>Name</TableCell>
-                <TableCell style={styles.tableCellHeader}>Status</TableCell>
-                <TableCell style={styles.tableCellHeader}>Purpose</TableCell>
-                <TableCell style={styles.tableCellHeader}>Start Date</TableCell>
-                <TableCell style={styles.tableCellHeader}>End Date</TableCell>
-                <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>
-                <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>
-                <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>
-                <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>
-                <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>
+                {selectedColumns.includes('grantor') && <TableCell style={styles.tableCellHeader}>Grantor</TableCell>}
+                {selectedColumns.includes('representative') && <TableCell style={styles.tableCellHeader}>Representative</TableCell>}
+                {selectedColumns.includes('name') && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
+                {selectedColumns.includes('status') && <TableCell style={styles.tableCellHeader}>Status</TableCell>}
+                {selectedColumns.includes('purpose') && <TableCell style={styles.tableCellHeader}>Purpose</TableCell>}
+                {selectedColumns.includes('startDate') && <TableCell style={styles.tableCellHeader}>Start Date</TableCell>}
+                {selectedColumns.includes('endDate') && <TableCell style={styles.tableCellHeader}>End Date</TableCell>}
+                {selectedColumns.includes('awardNotificationDate') && <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>}
+                {selectedColumns.includes('amountAwarded') && <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>}
+                {selectedColumns.includes('amountRequested') && <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>}
+                {selectedColumns.includes('proposalDueDate') && <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>}
+                {selectedColumns.includes('proposalSubmissionDate') && <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
               {grantsData.map((grant) => (
-                <TableRow
-                  key={grant.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell style={styles.tableCell}>{"n"}</TableCell>
-                  <TableCell style={styles.tableCell}>{"n"}</TableCell>
-                  <TableCell style={styles.tableCell}>{
-                    <Link href={`/Grants/Detail/${grant.id}`}>
-                      {grant.name}</Link>}
-                  </TableCell>
-                  <TableCell style={styles.tableCell}>{grant.status}</TableCell>
-                  <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>
-                  <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>
-                  <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>
-                  <TableCell style={styles.tableCell}>{
-                    grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString()
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>
-                  <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>
-                  <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>
-                  <TableCell style={styles.tableCell}>{
-                    grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString()
-                      : "N/A"}
-                  </TableCell>
+                <TableRow key={grant.id}>
+                  {selectedColumns.includes('grantor') && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.grantor.organization.name}</TableCell>}
+                  {selectedColumns.includes('representative') && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}</TableCell>}
+                  {selectedColumns.includes('name') && <TableCell style={styles.tableCell}><Link href={`/Grants/Detail/${grant.id}`}>{grant.name}</Link></TableCell>}
+                  {selectedColumns.includes('status') && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
+                  {selectedColumns.includes('purpose') && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
+                  {selectedColumns.includes('startDate') && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes('endDate') && <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes('awardNotificationDate') && <TableCell style={styles.tableCell}>{grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString() : "N/A"}</TableCell>}
+                  {selectedColumns.includes('amountAwarded') && <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>}
+                  {selectedColumns.includes('amountRequested') && <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>}
+                  {selectedColumns.includes('proposalDueDate') && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
+                  {selectedColumns.includes('proposalSubmissionDate') && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={12} style={{ padding: 0 }}>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                    component="div"
+                    count={totalCount}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    style={styles.pagination}
+                  />
+                </TableCell>
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableContainer>
       </Box>
@@ -134,5 +259,14 @@ const styles = {
     height: "100vh",
     marginLeft: "auto",
     marginRight: "auto",
+  },
+  pagination: {
+    display: "flex",
+    justifyContent: "left",
+    width: "100%",
+  },
+  breadcrumb: {
+    marginLeft: "5px",
+    marginTop: "8px"
   }
 };
