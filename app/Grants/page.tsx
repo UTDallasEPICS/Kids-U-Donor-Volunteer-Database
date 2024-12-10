@@ -14,6 +14,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
+import { grantors } from "../utils/grantorTestData";
+
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]); // State to store grants data
 
@@ -62,7 +64,7 @@ export default function GrantsPage() {
           <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
             <TableHead>
               <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Organization</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>Organization {/*Representative*/}</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>Requested Amount</TableCell>
@@ -79,13 +81,20 @@ export default function GrantsPage() {
                   key={grant.GrantID}
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell>{grant.Representative
+                  
+                  <TableCell><Link href={`/Grants/GrantorDetail/${grantors[parseInt(grantors[0].id, 10)]}`}>
+                  {grant.Representative
                     ? grant.Representative[0].FirstName
-                    : "N/A"}
+                    : "Grantor"}
+                  </Link>
                   </TableCell>
+
+
                   <TableCell>{<Link href={`/Grants/Detail/${grant.GrantID}`}>
                     {grant.GrantName}
                   </Link>}</TableCell>
+
+                  
                   <TableCell>{grant.AwardStatus}</TableCell>
                   <TableCell>{grant.AskAmount}</TableCell>
                   <TableCell>{grant.AmountAwarded}</TableCell>
