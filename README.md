@@ -37,4 +37,5 @@ Currently, we do not have any migration scripts.
 
 ## Figma
 
-Currently, there are no figma files since Kids-U gave us their desired UI design for the grants portion of the project.
+The volunteer section of the project has Figma files, as seen in the Figma folder.
+Currently, there are no figma files for the grant team since Kids-U gave us their desired UI design for the grants portion of the project.
