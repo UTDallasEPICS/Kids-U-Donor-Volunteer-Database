@@ -61,10 +61,11 @@ export default function GrantsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch(`/api/grants?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/grants/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
       setGrantsData(result.data);
       setTotalCount(result.count);
+      console.log(result.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grants:", error);
@@ -207,7 +208,7 @@ export default function GrantsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {grantsData.map((grant) => (
+              {grantsData?.map((grant) => (
                 <TableRow key={grant.id}>
                   {selectedColumns.includes("grantor") && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.grantor.organization.name}</TableCell>}
                   {selectedColumns.includes("representative") && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}</TableCell>}
@@ -222,7 +223,7 @@ export default function GrantsPage() {
                   {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
                   {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
                 </TableRow>
-              ))}
+              )) ?? null}
             </TableBody>
             <TableFooter>
               <TableRow>

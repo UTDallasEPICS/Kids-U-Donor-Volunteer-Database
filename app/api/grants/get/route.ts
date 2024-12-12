@@ -1,24 +1,7 @@
-import prisma from '../../utils/prisma';
+import prisma from '../../../utils/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
-
-// Create
-export async function POST(req: NextRequest) {
-  try {
-    const body = req.json();
-
-    return NextResponse.json(
-      {
-        message: 'POST REQUEST',
-        receivedData: body,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error('POST ERROR:', error);
-  }
-}
 
 // Read
 export async function GET(req: NextRequest) {
@@ -94,6 +77,7 @@ export async function GET(req: NextRequest) {
     const count = await prisma.grant.count({
       where,
     });
+    console.log(data);
   
     return NextResponse.json(
       { message: 'GET REQUEST', data: data, count: count},
@@ -107,7 +91,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
-// Update
-
-// Delete

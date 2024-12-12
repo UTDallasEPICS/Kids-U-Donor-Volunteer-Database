@@ -203,7 +203,7 @@ export default function GrantorsPage() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {grantorsData.map((grantor) => (
+              {grantorsData?.map((grantor) => (
                 <TableRow key={grantor.id}>
                   {selectedColumns.includes("name") && <TableCell style={styles.tableCell}>{grantor.organization.name}</TableCell>}
                   {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{grantor.type}</TableCell>}
@@ -215,7 +215,7 @@ export default function GrantorsPage() {
                   {selectedColumns.includes("communicationPreference") && <TableCell style={styles.tableCell}>{grantor.communicationPreference}</TableCell>}
                   {selectedColumns.includes("recognitionPreference") && <TableCell style={styles.tableCell}>{grantor.recognitionPreference}</TableCell>}
                 </TableRow>
-              ))}
+              )) ?? null}
             </TableBody>
             <TableFooter>
               <TableRow>

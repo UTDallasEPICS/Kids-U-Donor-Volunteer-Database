@@ -95,7 +95,7 @@ model Grant {
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
   proposalDueDate         DateTime
-  proposalSummary         String
+  proposalSummary         String?
   proposalSubmissionDate  DateTime?
   applicationType         String
   internalOwner           String
