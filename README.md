@@ -16,7 +16,16 @@
 
 ## Overview
 
-This project is focused on developing a database alongside a web application that will help Kids-U manage donors, both individual and organizations, and volunteers along with related funding (via donations and grants) and events. There will only be one type of user: administrators who will be able to manage and utilize the data.
+This project is focused on developing a database alongside a web application that will help Kids-U manage donors, both individual and organizations, and volunteers along with related funding (via donations and grants) and events. There will be two types of users: administrators and volunteers.
+
+**Admin**
+- Ability to manage and utilize data
+- Ability to view all modules
+- Ability to edit any module
+
+**Volunteers**
+- Can view registration, mail, and check in check out pages within Volunteer module
+- Can fill out the registration form
 
 ## Third Party Integration
 
