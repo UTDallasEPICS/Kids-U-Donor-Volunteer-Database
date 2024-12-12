@@ -1,12 +1,3 @@
-generator client {
-  provider = "prisma-client-js"
-}
-
-datasource db {
-  provider = "postgresql"
-  url      = env("PRISMA_DB_URL")
-}
-
 enum Role {
   VOLUNTEER
   ADMIN
@@ -18,9 +9,9 @@ model Person {
   lastName       String
   emailAddress   String          @unique
   phoneNumber    String?         @unique
+  address        Address?
   donor          Donor?
   representative Representative?
-  address        Address?
   user           User?
 }
 
@@ -125,29 +116,18 @@ model RepresentativeGrant {
   @@id([grantId, representativeId])
 }
 
-model Person {
-  id           String   @id @default(uuid())
-  firstName    String
-  lastName     String
-  emailAddress String   @unique
-  phoneNumber  String?  @unique
-  donor        Donor?
-  //representative Representative?
-  address      Address?
-  //user           User?
-}
-
+// Donation Related
 model Donor {
   id                      String        @id @default(uuid())
   type                    String
   communicationPreference String
   status                  String
-  notes                   String?
-  isRetained              Boolean?
-  personId                String?       @unique
-  organizationId          String?       @unique
+  notes                   String
+  isRetained              Boolean
   donation                Donation[]
+  personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
+  organizationId          String?       @unique
   organization            Organization? @relation(fields: [organizationId], references: [id])
 }
 
@@ -158,16 +138,16 @@ model Donation {
   item                String?
   paymentMethod       String?
   campaign            String?
-  date                DateTime
   fundDesignation     String
   recurringFrequency  String?
+  date                DateTime
   source              String
   isMatching          Boolean
-  receiptSent         Boolean
-  receiptNumber       String   @default(uuid())
-  taxDeductableAmount Float
+  taxDeductibleAmount Float?
+  receiptSent         Boolean?
+  receiptNumber       String?  @default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String
-  donor               Donor    @relation(fields: [donorId], references: [id])
+  donorId             String?
+  donor               Donor?   @relation(fields: [donorId], references: [id])
 }
