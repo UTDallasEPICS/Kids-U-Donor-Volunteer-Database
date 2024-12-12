@@ -205,7 +205,7 @@ export default function GrantorsPage() {
             <TableBody>
               {grantorsData?.map((grantor) => (
                 <TableRow key={grantor.id}>
-                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}>{grantor.organization.name}</TableCell>}
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/Grants/Grantor/Detail/${grantor.id}`}>{grantor.organization.name}</Link></TableCell>}
                   {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{grantor.type}</TableCell>}
                   {selectedColumns.includes("addressLine1") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine1}</TableCell>}
                   {selectedColumns.includes("addressLine2") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine2}</TableCell>}
