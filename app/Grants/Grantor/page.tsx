@@ -98,14 +98,13 @@ export default function GrantorsPage() {
     setSearchCriteria(event.target.value as string);
   };
 
-  //sessionStorage for selected columns
-  if (sessionStorage.getItem("page") !== "grantorList") {
-    sessionStorage.clear();
-  }
-  sessionStorage.setItem("page", "grantorList");
-
   useEffect(() => {
     if (typeof window !== 'undefined') { //This ensures the code runs only in the browser
+      if (sessionStorage.getItem("page") !== "grantorList") {
+        sessionStorage.clear();
+      }
+      sessionStorage.setItem("page", "grantorList");
+
       const savedColumns = sessionStorage.getItem('selectedColumns');
       if (savedColumns) {
         setSelectedColumns(JSON.parse(savedColumns));

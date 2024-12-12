@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('VOLUNTER', 'ADMIN');
+CREATE TYPE "Role" AS ENUM ('VOLUNTEER', 'ADMIN');
 
 -- CreateTable
 CREATE TABLE "Person" (
@@ -40,7 +40,6 @@ CREATE TABLE "Address" (
     "zipCode" TEXT NOT NULL,
     "type" TEXT NOT NULL,
     "personId" TEXT,
-    "grantorId" TEXT,
     "organizationId" TEXT,
 
     CONSTRAINT "Address_pkey" PRIMARY KEY ("id")
@@ -75,27 +74,27 @@ CREATE TABLE "Grant" (
     "name" TEXT NOT NULL,
     "status" TEXT NOT NULL,
     "amountRequested" DOUBLE PRECISION NOT NULL,
-    "amountAwarded" DOUBLE PRECISION NOT NULL,
+    "amountAwarded" DOUBLE PRECISION NOT NULL DEFAULT 0,
     "purpose" TEXT NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
     "endDate" TIMESTAMP(3) NOT NULL,
     "isMultipleYears" BOOLEAN NOT NULL,
     "quarter" TEXT NOT NULL,
     "acknowledgementSent" BOOLEAN NOT NULL,
-    "awardNotificationDate" TIMESTAMP(3) NOT NULL,
+    "awardNotificationDate" TIMESTAMP(3),
     "fundingArea" TEXT NOT NULL,
     "internalProposalDueDate" TIMESTAMP(3),
     "proposalDueDate" TIMESTAMP(3) NOT NULL,
     "proposalSummary" TEXT NOT NULL,
-    "proposalSubmissionDate" TIMESTAMP(3) NOT NULL,
+    "proposalSubmissionDate" TIMESTAMP(3),
     "applicationType" TEXT NOT NULL,
     "internalOwner" TEXT NOT NULL,
     "fundingRestriction" TEXT,
     "matchingRequirement" TEXT,
     "useArea" TEXT NOT NULL,
     "isEligibleForRenewal" BOOLEAN NOT NULL,
-    "renewalApplicationDate" TIMESTAMP(3) NOT NULL,
-    "renewalAwardStatus" TEXT NOT NULL,
+    "renewalApplicationDate" TIMESTAMP(3),
+    "renewalAwardStatus" TEXT,
 
     CONSTRAINT "Grant_pkey" PRIMARY KEY ("id")
 );
@@ -168,9 +167,6 @@ CREATE UNIQUE INDEX "User_personId_key" ON "User"("personId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Address_personId_key" ON "Address"("personId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Address_grantorId_key" ON "Address"("grantorId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Address_organizationId_key" ON "Address"("organizationId");

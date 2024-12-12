@@ -98,14 +98,14 @@ export default function GrantsPage() {
     setSearchCriteria(event.target.value as string);
   };
 
-  //sessionStorage for selected columns
-  if (sessionStorage.getItem("page") !== "grantList") {
-    sessionStorage.clear();
-  }
-  sessionStorage.setItem("page", "grantList");
-
   useEffect(() => {
     if (typeof window !== "undefined") { //This ensures the code runs only in the browser
+      //sessionStorage for selected columns
+      if (sessionStorage.getItem("page") !== "grantList") {
+        sessionStorage.clear();
+      }
+      sessionStorage.setItem("page", "grantList");
+
       const savedColumns = sessionStorage.getItem("selectedColumns");
       if (savedColumns) {
         setSelectedColumns(JSON.parse(savedColumns));
@@ -217,8 +217,8 @@ export default function GrantsPage() {
                   {selectedColumns.includes("startDate") && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
                   {selectedColumns.includes("endDate") && <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>}
                   {selectedColumns.includes("awardNotificationDate") && <TableCell style={styles.tableCell}>{grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString() : "N/A"}</TableCell>}
-                  {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCell}>{grant.amountAwarded}</TableCell>}
-                  {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCell}>{grant.amountRequested}</TableCell>}
+                  {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCell}>{"$" + grant.amountAwarded}</TableCell>}
+                  {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCell}>{"$" + grant.amountRequested}</TableCell>}
                   {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
                   {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
                 </TableRow>

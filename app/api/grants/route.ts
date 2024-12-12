@@ -1,9 +1,7 @@
-import { PrismaClient } from '@prisma/client';
+import prisma from '../../utils/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
-
-const prisma = new PrismaClient();
 
 // Create
 export async function POST(req: NextRequest) {

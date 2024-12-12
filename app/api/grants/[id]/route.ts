@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
+import prisma from '../../../utils/prisma';
 import { NextRequest, NextResponse } from "next/server";
 
 // Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
 // This file will handle single item operations
-
-const prisma = new PrismaClient();
 
 // Fetch single Grant based on id, Ex. http://localhost:3000/api/grants/[id]
 export async function GET(
