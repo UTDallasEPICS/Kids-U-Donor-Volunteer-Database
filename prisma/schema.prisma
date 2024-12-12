@@ -45,7 +45,7 @@ model User {
 model Address {
   id             String        @id @default(uuid())
   addressLine1   String
-  addressLine2   String
+  addressLine2   String?
   city           String
   state          String
   zipCode        String
@@ -131,8 +131,8 @@ model Donor {
   type                    String
   communicationPreference String
   status                  String
-  notes                   String
-  isRetained              Boolean
+  notes                   String?
+  isRetained              Boolean?
   personId                String?       @unique
   organizationId          String?       @unique
   donation                Donation[]
@@ -149,7 +149,7 @@ model Donation {
   campaign            String?
   date                DateTime
   fundDesignation     String
-  recurringFrequency  String
+  recurringFrequency  String?
   source              String
   isMatching          Boolean
   receiptSent         Boolean
