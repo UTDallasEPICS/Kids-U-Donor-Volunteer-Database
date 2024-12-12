@@ -215,7 +215,7 @@ export const MiniDonationsTable = ({ donations }: { donations: DonationTableStat
                 </TableCell>
                 <TableCell sx={styles.tableCell}>{donation.type !== "In-Kind" ? "" : donation.item}</TableCell>
                 <TableCell sx={styles.tableCell}>{donation.type !== "In-Kind" ? donation.paymentMethod : ""}</TableCell>
-                <TableCell sx={styles.tableCell}>{donation.date.toLocaleDateString()}</TableCell>
+                <TableCell sx={styles.tableCell}>{new Date(donation.date).toLocaleDateString()}</TableCell>
               </TableRow>
             );
           })}

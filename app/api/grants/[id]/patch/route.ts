@@ -1,19 +1,19 @@
-import prisma from '../../../../utils/prisma';
+import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
-  
+
   try {
     const {
-        data: { grant },
+      data: { grant },
     } = await req.json();
 
     const updatedData = await prisma.grant.update({
       where: {
         id: id,
       },
-      data: grant, /*{
+      data: grant /*{
           ...grant, 
           representativeGrants: {
             update: grant.representativeGrants?.map((repGrant: any) => ({
@@ -46,18 +46,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
               },
             })),
           },
-        },*/
+        },*/,
     });
-    console.log(updatedData)
-    return NextResponse.json(
-      { message: "Updated grant with id:", id: id },
-      { status: 200 }
-    );
+    console.log(updatedData);
+    return NextResponse.json({ message: "Updated grant with id:", id: id }, { status: 200 });
   } catch (error) {
     console.error("Error fetching grant with ID: ", id);
-    return NextResponse.json(
-      { message: "Grant item not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ message: "Grant item not found" }, { status: 404 });
   }
 }

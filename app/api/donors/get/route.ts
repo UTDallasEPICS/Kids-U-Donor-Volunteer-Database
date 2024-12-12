@@ -1,7 +1,6 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-// Read
 export async function GET(req: NextRequest) {
   //For pagination
   const pageParam = req.nextUrl.searchParams.get("page");
@@ -16,31 +15,42 @@ export async function GET(req: NextRequest) {
   if (searchCriteriaParam && searchValueParam) {
     // Dynamically build the filter based on the criteria and value
     switch (searchCriteriaParam) {
-      case "name":
-        where.name = {
+      case "donor":
+        where.OR = [
+          {
+            person: {
+              firstName: {
+                contains: searchValueParam,
+                mode: "insensitive",
+              },
+            },
+          },
+          {
+            person: {
+              lastName: {
+                contains: searchValueParam,
+                mode: "insensitive",
+              },
+            },
+          },
+          {
+            organization: {
+              name: {
+                contains: searchValueParam,
+                mode: "insensitive",
+              },
+            },
+          },
+        ];
+        break;
+      case "campaign":
+        where.campaign = {
           contains: searchValueParam,
           mode: "insensitive",
         };
         break;
-      case "grantor":
-        //Nested relation
-        where.representativeGrant = {
-          some: {
-            representative: {
-              grantor: {
-                organization: {
-                  name: {
-                    contains: searchValueParam,
-                    mode: "insensitive",
-                  },
-                },
-              },
-            },
-          },
-        };
-        break;
-      case "status":
-        where.status = {
+      case "fundDesignation":
+        where.fundDesignation = {
           contains: searchValueParam,
           mode: "insensitive",
         };
@@ -51,31 +61,36 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const data = await prisma.grant.findMany({
+    const data = await prisma.donation.findMany({
       skip: pageNum * rowsPerPageNum,
       take: rowsPerPageNum,
       where, // Applies search filters if any
       include: {
-        representativeGrant: {
+        donor: {
           include: {
-            representative: {
-              include: {
-                person: true,
-                grantor: {
-                  include: {
-                    organization: true,
-                  },
-                },
+            person: {
+              select: {
+                firstName: true,
+                lastName: true,
+                phoneNumber: true,
+                emailAddress: true,
+                address: true,
+              },
+            },
+            organization: {
+              select: {
+                name: true,
+                emailAddress: true,
+                address: true,
               },
             },
           },
         },
       },
     });
-    const count = await prisma.grant.count({
+    const count = await prisma.donation.count({
       where,
     });
-    console.log(data);
 
     return NextResponse.json({ message: "GET REQUEST", data: data, count: count }, { status: 200 });
   } catch (error) {

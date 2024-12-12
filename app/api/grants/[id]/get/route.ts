@@ -1,11 +1,11 @@
-import prisma from '../../../../utils/prisma';
+import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
 // This file will handle single item operations
 
 // Fetch single Grant based on id, Ex. http://localhost:3000/api/grants/[id]
-export async function GET( req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
   try {
     const data = await prisma.grant.findUnique({
@@ -22,13 +22,13 @@ export async function GET( req: NextRequest, { params }: { params: { id: string 
                 grantor: {
                   include: {
                     organization: true,
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     console.log(data);
 
@@ -39,10 +39,7 @@ export async function GET( req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ message: `Successfully fetched grant with ID: ${id}`, data: data }, { status: 200 });
   } catch (error) {
     console.error(`Error fetching grant with ID: ${id}\n`, id);
-    return NextResponse.json(
-      { message: "Grant not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ message: "Grant not found" }, { status: 404 });
   }
 }
 

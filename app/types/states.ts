@@ -6,13 +6,11 @@ export type DonorState = {
   status: string;
   notes: string;
   isRetained: boolean;
-  segment: string | null;
 };
 
 export type OrganizationState = {
   name: string;
   emailAddress: string;
-  phoneNumber?: string | null;
 };
 
 export type PersonState = {
@@ -80,7 +78,6 @@ export type DonorResponse = {
     organization: {
       name: string;
       emailAddress: string;
-      phoneNumber?: string | null;
       address?: Address | null;
     };
   };
