@@ -5,7 +5,7 @@
 
 - [Overview](#overview)
 - [Functional Requirements](docs/functionalRequirements.md)
-- [Setting Up Project](docs/setUpProject.md)
+- [Setting Up Project](docs/setUPProjectV2.md)
 - [Techstack](docs/techstack.md)
 - [Third Party Integrations](#third-party-integration)
 - [Migration Scripts](#migration-scripts)
