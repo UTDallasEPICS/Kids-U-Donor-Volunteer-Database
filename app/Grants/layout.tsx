@@ -12,6 +12,7 @@ export default function GrantsLayout({
         items={[
           { name: "Grants List", reference: "/Grants" },
           { name: "Add a Grant", reference: "/Grants/Add" },
+          { name: "Grantor List", reference: "/Grants/Grantor" },
         ]}
       />
       <div className="flex-grow">{children}</div>

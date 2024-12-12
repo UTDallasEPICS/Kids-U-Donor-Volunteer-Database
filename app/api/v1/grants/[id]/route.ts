@@ -7,10 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 const prisma = new PrismaClient();
 
 // Fetch single Grant based on id, Ex. http://localhost:3000/api/grants/[id]
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
   try {
     const data = await prisma.grant.findUnique({
@@ -23,18 +20,12 @@ export async function GET(
     return NextResponse.json({ data }, { status: 200 });
   } catch (error) {
     console.error("Error fetching grant with ID: ", id);
-    return NextResponse.json(
-      { message: "Grant item not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ message: "Grant item not found" }, { status: 404 });
   }
 }
 
 // Update single Grant based on id
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
   try {
@@ -49,24 +40,15 @@ export async function PUT(
       data: bodyData,
     });
     */
-    return NextResponse.json(
-      { message: "Updated grant with id:", id },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Updated grant with id:", id }, { status: 200 });
   } catch (error) {
     console.error("Error fetching grant with ID: ", id);
-    return NextResponse.json(
-      { message: "Grant item not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ message: "Grant item not found" }, { status: 404 });
   }
 }
 
 // Delete single Grant based on id
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
   try {
@@ -76,15 +58,9 @@ export async function DELETE(
       },
     });
 
-    return NextResponse.json(
-      { message: "Deleted data:", data },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Deleted data:", data }, { status: 200 });
   } catch (error) {
     console.error("Error deleting grant with ID: ", id);
-    return NextResponse.json(
-      { message: "Grant item not found" },
-      { status: 404 }
-    );
+    return NextResponse.json({ message: "Grant item not found" }, { status: 404 });
   }
 }

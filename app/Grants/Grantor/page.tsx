@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Donation } from "@/prisma";
+import { Grantor } from "@/prisma"
 import {
   Box,
   TextField,
@@ -24,16 +24,33 @@ import {
   Checkbox,
   ListItemText,
   SelectChangeEvent,
-} from "@mui/material";
+} from "@mui/material"
 import Grid from "@mui/material/Grid2";
-import Link from "next/link";
+import Link from "next/link"
 
-const columns = ["donor", "type", "amount", "paymentMethod", "campaign", "date", "fundDesignation", "source"];
+const columns = [
+  "name",
+  "type",
+  "addressLine1",
+  "addressLine2",
+  "city",
+  "state",
+  "zipcode",
+  "communicationPreference",
+  "recognitionPreference",
+];
 
-const searchOptions = ["donor", "campaign", "fundDesignation"];
+const searchOptions = [
+  "name",
+  "type",
+  "addressLine1",
+  "city",
+  "state",
+  "zipcode",
+];
 
-export default function DonationsPage() {
-  const [donationsData, setDonationsData] = useState<Donation[]>([]);
+export default function GrantorsPage() {
+  const [grantorsData, setGrantorsData] = useState<Grantor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -42,18 +59,15 @@ export default function DonationsPage() {
   const [searchValue, setSearchValue] = useState("");
   const [searchCriteria, setSearchCriteria] = useState("");
 
-  const fetchDonationsData = async () => {
+  const fetchGrantsData = async () => {
     try {
-      const response = await fetch(
-        `/api/donations/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`
-      );
+      const response = await fetch(`/api/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
-      setDonationsData(result.data);
+      setGrantorsData(result.data);
       setTotalCount(result.count);
-      console.log(result.data);
       setLoading(false);
     } catch (error) {
-      console.error("Error fetching grants:", error);
+      console.error("Error fetching grantors:", error);
       setLoading(false);
     }
   };
@@ -71,7 +85,9 @@ export default function DonationsPage() {
     const {
       target: { value },
     } = event;
-    setSelectedColumns(typeof value === "string" ? value.split(",") : value);
+    setSelectedColumns(
+      typeof value === 'string' ? value.split(',') : value,
+    );
   };
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -83,15 +99,13 @@ export default function DonationsPage() {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      //This ensures the code runs only in the browser
-      //sessionStorage for selected columns
-      if (sessionStorage.getItem("page") !== "donationList") {
+    if (typeof window !== 'undefined') { //This ensures the code runs only in the browser
+      if (sessionStorage.getItem("page") !== "grantorList") {
         sessionStorage.clear();
       }
-      sessionStorage.setItem("page", "donationList");
+      sessionStorage.setItem("page", "grantorList");
 
-      const savedColumns = sessionStorage.getItem("selectedColumns");
+      const savedColumns = sessionStorage.getItem('selectedColumns');
       if (savedColumns) {
         setSelectedColumns(JSON.parse(savedColumns));
       } else {
@@ -101,28 +115,26 @@ export default function DonationsPage() {
   }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && selectedColumns.length > 0) {
-      sessionStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
+    if (typeof window !== 'undefined' && selectedColumns.length > 0) {
+      sessionStorage.setItem('selectedColumns', JSON.stringify(selectedColumns));
     }
   }, [selectedColumns]);
 
   useEffect(() => {
-    fetchDonationsData();
+    fetchGrantsData();
   }, [page, rowsPerPage, searchValue, searchCriteria]);
 
   if (loading) {
-    return <CircularProgress style={styles.center} />;
+    return <CircularProgress style={styles.center} />
   }
 
   return (
     <Box>
       <Box>
         <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"} style={{ textDecoration: "underline" }}>
-            Dashboard
-          </Link>
-          <Typography>Donations</Typography>
-          <Typography>Donations List</Typography>
+          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
+          <Typography>Grants</Typography>
+          <Typography>Grantor List</Typography>
         </Breadcrumbs>
       </Box>
       <Box>
@@ -130,7 +142,11 @@ export default function DonationsPage() {
           <Grid>
             <FormControl variant="outlined" sx={{ width: 150 }}>
               <InputLabel>Search By</InputLabel>
-              <Select label="Search By" value={searchCriteria} onChange={handleCriteriaChange}>
+              <Select
+                label="Search By"
+                value={searchCriteria}
+                onChange={handleCriteriaChange}
+              >
                 {searchOptions.map((option) => (
                   <MenuItem key={option} value={option}>
                     <ListItemText>{option}</ListItemText>
@@ -157,7 +173,7 @@ export default function DonationsPage() {
                 value={selectedColumns}
                 onChange={handleColumnChange}
                 input={<OutlinedInput label="Included Columns" />}
-                renderValue={(selected) => selected.join(", ")}
+                renderValue={(selected) => selected.join(', ')}
               >
                 {columns.map((col) => (
                   <MenuItem key={col} value={col}>
@@ -175,55 +191,29 @@ export default function DonationsPage() {
           <Table sx={{ minWidth: 650 }} size="small">
             <TableHead>
               <TableRow>
-                {selectedColumns.includes("donor") && <TableCell style={styles.tableCellHeader}>Donor</TableCell>}
-                {selectedColumns.includes("type") && (
-                  <TableCell style={styles.tableCellHeader}>Donation Type</TableCell>
-                )}
-                {selectedColumns.includes("amount") && <TableCell style={styles.tableCellHeader}>Amount</TableCell>}
-                {selectedColumns.includes("paymentMethod") && (
-                  <TableCell style={styles.tableCellHeader}>Payment Method</TableCell>
-                )}
-                {selectedColumns.includes("campaign") && <TableCell style={styles.tableCellHeader}>Campaign</TableCell>}
-                {selectedColumns.includes("date") && <TableCell style={styles.tableCellHeader}>Date Donated</TableCell>}
-                {selectedColumns.includes("fundDesignation") && (
-                  <TableCell style={styles.tableCellHeader}>Fund Designation</TableCell>
-                )}
-                {selectedColumns.includes("source") && (
-                  <TableCell style={styles.tableCellHeader}>Donation Source</TableCell>
-                )}
+                {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
+                {selectedColumns.includes("type") && <TableCell style={styles.tableCellHeader}>Type</TableCell>}
+                {selectedColumns.includes("addressLine1") && <TableCell style={styles.tableCellHeader}>Address Line 1</TableCell>}
+                {selectedColumns.includes("addressLine2") && <TableCell style={styles.tableCellHeader}>Address Line 2</TableCell>}
+                {selectedColumns.includes("city") && <TableCell style={styles.tableCellHeader}>City</TableCell>}
+                {selectedColumns.includes("state") && <TableCell style={styles.tableCellHeader}>State</TableCell>}
+                {selectedColumns.includes("zipcode") && <TableCell style={styles.tableCellHeader}>Zipcode</TableCell>}
+                {selectedColumns.includes("communicationPreference") && <TableCell style={styles.tableCellHeader}>Communication Preference</TableCell>}
+                {selectedColumns.includes("recognitionPreference") && <TableCell style={styles.tableCellHeader}>Recognition Preference</TableCell>}
               </TableRow>
             </TableHead>
             <TableBody>
-              {donationsData?.map((donation) => (
-                <TableRow key={donation.id}>
-                  {selectedColumns.includes("donor") && (
-                    <TableCell style={styles.tableCell}>
-                      {donation.donor.personId
-                        ? donation.donor.person.firstName + " " + donation.donor.person.lastName
-                        : donation.donor.organization.name}
-                    </TableCell>
-                  )}
-                  {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{donation.type}</TableCell>}
-                  {selectedColumns.includes("amount") && (
-                    <TableCell style={styles.tableCell}>{"$" + donation.amount}</TableCell>
-                  )}
-                  {selectedColumns.includes("paymentMethod") && (
-                    <TableCell style={styles.tableCell}>
-                      {donation.paymentMethod ? donation.paymentMethod : "N/A"}
-                    </TableCell>
-                  )}
-                  {selectedColumns.includes("campaign") && (
-                    <TableCell style={styles.tableCell}>{donation.campaign ? donation.campaign : "N/A"}</TableCell>
-                  )}
-                  {selectedColumns.includes("date") && (
-                    <TableCell style={styles.tableCell}>{new Date(donation.date).toLocaleDateString()}</TableCell>
-                  )}
-                  {selectedColumns.includes("fundDesignation") && (
-                    <TableCell style={styles.tableCell}>{donation.fundDesignation}</TableCell>
-                  )}
-                  {selectedColumns.includes("source") && (
-                    <TableCell style={styles.tableCell}>{donation.source}</TableCell>
-                  )}
+              {grantorsData?.map((grantor) => (
+                <TableRow key={grantor.id}>
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/Grants/Grantor/Detail/${grantor.id}`}>{grantor.organization.name}</Link></TableCell>}
+                  {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{grantor.type}</TableCell>}
+                  {selectedColumns.includes("addressLine1") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine1}</TableCell>}
+                  {selectedColumns.includes("addressLine2") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine2}</TableCell>}
+                  {selectedColumns.includes("city") && <TableCell style={styles.tableCell}>{grantor.organization.address.city}</TableCell>}
+                  {selectedColumns.includes("state") && <TableCell style={styles.tableCell}>{grantor.organization.address.state}</TableCell>}
+                  {selectedColumns.includes("zipcode") && <TableCell style={styles.tableCell}>{grantor.organization.address.zipCode}</TableCell>}
+                  {selectedColumns.includes("communicationPreference") && <TableCell style={styles.tableCell}>{grantor.communicationPreference}</TableCell>}
+                  {selectedColumns.includes("recognitionPreference") && <TableCell style={styles.tableCell}>{grantor.recognitionPreference}</TableCell>}
                 </TableRow>
               )) ?? null}
             </TableBody>
@@ -246,7 +236,7 @@ export default function DonationsPage() {
           </Table>
         </TableContainer>
       </Box>
-    </Box>
+    </Box >
   );
 }
 
@@ -278,6 +268,6 @@ const styles = {
   },
   breadcrumb: {
     marginLeft: "5px",
-    marginTop: "8px",
-  },
+    marginTop: "8px"
+  }
 };

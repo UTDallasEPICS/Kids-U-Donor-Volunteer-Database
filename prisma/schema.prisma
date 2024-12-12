@@ -7,96 +7,122 @@ datasource db {
   url      = env("PRISMA_DB_URL")
 }
 
-model Constituent {
-  ConstituentID String      @id @default(uuid())
-  FirstName     String
-  LastName      String
-  StreetAddress String
-  City          String
-  State         String
-  Zipcode       String
-  Country       String
-  EmailAddress  String      @unique
-  PhoneNumber   String?     @unique
-  AreaCode      String?
-  Volunteers    Volunteer[]
+enum Role {
+  VOLUNTEER
+  ADMIN
 }
 
-model Volunteer {
-  VolunteerID               String           @id @default(uuid())
-  DOB                       DateTime
-  Age                       Int
-  EmergencyContact          String?
-  EventsAttended            String[]
-  AgreementToMediaUse       Boolean?
-  TrainingCompletion        String?
-  BackgroundCheckCompletion Boolean?
-  IsOverEighteen            Boolean?
-  ConstituentID             String
-  Constituent               Constituent      @relation(fields: [ConstituentID], references: [ConstituentID])
-  VolunteerEvents           VolunteerEvent[]
+model Person {
+  id             String          @id @default(uuid())
+  firstName      String
+  lastName       String
+  emailAddress   String          @unique
+  phoneNumber    String?         @unique
+  donor          Donor?
+  representative Representative?
+  address        Address?
+  user           User?
 }
 
 model Organization {
   id           String   @id @default(uuid())
   name         String
-  emailAddress String   @unique
-  phoneNumber  String?  @unique
+  emailAddress String?  @unique
   address      Address?
-  Donor        Donor?
+  grantor      Grantor?
+  donor        Donor?
+}
+
+model User {
+  id       String  @id @default(uuid())
+  role     Role
+  personId String? @unique
+  person   Person? @relation(fields: [personId], references: [id])
+}
+
+//Volunteer profile and Admin profile
+
+model Address {
+  id             String        @id @default(uuid())
+  addressLine1   String
+  addressLine2   String?
+  city           String
+  state          String
+  zipCode        String
+  type           String
+  personId       String?       @unique
+  organizationId String?       @unique
+  person         Person?       @relation(fields: [personId], references: [id])
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+}
+
+//Grant Related
+model Grantor {
+  id                          String           @id @default(uuid())
+  type                        String
+  websiteLink                 String?
+  communicationPreference     String
+  recognitionPreference       String
+  internalRelationshipManager String
+  organizationId              String           @unique
+  organization                Organization     @relation(fields: [organizationId], references: [id])
+  representative              Representative[]
 }
 
 model Representative {
-  ID                String  @id @default(uuid())
-  FirstName         String
-  LastName          String
-  Email             String  @unique
-  Phone             String? @unique
-  PositionInCompany String
-  OrganizationID    String
-  //Organization      Organization @relation(fields: [OrganizationID], references: [OrganizationID])
-  Grants            Grant[] @relation("GrantToRepresentative")
+  id                  String                @id @default(uuid())
+  positionTitle       String
+  personId            String                @unique
+  grantorId           String
+  person              Person                @relation(fields: [personId], references: [id])
+  grantor             Grantor               @relation(fields: [grantorId], references: [id])
+  representativeGrant RepresentativeGrant[]
 }
 
 model Grant {
-  GrantID                 String           @id @default(uuid())
-  GrantName               String           @unique
-  AwardStatus             String
-  GrantDueDate            DateTime
-  ContactType             String
-  FundingAreas            String[]
-  KidsUProgram            String[]
-  GrantOpeningDates       DateTime[]
-  AskDate                 DateTime?
-  AwardDate               DateTime?
-  ReportingDates          DateTime[]
-  TypeOfReporting         String?
-  DateToReapplyForGrant   DateTime?
-  WaitingPeriodToReapply  Int?
-  FundingRestrictions     String?
-  AskAmount               Float
-  AmountAwarded           Float
-  EndOfGrantReportDueDate DateTime
-  Representative          Representative[] @relation("GrantToRepresentative")
+  id                      String                @id @default(uuid())
+  name                    String                @unique
+  status                  String
+  amountRequested         Float
+  amountAwarded           Float                 @default(0)
+  purpose                 String //specific area or general
+  startDate               DateTime
+  endDate                 DateTime
+  isMultipleYears         Boolean
+  quarter                 String
+  acknowledgementSent     Boolean
+  awardNotificationDate   DateTime?
+  fundingArea             String //specific area or general
+  internalProposalDueDate DateTime?
+  proposalDueDate         DateTime
+  proposalSummary         String?
+  proposalSubmissionDate  DateTime?
+  applicationType         String
+  internalOwner           String
+  fundingRestriction      String?
+  matchingRequirement     String?
+  useArea                 String //specific area or general
+  isEligibleForRenewal    Boolean
+  renewalApplicationDate  DateTime?
+  renewalAwardStatus      String?
+  representativeGrant     RepresentativeGrant[]
+  grantAttachment         GrantAttachment[]
 }
 
-model Event {
-  EventID            String           @id @default(uuid())
-  NameOfEvent        String
-  Date               DateTime
-  Time               DateTime
-  VolunteersAttended VolunteerEvent[]
+model GrantAttachment {
+  id       String @id @default(uuid())
+  grantId  String
+  document String
+  Grant    Grant  @relation(fields: [grantId], references: [id])
 }
 
-model VolunteerEvent {
-  ID          String    @id @default(uuid())
-  VolunteerID String
-  EventID     String
-  LoginTime   DateTime
-  LogoutTime  DateTime
-  LoggedHours Int
-  Event       Event     @relation(fields: [EventID], references: [EventID])
-  Volunteer   Volunteer @relation(fields: [VolunteerID], references: [VolunteerID])
+model RepresentativeGrant {
+  grantId          String
+  representativeId String
+  grant            Grant          @relation(fields: [grantId], references: [id])
+  representative   Representative @relation(fields: [representativeId], references: [id])
+
+  @@id([grantId, representativeId])
 }
 
 model Person {
@@ -116,30 +142,13 @@ model Donor {
   type                    String
   communicationPreference String
   status                  String
-  notes                   String
-  isRetained              Boolean
-  segment                 String?
-  donation                Donation[]
+  notes                   String?
+  isRetained              Boolean?
   personId                String?       @unique
-  person                  Person?       @relation(fields: [personId], references: [id])
   organizationId          String?       @unique
+  donation                Donation[]
+  person                  Person?       @relation(fields: [personId], references: [id])
   organization            Organization? @relation(fields: [organizationId], references: [id])
-}
-
-model Address {
-  id             String        @id @default(uuid())
-  addressLine1   String
-  addressLine2   String?
-  city           String
-  state          String
-  zipCode        String
-  type           String
-  personId       String?       @unique
-  person         Person?       @relation(fields: [personId], references: [id])
-  organizationId String?       @unique
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-  //grantorId      String?       @unique
-  //Grantor      Grantor[]
 }
 
 model Donation {
@@ -148,17 +157,17 @@ model Donation {
   amount              Float
   item                String?
   paymentMethod       String?
-  campaign            String
-  fundDesignation     String
-  recurringFrequency  String
+  campaign            String?
   date                DateTime
+  fundDesignation     String
+  recurringFrequency  String?
   source              String
   isMatching          Boolean
-  taxDeductibleAmount Float?
-  receiptSent         Boolean?
-  receiptNumber       String?  @default(uuid())
+  receiptSent         Boolean
+  receiptNumber       String   @default(uuid())
+  taxDeductableAmount Float
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String?
-  donor               Donor?   @relation(fields: [donorId], references: [id])
+  donorId             String
+  donor               Donor    @relation(fields: [donorId], references: [id])
 }

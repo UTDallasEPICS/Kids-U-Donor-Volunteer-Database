@@ -1,5 +1,6 @@
 import MainSidebar from "./components/MainSidebar";
 import "./globals.css";
+import TopNavigationBar from "./components/TopNavigationBar";
 
 export const metadata = {
   title: "KIDSU Donor Volunteer Database",
@@ -15,8 +16,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex">
         <MainSidebar />
-        <div className="flex-grow">{children}</div>
+        <div className="flex flex-col flex-grow">
+          <TopNavigationBar />
+          <main className="flex-grow">{children}</main>
+        </div>
       </body>
     </html>
   );
 }
+  
