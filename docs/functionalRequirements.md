@@ -1,6 +1,27 @@
 # Functional Requirements
 
-## This semester (Spring 2024)
+## This semester (Fall 2024)
+
+### Volunteer Module 
+#### Check-In / Check-Out Page
+* Tracks and records check-in / check-out 
+* Check in page that allows volunteers to tell their name and have it recorded 
+* Manually log attendance hours/people 
+#### Registration Page
+* Event Registration 
+  * Single time or reoccurring 
+  * Sign up type (individual, group, group member) 
+  * Customizable volunteer data registration pages, includes name, email, address, emergency contact, agreement to media use/background check, Training completion, age
+#### Mail Page
+* Allows for sending mail to multiple volunteers through the website
+* Requires (currently non-functional) mail service 
+#### Event Creation Form
+* Allows admins to create volunteer events and display them
+#### Prisma Schema
+* Prisma schema has been created - although database work has not begun.
+
+
+## Past semester (Spring 2024)
 
 ### Grants Module 
 #### Grants List Page
@@ -24,6 +45,12 @@
 
 ## Future (the rest of the project)
 Since these are to be implemented in the future, the requirements will be a bit broader (not listed by page but by modules)
+
+### Database For Volunteers
+* Stores information related to volunteers and events
+  * Includes their name, age, address, email, emergency contact, agreement to media use and background check, and status regarding their training
+* Allows for login
+  * Flags users based on admin / volunteer roles, then allows for access to certain parts of the website.
 
 #### General Administrative Dashboard  
 * Administrators need to be able create an account 
@@ -60,20 +87,6 @@ Since these are to be implemented in the future, the requirements will be a bit 
 * Admins need be able to add information
 * Admins need be able to edit and update information
 * Admins need to be able to search through the record of constituents and organizations
-
-#### Volunteers Module 
-* Event Registration 
-  * Single time or reoccurring 
-  * Sign up type (individual, group, group member) 
-  * Customizable volunteer data registration pages, includes name, email, address, emergency contact, agreement to media use/background check, Training completion, age 
-  * Includes a custom volunteer waiver  
-* Volunteer registration pages 
-  * A calendar view so volunteers can see all upcoming opportunities 
-  * Form pages to collect information listed above
-* Volunteer attendance 
-  * Generates QR codes/links that can be used on site to confirm attendance 
-  * Check in page that allows volunteers to tell their name and have it recorded 
-  * Manually log attendance hours/people 
 
 #### Events Module 
 * Keeps track of any events  
