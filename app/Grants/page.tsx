@@ -134,7 +134,7 @@ export default function GrantsPage() {
     <Box>
       <Box>
         <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"}>Dashboard</Link>
+          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
           <Typography>Grants</Typography>
           <Typography>Grant List</Typography>
         </Breadcrumbs>
