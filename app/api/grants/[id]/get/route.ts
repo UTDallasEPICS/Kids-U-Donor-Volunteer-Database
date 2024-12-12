@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Fetch single Grant based on id, Ex. http://localhost:3000/api/grants/[id]
 export async function GET( req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+  const { id } = await params;
   try {
     const data = await prisma.grant.findUnique({
       where: {
@@ -47,7 +47,7 @@ export async function GET( req: NextRequest, { params }: { params: { id: string 
 }
 
 // Update single Grant based on id
-export async function PUT(
+/*export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
@@ -57,14 +57,14 @@ export async function PUT(
     const body = await req.json();
     //const bodyData = JSON.parse(body) as GrantData;
 
-    /*
+
     const updatedData = await prisma.grant.update({
       where: {
         GrantID: id,
       },
       data: bodyData,
     });
-    */
+
     return NextResponse.json(
       { message: "Updated grant with id:", id },
       { status: 200 }
@@ -103,4 +103,4 @@ export async function DELETE(
       { status: 404 }
     );
   }
-}
+}*/

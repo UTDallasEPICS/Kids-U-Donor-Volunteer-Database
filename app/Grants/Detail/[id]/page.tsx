@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import {
   Box,
   TextField,
+  Button,
   Typography,
   Breadcrumbs,
   CircularProgress,
@@ -14,16 +15,16 @@ import {
 } from "@mui/material"
 import Grid from '@mui/material/Grid2';
 import Link from "next/link"
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 
 const GrantDetailPage = () => {
   const { id } = useParams();
   const [grantDetails, setGrantDetails] = useState<Grant[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [showSave, setShowSave] = useState(false);
+  const [showEdit, setShowEdit] = useState(true);
+  const [showCancelEdit, setShowCancelEdit] = useState(false);
 
   useEffect(() => {
     const fetchGrantDetails = async () => {
@@ -31,7 +32,6 @@ const GrantDetailPage = () => {
         const response = await fetch(`/api/grants/${id}/get`);
         const result = await response.json();
         setGrantDetails(result.data);
-        console.log(result.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching grant details:", error);
@@ -46,15 +46,24 @@ const GrantDetailPage = () => {
 
   const handleEditClick = () => {
     setIsEditing((prevState) => !prevState);
+    setShowEdit(false);
+    setShowSave(true);
+    setShowCancelEdit(true);
   };
 
   const handleSaveClick = async () => {
-    console.log("Save button clicked"); // Add this line
+    setShowEdit(true);
+    setShowSave(false);
+    setShowCancelEdit(false);
     try {
       //const response = await axios.put(`/api/grant/updateGrant?id=${id}`, {
       //  updatedData: grantDetails,
       //});
       //console.log("Updated grant details:", response.data);
+      const response = await fetch(`/api/grants/${id}/patch`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(grantDetails) });
+      const result = await response.json();
+      setGrantDetails(result.data);
+      console.log(result.data)
       setIsEditing(false);
     } catch (error) {
       console.error("Error updating grant details:", error);
@@ -62,7 +71,16 @@ const GrantDetailPage = () => {
     }
   };
 
-  const handleInputChange = (e: any) => {
+  const handleCancelEditClick = () => {
+    setShowEdit(true);
+    setShowSave(false);
+    setShowCancelEdit(false);
+    setIsEditing(false);
+  }
+
+  //Old handleInputChange, not really sure how this works
+
+  /*const handleInputChange = (e: any) => {
     const { name, value } = e.target;
     setGrantDetails((prevGrantDetails: any) => {
       if (Array.isArray(prevGrantDetails[name])) {
@@ -91,6 +109,16 @@ const GrantDetailPage = () => {
         };
       }
     });
+  };*/
+
+  //Only works for status at the moment, was supposed to be dynamic and work for all textfields
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+
+    setGrantDetails((prevState) => ({
+      ...prevState,
+      status: value,
+    }));
   };
 
   if (loading) {
@@ -102,74 +130,50 @@ const GrantDetailPage = () => {
   }
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
-        <Breadcrumb />
-        <Header
-          handleEditClick={handleEditClick}
-          handleSaveClick={handleSaveClick}
-          isEditing={isEditing}
-        />
-        {/*<SearchBar />*/}
+    <Box>
+      <Box>
+        <Breadcrumbs style={styles.breadcrumb}>
+          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
+          <Typography>Grants</Typography>
+          <Link href={"/Grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
+          <Typography>Grant Details</Typography>
+        </Breadcrumbs>
+      </Box>
+      <Box>
+        <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={2} marginBottom={2}>
+          {showSave && <Button
+            variant="contained"
+            onClick={handleSaveClick}
+          >
+            <Typography>Save</Typography>
+          </Button>
+          }
+          {showEdit && <Button
+            variant="contained"
+            onClick={handleEditClick}
+          >
+            <Typography>Edit</Typography>
+          </Button>
+          }
+          {showCancelEdit && <Button
+            variant="contained"
+            onClick={handleCancelEditClick}
+          >
+            <Typography>Cancel Edit</Typography>
+          </Button>
+          }
+        </Grid>
+      </Box>
+      <Box flexGrow={1} p={2}>
         <DetailsTable
           grantDetails={grantDetails}
           isEditing={isEditing}
           handleInputChange={handleInputChange}
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
-
-const Breadcrumb = () => <div className="mb-5">Home / Grants / Grant Details</div>;
-
-const Header = ({ handleEditClick, isEditing, handleSaveClick }: any) => (
-  <div className="flex justify-between items-center mb-5">
-    <h1>Grant Details</h1>
-    <div className="flex justify-between items-center mb-5">
-      {isEditing ?
-        (
-          <>
-            <button onClick={handleSaveClick} className="p-2 ml-2">
-              Save
-            </button>
-            <button onClick={handleEditClick} className="p-2 ml-2">
-              Cancel Edit
-            </button>
-          </>
-        ) : (
-          <button onClick={handleEditClick} className="p-2 ml-2">
-            Edit Grant Details
-          </button>
-        )}
-    </div>
-  </div>
-);
-
-{/*<Grid size={{ xs: 3, sm: 3 , md: 4 }}>
-          <DatePicker
-    label="Grant Period Start"
-    onChange={(newValue: dayjs | null) =>
-      handleInputChange({
-        target: { name: "grantPeriodStart", value: newValue },
-      })
-    }
-    // Directly using TextField as input component
-    slotProps={{
-      textField: {
-        id: "grant-Period-Start-Text-Field",
-        label: "Grant Period Start",
-        variant: "outlined",
-        sx: { width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' } }
-      }
-    }}
-  />
-  </Grid> */}
-
-
-
-
-
 
 const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
 
@@ -319,16 +323,6 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
   return (
 
     <Box sx={{ flexGrow: '2' }}>
-
-      <Box>
-        <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
-          <Typography>Grants</Typography>
-          <Link href={"/Grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
-          <Typography>Grant Details</Typography>
-        </Breadcrumbs>
-      </Box>
-
       <Grid container spacing={5} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
         <Grid size={{ xs: 3, sm: 3, md: 4 }}>
           <TextField
@@ -399,6 +393,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
             variant="outlined"
             value={grantDetails.status}
             disabled={!isEditing}
+            onChange={handleInputChange}
             sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }}
             select>
             {status.map((option) => (
@@ -780,11 +775,8 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
         </Grid>
 
         {/*----------------------------------------------------------------*/}
-
       </Grid>
     </Box >
-
-
   );
 };
 
