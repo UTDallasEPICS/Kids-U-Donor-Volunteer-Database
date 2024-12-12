@@ -46,6 +46,8 @@ export type Donation = PDonation & {
 
 export type Donor = PDonor & {
   donations: Donation[];
+  person: Person;
+  organization: Organization;
 }
 
 export type Organization = POrganization & {
