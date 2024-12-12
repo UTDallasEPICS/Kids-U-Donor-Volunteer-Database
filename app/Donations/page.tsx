@@ -101,7 +101,7 @@ export default function Donations() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  useEffect(() => {});
+  useEffect(() => { });
   /*
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
