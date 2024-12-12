@@ -12,6 +12,7 @@ export default function DonationsLayout({
         items={[
           { name: "Donations List", reference: "/Donations" },
           { name: "Add a Donations", reference: "/Donations/Add" },
+          { name: "Donor List", reference: "/Donor" },
         ]}
       />
       <div className="flex-grow">{children}</div>
