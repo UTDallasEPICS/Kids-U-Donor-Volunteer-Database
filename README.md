@@ -10,7 +10,7 @@
 - [Third Party Integrations](#third-party-integration)
 - [Migration Scripts](#migration-scripts)
 - [Figma](#figma)
-- [Github Commands](docs/githubcommands.md)
+- [Github Commands](docs/github-git-cheat-sheet.pdf)
 
 </details>
 
