@@ -160,3 +160,134 @@ model Donation {
   donorId             String?
   donor               Donor?   @relation(fields: [donorId], references: [id])
 }
+
+// Volunteer databse
+model Volunteer {
+  id                   String                @id @default(uuid())
+  ssn                  String                @unique
+  username             String
+  password             String
+  firstName            String
+  lastName             String
+  emailAddress         String                @unique
+  phoneNumber          String?               @unique
+  preferredName        String?
+  addressLine          String
+  city                 String
+  state                String
+  zipCode              String
+  usCitizen            Boolean
+  driversLicense       Boolean
+  reliableTransport    Boolean
+  speakSpanish         Boolean
+  emergencyContact     EmergencyContact?
+  referenceName        String
+  volunteerAttendances VolunteerAttendance[]
+  eventRegistrations   EventRegistration[]
+  mailRecipients       MailRecipient[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+}
+
+model EmergencyContact {
+  id           String    @id @default(uuid())
+  name         String
+  relationship String
+  phoneNumber  String
+  volunteerId  String    @unique
+  volunteer    Volunteer @relation(fields: [volunteerId], references: [id])
+}
+
+model VolunteerAttendance {
+  id           String    @id @default(uuid())
+  hoursWorked  Float
+  checkInTime  DateTime
+  checkOutTime DateTime
+  volunteerId  String
+  volunteer    Volunteer @relation(fields: [volunteerId], references: [id])
+  eventId      String
+  event        Event     @relation(fields: [eventId], references: [id])
+}
+
+model Event {
+  id                   String                @id @default(uuid())
+  name                 String
+  schedule             DateTime
+  description          String
+  locationId           String
+  location             Location              @relation(fields: [locationId], references: [id])
+  volunteerAttendances VolunteerAttendance[]
+  eventRegistrations   EventRegistration[]
+}
+
+model EventRegistration {
+  id                    String    @id @default(uuid())
+  eventGroup            String
+  date                  DateTime
+  referrelSource        String
+  reasonForVolunteering String
+  eSignature            String
+  volunteerId           String
+  volunteer             Volunteer @relation(fields: [volunteerId], references: [id])
+  eventId               String
+  event                 Event     @relation(fields: [eventId], references: [id])
+}
+
+model Location {
+  id           String  @id @default(uuid())
+  name         String
+  address      String
+  city         String
+  state        String
+  zipCode      String
+  phoneNumber  String
+  emailAddress String
+  hours        String
+  events       Event[]
+  admins       Admin[]
+}
+
+model Admin {
+  id         String   @id @default(uuid())
+  username   String
+  password   String
+  firstName  String
+  lastName   String
+  locationId String
+  location   Location @relation(fields: [locationId], references: [id])
+  mails      Mail[]
+}
+
+model Mail {
+  id                String          @id @default(uuid())
+  subjectLine       String
+  body              String
+  creationDateTime  DateTime
+  scheduledDateTime DateTime
+  attachments       String[] // Changed to array of strings
+  adminId           String
+  admin             Admin           @relation(fields: [adminId], references: [id])
+  mailRecipients    MailRecipient[]
+}
+
+model MailRecipient {
+  id             String         @id @default(uuid())
+  recipientType  RecipientType
+  deliveryStatus DeliveryStatus
+  volunteerId    String
+  volunteer      Volunteer      @relation(fields: [volunteerId], references: [id])
+  mailId         String
+  mail           Mail           @relation(fields: [mailId], references: [id])
+}
+
+enum RecipientType {
+  PRIMARY
+  CC
+  BCC
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+}

@@ -1,11 +1,7 @@
 import React from "react";
-import { SecondarySideBar } from "../components/SecondarySideBar";
+import { SecondarySideBar } from "@/app/components/SecondarySideBar";
 
-export default function VolunteerLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex">
       <SecondarySideBar

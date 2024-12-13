@@ -1,8 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
-import { SecondarySideBar } from "../components/SecondarySideBar";
-
-export default function GrantsPage() {
+export default function VolunteersPage() {
   const Header = () => (
     <div className="flex justify-between items-center mb-5">
       <h1 className="text-2xl font-bold text-gray-800">Volunteers</h1>

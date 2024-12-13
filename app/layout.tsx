@@ -7,21 +7,21 @@ export const metadata = {
   description: "Next.js application",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="flex">
-        <MainSidebar />
-        <div className="flex flex-col flex-grow">
+      <body className="flex flex-col items-center">
+        <div className="w-full">
           <TopNavigationBar />
-          <main className="flex-grow">{children}</main>
+        </div>
+
+        <div className="flex w-full">
+          <MainSidebar />
+          <div className="flex flex-col flex-grow">
+            <main className="flex-grow">{children}</main>
+          </div>
         </div>
       </body>
     </html>
   );
 }
-  
