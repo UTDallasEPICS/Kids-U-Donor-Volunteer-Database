@@ -62,6 +62,13 @@ export default function DonationsList() {
       const response = await fetch("/api/donations", {
         method: "GET",
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
+      }
+
       const result = await response.json();
 
       setData(result.data);
