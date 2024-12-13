@@ -1,52 +1,73 @@
 import {
-  Grant as PGrant,
-  Representative as PRepresentative,
-  Event as PEvent,
-  VolunteerEvent as PVolunteerEvent,
+  Person as PPerson,
   Organization as POrganization,
-  Donation as PDonation,
-  Volunteer as PVolunteer,
-  Constituent as PConstituent,
+  User as PUser,
+  Address as PAddress,
+  Grant as PGrant,
+  GrantAttachment as PGrantAttachment,
+  Representative as PRepresentative,
+  Grantor as PGrantor,
+  RepresentativeGrant as PRepresentativeGrant,
   Donor as PDonor,
-} from '@prisma/client';
+  Donation as PDonation
+} from "@prisma/client";
+
+//import { Donor, Address, Donation } from "@prisma/client";
 
 export type Grant = PGrant & {
-  Representative: Representative[];
+  representativeGrant: RepresentativeGrant[];
+  grantAttachment: GrantAttachment[];
+};
+
+export type GrantAttachment = PGrantAttachment & {
+  grantor: Grantor;
+}
+
+export type Grantor = PGrantor & {
+  organization: Organization;
+  representatives: Representative[];
 };
 
 export type Representative = PRepresentative & {
-  Organization: Organization;
-  Grants: Grant[];
+  person: Person;
+  grantor: Grantor;
+  representativeGrant: RepresentativeGrant[];
 };
 
-export type Event = PEvent & {
-  VolunteersAtteneded: VolunteerEvent[];
-};
 
-export type VolunteerEvent = PVolunteerEvent & {
-  Event: Event;
-  Volunteer: Volunteer;
-};
-
-export type Organization = POrganization & {
-  Representatives: Representative[];
+export type RepresentativeGrant = PRepresentativeGrant & {
+  grant: Grant;
+  representative: Representative;
 };
 
 export type Donation = PDonation & {
-  Donor: Donor;
-};
-
-export type Volunteer = PVolunteer & {
-  Constituent: Constituent;
-  VolunteerEvents: VolunteerEvent[];
-};
-
-export type Constituent = PConstituent & {
-  Donors: Donor[];
-  Volunteers: Volunteer[];
-};
+  donor: Donor;
+}
 
 export type Donor = PDonor & {
-  Constituent: Constituent;
-  Donations: Donation[];
+  donations: Donation[];
+  person: Person;
+  organization: Organization;
+}
+
+export type Organization = POrganization & {
+  grantor: Grantor;
+  address: Address;
+  donor: Donor;
 };
+
+export type Person = PPerson & {
+  donor: Donor;
+  representative: Representative;
+  address: Address;
+  user: User;
+};
+
+export type User = PUser & {
+  person: Person;
+}
+
+export type Address = PAddress & {
+  person: Person;
+  organization: Organization;
+}

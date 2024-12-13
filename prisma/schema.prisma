@@ -18,9 +18,9 @@ model Person {
   lastName       String
   emailAddress   String          @unique
   phoneNumber    String?         @unique
+  address        Address?
   donor          Donor?
   representative Representative?
-  address        Address?
   user           User?
 }
 
@@ -40,148 +40,17 @@ model User {
   person   Person? @relation(fields: [personId], references: [id])
 }
 
-//volunteer database information
-model Volunteer {
-  id                   String                @id @default(uuid())
-  ssn                  String                @unique
-  username             String
-  password             String
-  firstName            String
-  lastName             String
-  emailAddress         String                @unique
-  phoneNumber          String?               @unique
-  preferredName        String?
-  addressLine          String
-  city                 String
-  state                String
-  zipCode              String
-  usCitizen            Boolean
-  driversLicense       Boolean
-  reliableTransport    Boolean
-  speakSpanish         Boolean
-  emergencyContact     EmergencyContact?
-  referenceName        String
-  volunteerAttendances VolunteerAttendance[]
-  eventRegistrations   EventRegistration[]
-  mailRecipients       MailRecipient[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-}
+//Volunteer profile and Admin profile
 
-model EmergencyContact {
-  id           String    @id @default(uuid())
-  name         String
-  relationship String
-  phoneNumber  String
-  volunteerId  String    @unique
-  volunteer    Volunteer @relation(fields: [volunteerId], references: [id])
-}
-
-model VolunteerAttendance {
-  id           String    @id @default(uuid())
-  hoursWorked  Float
-  checkInTime  DateTime
-  checkOutTime DateTime
-  volunteerId  String
-  volunteer    Volunteer @relation(fields: [volunteerId], references: [id])
-  eventId      String
-  event        Event     @relation(fields: [eventId], references: [id])
-}
-
-model Event {
-  id                   String                @id @default(uuid())
-  name                 String
-  schedule             DateTime
-  description          String
-  locationId           String
-  location             Location              @relation(fields: [locationId], references: [id])
-  volunteerAttendances VolunteerAttendance[]
-  eventRegistrations   EventRegistration[]
-}
-
-model EventRegistration {
-  id                    String    @id @default(uuid())
-  eventGroup            String
-  date                  DateTime
-  referrelSource        String
-  reasonForVolunteering String
-  eSignature            String
-  volunteerId           String
-  volunteer             Volunteer @relation(fields: [volunteerId], references: [id])
-  eventId               String
-  event                 Event     @relation(fields: [eventId], references: [id])
-}
-
-model Location {
-  id           String  @id @default(uuid())
-  name         String
-  address      String
-  city         String
-  state        String
-  zipCode      String
-  phoneNumber  String
-  emailAddress String
-  hours        String
-  events       Event[]
-  admins       Admin[]
-}
-
-model Admin {
-  id         String   @id @default(uuid())
-  username   String
-  password   String
-  firstName  String
-  lastName   String
-  locationId String
-  location   Location @relation(fields: [locationId], references: [id])
-  mails      Mail[]
-}
-
-model Mail {
-  id                String          @id @default(uuid())
-  subjectLine       String
-  body              String
-  creationDateTime  DateTime
-  scheduledDateTime DateTime
-  attachments       String[] // Changed to array of strings
-  adminId           String
-  admin             Admin           @relation(fields: [adminId], references: [id])
-  mailRecipients    MailRecipient[]
-}
-
-model MailRecipient {
-  id             String         @id @default(uuid())
-  recipientType  RecipientType
-  deliveryStatus DeliveryStatus
-  volunteerId    String
-  volunteer      Volunteer      @relation(fields: [volunteerId], references: [id])
-  mailId         String
-  mail           Mail           @relation(fields: [mailId], references: [id])
-}
-
-enum RecipientType {
-  PRIMARY
-  CC
-  BCC
-}
-
-enum DeliveryStatus {
-  PENDING
-  SENT
-  FAILED
-}
-
-//donor grant database information
 model Address {
   id             String        @id @default(uuid())
   addressLine1   String
-  addressLine2   String
+  addressLine2   String?
   city           String
   state          String
   zipCode        String
   type           String
   personId       String?       @unique
-  grantorId      String?       @unique
   organizationId String?       @unique
   person         Person?       @relation(fields: [personId], references: [id])
   organization   Organization? @relation(fields: [organizationId], references: [id])
@@ -222,20 +91,20 @@ model Grant {
   isMultipleYears         Boolean
   quarter                 String
   acknowledgementSent     Boolean
-  awardNotificationDate   DateTime
+  awardNotificationDate   DateTime?
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
   proposalDueDate         DateTime
-  proposalSummary         String
-  proposalSubmissionDate  DateTime
+  proposalSummary         String?
+  proposalSubmissionDate  DateTime?
   applicationType         String
   internalOwner           String
   fundingRestriction      String?
   matchingRequirement     String?
   useArea                 String //specific area or general
   isEligibleForRenewal    Boolean
-  renewalApplicationDate  DateTime
-  renewalAwardStatus      String
+  renewalApplicationDate  DateTime?
+  renewalAwardStatus      String?
   representativeGrant     RepresentativeGrant[]
   grantAttachment         GrantAttachment[]
 }
@@ -264,10 +133,10 @@ model Donor {
   status                  String
   notes                   String
   isRetained              Boolean
-  personId                String?       @unique
-  organizationId          String?       @unique
   donation                Donation[]
+  personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
+  organizationId          String?       @unique
   organization            Organization? @relation(fields: [organizationId], references: [id])
 }
 
@@ -278,16 +147,16 @@ model Donation {
   item                String?
   paymentMethod       String?
   campaign            String?
-  date                DateTime
   fundDesignation     String
-  recurringFrequency  String
+  recurringFrequency  String?
+  date                DateTime
   source              String
   isMatching          Boolean
-  receiptSent         Boolean
-  receiptNumber       String   @default(uuid())
-  taxDeductableAmount Float
+  taxDeductibleAmount Float?
+  receiptSent         Boolean?
+  receiptNumber       String?  @default(uuid())
   isAnonymous         Boolean
   acknowledgementSent Boolean
-  donorId             String
-  donor               Donor    @relation(fields: [donorId], references: [id])
+  donorId             String?
+  donor               Donor?   @relation(fields: [donorId], references: [id])
 }

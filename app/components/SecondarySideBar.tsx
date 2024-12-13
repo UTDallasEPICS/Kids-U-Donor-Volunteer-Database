@@ -1,4 +1,5 @@
-import Link from "next/link";
+import NextLink from "next/link";
+import { List, ListItem, Link } from "@mui/material";
 
 type ListItem = {
   name: string;
@@ -7,17 +8,33 @@ type ListItem = {
 
 export const SecondarySideBar = ({ items }: { items: ListItem[] }) => {
   return (
-    <div className="bg-gray-700 text-white w-[7rem] min-h-screen flex flex-col">
-      <ul className="flex flex-col space-y-2 p-2">
-        {items.map((item, index) => (
-          <li
-            key={index}
-            className="hover:bg-gray-600 p-1 rounded cursor-pointer"
-          >
-            <Link href={item.reference}>{item.name}</Link>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <List sx={styles.container}>
+      {items.map((item, index) => (
+        <ListItem sx={{ px: 0.5 }} key={index}>
+          <Link sx={styles.button} href={item.reference} component={NextLink} underline="none">
+            {item.name}
+          </Link>
+        </ListItem>
+      ))}
+    </List>
   );
+};
+
+const styles = {
+  container: {
+    backgroundColor: "#0d1a2d",
+    width: "7rem",
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  },
+  button: {
+    color: "white",
+    width: "100%",
+    borderRadius: 1,
+    p: 1,
+    px: 0.5,
+    fontSize: "0.95rem",
+    "&:hover": { backgroundColor: "grey.600" },
+  },
 };
