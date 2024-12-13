@@ -30,14 +30,16 @@
 
 - Prisma schema has been created - although database work has not begun.
 
-### Grant Module
+### Grant / Donation Overall Requirements
+
+#### Grant Module
 - Tracks and records all grants
 - Admins need to be able to add information to grant records
 - Admins need to be able to delete information to grant records
 - Admins need to be able to edit information to grant records
 - Admins need to be able to import/export information (documents, like a budget, or notes in .docx or .pdf format) to grant records
 
-### Donation Module
+#### Donation Module
 - Tracks and records of all online donations
 - Allows offline donations to be manually logged
 - Creates donor profiles
@@ -46,14 +48,14 @@
 - Admins need to be able to edit information to donation records
 - Admins need to be able to import/export information (documents or notes in .docx or .pdf format) to donation records
 
-### General Administrative Dashboard
+#### General Administrative Dashboard
 - Administrators need to be able create an account
 - Administrators need to be able to log in to access the dashboard
 - After an administrator logs in
     - Show graphics about grant and donation information
     - Navigation bar to donation and grants module
 
-### Mailing
+#### Mailing
 - Admins need to be able to access email and mailing addresses
 - Needs to be able to send Thank You Letters/Receipts for donations
 - Needs to be able to send acknowledgements for grants
