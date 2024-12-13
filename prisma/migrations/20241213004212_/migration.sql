@@ -1,6 +1,12 @@
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('VOLUNTEER', 'ADMIN');
 
+-- CreateEnum
+CREATE TYPE "RecipientType" AS ENUM ('PRIMARY', 'CC', 'BCC');
+
+-- CreateEnum
+CREATE TYPE "DeliveryStatus" AS ENUM ('PENDING', 'SENT', 'FAILED');
+
 -- CreateTable
 CREATE TABLE "Person" (
     "id" TEXT NOT NULL,
@@ -153,6 +159,131 @@ CREATE TABLE "Donation" (
     CONSTRAINT "Donation_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Volunteer" (
+    "id" TEXT NOT NULL,
+    "ssn" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "emailAddress" TEXT NOT NULL,
+    "phoneNumber" TEXT,
+    "preferredName" TEXT,
+    "addressLine" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "zipCode" TEXT NOT NULL,
+    "usCitizen" BOOLEAN NOT NULL,
+    "driversLicense" BOOLEAN NOT NULL,
+    "reliableTransport" BOOLEAN NOT NULL,
+    "speakSpanish" BOOLEAN NOT NULL,
+    "referenceName" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Volunteer_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EmergencyContact" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "relationship" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
+    "volunteerId" TEXT NOT NULL,
+
+    CONSTRAINT "EmergencyContact_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "VolunteerAttendance" (
+    "id" TEXT NOT NULL,
+    "hoursWorked" DOUBLE PRECISION NOT NULL,
+    "checkInTime" TIMESTAMP(3) NOT NULL,
+    "checkOutTime" TIMESTAMP(3) NOT NULL,
+    "volunteerId" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
+
+    CONSTRAINT "VolunteerAttendance_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Event" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "schedule" TIMESTAMP(3) NOT NULL,
+    "description" TEXT NOT NULL,
+    "locationId" TEXT NOT NULL,
+
+    CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "EventRegistration" (
+    "id" TEXT NOT NULL,
+    "eventGroup" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "referrelSource" TEXT NOT NULL,
+    "reasonForVolunteering" TEXT NOT NULL,
+    "eSignature" TEXT NOT NULL,
+    "volunteerId" TEXT NOT NULL,
+    "eventId" TEXT NOT NULL,
+
+    CONSTRAINT "EventRegistration_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Location" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "state" TEXT NOT NULL,
+    "zipCode" TEXT NOT NULL,
+    "phoneNumber" TEXT NOT NULL,
+    "emailAddress" TEXT NOT NULL,
+    "hours" TEXT NOT NULL,
+
+    CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Admin" (
+    "id" TEXT NOT NULL,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "firstName" TEXT NOT NULL,
+    "lastName" TEXT NOT NULL,
+    "locationId" TEXT NOT NULL,
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Mail" (
+    "id" TEXT NOT NULL,
+    "subjectLine" TEXT NOT NULL,
+    "body" TEXT NOT NULL,
+    "creationDateTime" TIMESTAMP(3) NOT NULL,
+    "scheduledDateTime" TIMESTAMP(3) NOT NULL,
+    "attachments" TEXT[],
+    "adminId" TEXT NOT NULL,
+
+    CONSTRAINT "Mail_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "MailRecipient" (
+    "id" TEXT NOT NULL,
+    "recipientType" "RecipientType" NOT NULL,
+    "deliveryStatus" "DeliveryStatus" NOT NULL,
+    "volunteerId" TEXT NOT NULL,
+    "mailId" TEXT NOT NULL,
+
+    CONSTRAINT "MailRecipient_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "Person_emailAddress_key" ON "Person"("emailAddress");
 
@@ -185,6 +316,18 @@ CREATE UNIQUE INDEX "Donor_personId_key" ON "Donor"("personId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Donor_organizationId_key" ON "Donor"("organizationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Volunteer_ssn_key" ON "Volunteer"("ssn");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Volunteer_emailAddress_key" ON "Volunteer"("emailAddress");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Volunteer_phoneNumber_key" ON "Volunteer"("phoneNumber");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "EmergencyContact_volunteerId_key" ON "EmergencyContact"("volunteerId");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_personId_fkey" FOREIGN KEY ("personId") REFERENCES "Person"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -221,3 +364,33 @@ ALTER TABLE "Donor" ADD CONSTRAINT "Donor_organizationId_fkey" FOREIGN KEY ("org
 
 -- AddForeignKey
 ALTER TABLE "Donation" ADD CONSTRAINT "Donation_donorId_fkey" FOREIGN KEY ("donorId") REFERENCES "Donor"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EmergencyContact" ADD CONSTRAINT "EmergencyContact_volunteerId_fkey" FOREIGN KEY ("volunteerId") REFERENCES "Volunteer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VolunteerAttendance" ADD CONSTRAINT "VolunteerAttendance_volunteerId_fkey" FOREIGN KEY ("volunteerId") REFERENCES "Volunteer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VolunteerAttendance" ADD CONSTRAINT "VolunteerAttendance_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Event" ADD CONSTRAINT "Event_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EventRegistration" ADD CONSTRAINT "EventRegistration_volunteerId_fkey" FOREIGN KEY ("volunteerId") REFERENCES "Volunteer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "EventRegistration" ADD CONSTRAINT "EventRegistration_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Admin" ADD CONSTRAINT "Admin_locationId_fkey" FOREIGN KEY ("locationId") REFERENCES "Location"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Mail" ADD CONSTRAINT "Mail_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MailRecipient" ADD CONSTRAINT "MailRecipient_volunteerId_fkey" FOREIGN KEY ("volunteerId") REFERENCES "Volunteer"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "MailRecipient" ADD CONSTRAINT "MailRecipient_mailId_fkey" FOREIGN KEY ("mailId") REFERENCES "Mail"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

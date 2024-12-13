@@ -26,6 +26,7 @@ export default function VolunteersPage() {
     <div className={"flex font-sans"}>
       <div className="flex-grow p-5">
         <Header />
+        page
         {/* <SearchBar /> */}
       </div>
     </div>
