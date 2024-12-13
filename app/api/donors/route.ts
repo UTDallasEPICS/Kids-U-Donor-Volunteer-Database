@@ -81,7 +81,12 @@ export async function POST(req: NextRequest) {
 
 // Read
 export async function GET() {
-  const data = await prisma.donor.findMany();
+  try {
+    const data = await prisma.donor.findMany();
 
-  return NextResponse.json({ message: "GET REQUEST", data: data }, { status: 200 });
+    return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching donations:", error);
+    return NextResponse.json({ message: "Failed to fetch donors", error: error }, { status: 500 });
+  }
 }

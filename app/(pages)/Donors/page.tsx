@@ -52,6 +52,13 @@ export default function DonorsList() {
       const response = await fetch("/api/donors", {
         method: "GET",
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
+      }
+
       const result = await response.json();
 
       setData(result.data);
