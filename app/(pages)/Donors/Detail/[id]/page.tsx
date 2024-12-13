@@ -55,7 +55,7 @@ export default function DonorDetail() {
 
   const fetchDonor = async () => {
     try {
-      const result = await fetch(`/api/v1/donors/${id}`, {
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donors/${id}`, {
         method: "GET",
       });
 

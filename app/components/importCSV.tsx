@@ -88,7 +88,7 @@ export const Import = () => {
 
       <Box>
         <p>
-          There are specific fields to import to grants. <br />
+          There are specific fields to import to grants. (then donations/donor stuff too...) <br />
           These are the grant fields for the database schema so far, depending on Kids-U current excel sheet data, you
           will need to get their specific column names, and add a default value for anything that their excel sheet does
           not cover.

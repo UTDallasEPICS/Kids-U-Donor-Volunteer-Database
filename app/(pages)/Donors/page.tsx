@@ -1,331 +1,96 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Donor } from "@/prisma";
-import {
-  Box,
-  TextField,
-  Typography,
-  Breadcrumbs,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  CircularProgress,
-  TableFooter,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Checkbox,
-  ListItemText,
-  SelectChangeEvent,
-} from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import type { Donation } from "@/prisma";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Link from "next/link";
+import { Donor } from "@prisma/client";
 
-const columns = [
-  "name",
-  "email",
-  "addressLine1",
-  "addressLine2",
-  "city",
-  "state",
-  "zipcode",
-  "type",
-  "communicationPreference",
-  "status",
+/*
+place holder list
+*/
+
+const headCells = [
+  {
+    id: "type",
+    numeric: false,
+    label: "Donor Type",
+  },
+  {
+    id: "commPref",
+    numeric: false,
+    label: "Communication Preference",
+  },
+  {
+    id: "status",
+    numeric: false,
+    label: "Status",
+  },
 ];
+export const TableHeader = () => {
+  return (
+    <TableHead>
+      <TableRow>
+        {headCells.map((headCell: any) => (
+          <TableCell key={headCell.id} style={styles.tableCellHeader}>
+            {headCell.label}
+          </TableCell>
+        ))}
+      </TableRow>
+    </TableHead>
+  );
+};
 
-const searchOptions = ["name", "addressLine1", "city", "state", "zipcode", "type", "status"];
+export default function DonorsList() {
+  const [data, setData] = useState<Donor[]>([]);
 
-export default function DonorsPage() {
-  const [donorsData, setDonorsData] = useState<Donor[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [totalCount, setTotalCount] = React.useState(0);
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [searchCriteria, setSearchCriteria] = useState("");
-
-  const fetchDonorsData = async () => {
+  const fetchDonorData = async () => {
     try {
-      const response = await fetch(
-        `/api/donors/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`
-      );
+      const response = await fetch("/api/donors", {
+        method: "GET",
+      });
       const result = await response.json();
-
-      setDonorsData(result.data);
-      setTotalCount(result.count);
-
-      setLoading(false);
+      console.log(result.data);
+      setData(result.data);
     } catch (error) {
       console.error("Error fetching:", error);
-      setLoading(false);
     }
   };
-
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); //Bring back to first page
-  };
-
-  const handleColumnChange = (event: SelectChangeEvent<typeof selectedColumns>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedColumns(typeof value === "string" ? value.split(",") : value);
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setSearchValue(event.target.value as string);
-  };
-
-  const handleCriteriaChange = (event: SelectChangeEvent<string>) => {
-    setSearchCriteria(event.target.value as string);
-  };
-
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      //This ensures the code runs only in the browser
-      //sessionStorage for selected columns
-      if (sessionStorage.getItem("page") !== "donorList") {
-        sessionStorage.clear();
-      }
-      sessionStorage.setItem("page", "donorList");
-
-      const savedColumns = sessionStorage.getItem("selectedColumns");
-      if (savedColumns) {
-        setSelectedColumns(JSON.parse(savedColumns));
-      } else {
-        setSelectedColumns(columns);
-      }
-    }
+    fetchDonorData();
   }, []);
 
-  useEffect(() => {
-    if (typeof window !== "undefined" && selectedColumns.length > 0) {
-      sessionStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
-    }
-  }, [selectedColumns]);
-
-  useEffect(() => {
-    fetchDonorsData();
-  }, [page, rowsPerPage, searchValue, searchCriteria]);
-
-  if (loading) {
-    return <CircularProgress style={styles.center} />;
-  }
-
   return (
-    <Box>
-      <Box>
-        <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"} style={{ textDecoration: "underline" }}>
-            Dashboard
-          </Link>
-          <Typography>Donations</Typography>
-          <Typography>Donors List</Typography>
-        </Breadcrumbs>
-      </Box>
-      <Box>
-        <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
-          <Grid>
-            <FormControl variant="outlined" sx={{ width: 150 }}>
-              <InputLabel>Search By</InputLabel>
-              <Select label="Search By" value={searchCriteria} onChange={handleCriteriaChange}>
-                {searchOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <ListItemText>{option}</ListItemText>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid>
-            <TextField
-              label="Search Value"
-              variant="outlined"
-              name="value"
-              value={searchValue}
-              onChange={handleSearchChange}
-              disabled={!searchCriteria} //Disable search input until something is selected
-            />
-          </Grid>
-          <Grid>
-            <FormControl sx={{ width: 500 }}>
-              <InputLabel>Included Columns</InputLabel>
-              <Select
-                multiple
-                value={selectedColumns}
-                onChange={handleColumnChange}
-                input={<OutlinedInput label="Included Columns" />}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {columns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    <Checkbox checked={selectedColumns.includes(col)} />
-                    <ListItemText primary={col} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Box>
-      <Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small">
-            <TableHead>
-              <TableRow>
-                {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
-                {selectedColumns.includes("email") && (
-                  <TableCell style={styles.tableCellHeader}>Email Address</TableCell>
-                )}
-                {selectedColumns.includes("addressLine1") && (
-                  <TableCell style={styles.tableCellHeader}>Address Line 1</TableCell>
-                )}
-                {selectedColumns.includes("addressLine2") && (
-                  <TableCell style={styles.tableCellHeader}>Address Line 2</TableCell>
-                )}
-                {selectedColumns.includes("city") && <TableCell style={styles.tableCellHeader}>City</TableCell>}
-                {selectedColumns.includes("state") && <TableCell style={styles.tableCellHeader}>State</TableCell>}
-                {selectedColumns.includes("zipcode") && <TableCell style={styles.tableCellHeader}>Zipcode</TableCell>}
-                {selectedColumns.includes("type") && <TableCell style={styles.tableCellHeader}>Donor Type</TableCell>}
-                {selectedColumns.includes("communicationPreference") && (
-                  <TableCell style={styles.tableCellHeader}>Communication Preference</TableCell>
-                )}
-                {selectedColumns.includes("status") && <TableCell style={styles.tableCellHeader}>Status</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {donorsData?.map((donor) => {
-                console.log("Donor Owwwbject:", donor); // Debug log
-                return (
-                  <TableRow key={donor.id}>
-                    {selectedColumns.includes("name") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? `${donor.person?.firstName || "N/A"} ${donor.person?.lastName || "N/A"}`
-                          : donor.organization?.name || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("email") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.emailAddress || "N/A"
-                          : donor.organization?.emailAddress || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("addressLine1") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.address?.addressLine1 || "N/A"
-                          : donor.organization?.address?.addressLine1 || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("addressLine2") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.address?.addressLine2 || "N/A"
-                          : donor.organization?.address?.addressLine2 || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("city") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.address?.city || "N/A"
-                          : donor.organization?.address?.city || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("state") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.address?.state || "N/A"
-                          : donor.organization?.address?.state || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("zipcode") && (
-                      <TableCell style={styles.tableCell}>
-                        {donor.type === "Individual"
-                          ? donor.person?.address?.zipCode || "N/A"
-                          : donor.organization?.address?.zipCode || "N/A"}
-                      </TableCell>
-                    )}
-                    {selectedColumns.includes("type") && (
-                      <TableCell style={styles.tableCell}>{donor.type || "N/A"}</TableCell>
-                    )}
-                    {selectedColumns.includes("communicationPreference") && (
-                      <TableCell style={styles.tableCell}>{donor.communicationPreference || "N/A"}</TableCell>
-                    )}
-                    {selectedColumns.includes("status") && (
-                      <TableCell style={styles.tableCell}>{donor.status || "N/A"}</TableCell>
-                    )}
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={12} style={{ padding: 0 }}>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                    component="div"
-                    count={totalCount}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    style={styles.pagination}
-                  />
+    <TableContainer>
+      <Table stickyHeader sx={styles.table} aria-labelledby="tableTitle">
+        <TableHeader />
+        <TableBody>
+          {data.map((donor) => {
+            return (
+              <TableRow hover key={donor.id}>
+                <TableCell sx={styles.tableCell}>
+                  <Link className="text-blue-500" href={`/Donors/Detail/${donor.id}`}>
+                    {donor.type}
+                  </Link>
                 </TableCell>
+                <TableCell sx={styles.tableCell}>{donor.communicationPreference}</TableCell>
+                <TableCell sx={styles.tableCell}>{donor.status}</TableCell>
               </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Box>
+            );
+          })}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 
 const styles = {
   table: {
-    minWidth: 650,
+    minWidth: 750,
   },
   tableCellHeader: {
     fontWeight: "bold",
-    border: "1px solid #aaa",
-    backgroundColor: "#ccc",
   },
   tableCell: {
-    border: "1px solid #ccc",
-  },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  pagination: {
-    display: "flex",
-    justifyContent: "left",
-    width: "100%",
-    backgroundColor: "#ccc",
-  },
-  breadcrumb: {
-    marginLeft: "5px",
-    marginTop: "8px",
+    borderTop: "1px solid #ccc",
   },
 };

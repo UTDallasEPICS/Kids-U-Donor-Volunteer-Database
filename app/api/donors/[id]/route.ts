@@ -2,7 +2,7 @@ import { Address, Donor, Person, Prisma } from "@prisma/client";
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-// Fetch single Donor based on id, Ex. http://localhost:3000/api/v1/donors/[id]
+// Fetch single Donor based on id, Ex. http://localhost:3000/api/donors/[id]
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = await params;
   try {

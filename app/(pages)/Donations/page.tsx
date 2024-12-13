@@ -4,6 +4,10 @@ import type { Donation } from "@/prisma";
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Link from "next/link";
 
+/*
+place holder list
+*/
+
 const headCells = [
   {
     id: "type",
@@ -62,7 +66,7 @@ export default function DonationsList() {
   };
   useEffect(() => {
     fetchDonationsData();
-  });
+  }, []);
 
   return (
     <TableContainer>
