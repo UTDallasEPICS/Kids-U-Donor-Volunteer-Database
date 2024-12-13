@@ -30,6 +30,38 @@
 
 - Prisma schema has been created - although database work has not begun.
 
+### Grant Module
+- Tracks and records all grants
+- Admins need to be able to add information to grant records
+- Admins need to be able to delete information to grant records
+- Admins need to be able to edit information to grant records
+- Admins need to be able to import/export information (documents, like a budget, or notes in .docx or .pdf format) to grant records
+
+### Donation Module
+- Tracks and records of all online donations
+- Allows offline donations to be manually logged
+- Creates donor profiles
+- Admins need to be able to add information to donation records
+- Admins need to be able to delete information to donation records
+- Admins need to be able to edit information to donation records
+- Admins need to be able to import/export information (documents or notes in .docx or .pdf format) to donation records
+
+### General Administrative Dashboard
+- Administrators need to be able create an account
+- Administrators need to be able to log in to access the dashboard
+- After an administrator logs in
+    - Show graphics about grant and donation information
+    - Navigation bar to donation and grants module
+
+### Mailing
+- Admins need to be able to access email and mailing addresses
+- Needs to be able to send Thank You Letters/Receipts for donations
+- Needs to be able to send acknowledgements for grants
+
+
+
+
+
 ## Past semester (Spring 2024)
 
 ### Grants Module
@@ -93,21 +125,6 @@ Since these are to be implemented in the future, the requirements will be a bit 
 - Admins need to be able to upload attachments and notes related to grants
 - Admins shall be able to assign tasks for specific grants
 
-#### Constituents Module
-
-- Tracks and keeps a record of all constituents (donors, volunteers)
-- Creates a profile page for all constituents
-  - Includes personal and business information (names, addresses, contact details)
-  - Includes information regarding their donations
-  - Includes information related to volunteer work (trainings, certifications)
-- Tracks all organizations
-- Creates a page for each organization
-  - Includes representatives and personal information (name, contact details)
-  - Includes organization's name, location, and website link
-- Admins need be able to add information
-- Admins need be able to edit and update information
-- Admins need to be able to search through the record of constituents and organizations
-
 #### Events Module
 
 - Keeps track of any events
@@ -139,7 +156,6 @@ Since these are to be implemented in the future, the requirements will be a bit 
 
 #### Email Templates, Campaigns, and Marketing
 
-- Admins need to be able to send documents to constituents
 - Admins need to be able to send out acknowledgement emails or letters to donors
 - Custom email templates tied to certain events that can be triggered to send based on certain events, such as volunteer registration or a scheduled date before the event
 - Emails shall be able to have variables that can change based on the event or volunteer
