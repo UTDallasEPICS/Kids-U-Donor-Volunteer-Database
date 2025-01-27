@@ -18,7 +18,7 @@
     "@mui/x-date-pickers": "^7.19.0",
     "@opentelemetry/api": "^1.9.0",
     "@prisma/client": "^5.12.1",
-    "@types/node": "20.6.5",
+    "@types/node": "22.10.10",
     "@types/react": "18.2.22",
     "axios": "^1.6.8",
     "connect": "^3.7.0",
