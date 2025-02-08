@@ -32,6 +32,7 @@
 - Change the `PORT` to 5432, `USER`, `PASSWORD` and `DATABASE` to kidsu
 - In the VSCode terminal, run `npm install`
 - Open the docker application, then in the VSCode terminal, run `docker compose up -d`
+-   Don't register/login to Docker, just press skip
 - Again, in the VSCode terminal, run `npx prisma migrate dev` to initialize the database migrations (docker should still be open)
 
 ## 4. Start web application
