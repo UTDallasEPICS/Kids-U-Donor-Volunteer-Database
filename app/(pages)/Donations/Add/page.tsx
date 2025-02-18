@@ -12,15 +12,15 @@ import {
   paymentMethods,
   recurringFrequencies,
   statesChoices,
-} from "@/app/components/formComponents/FormInputProps";
+} from "@/app/components/form-components/form-input-props";
 import { Box, TextField, MenuItem, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
-import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
-import { FormInputDate } from "@/app/components/formComponents/FormInputDate";
-import { AddFooter } from "@/app/components/donations/add/AddFooter";
-import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
+import { FormInputDropdown } from "@/app/components/form-components/form-input-dropdown";
+import { FormInputTextfield } from "@/app/components/form-components/form-input-textfield";
+import { FormInputDate } from "@/app/components/form-components/form-input-date";
+import { AddFooter } from "@/app/components/donations/add/add-footer";
+import { FormInputCheckbox } from "@/app/components/form-components/form-input-checkbox";
 
 export default function AddDonation() {
   const {

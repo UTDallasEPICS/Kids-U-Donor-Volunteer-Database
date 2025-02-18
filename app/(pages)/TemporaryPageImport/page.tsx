@@ -1,4 +1,4 @@
-import { Import } from "../../components/importCSV";
+import { Import } from "../../components/ImportCSV";
 
 export default function ImportPage() {
   <Import />;

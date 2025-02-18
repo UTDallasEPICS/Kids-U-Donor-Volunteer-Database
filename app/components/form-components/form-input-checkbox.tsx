@@ -1,7 +1,7 @@
 import React from "react";
 import { Checkbox, FormControl, FormControlLabel } from "@mui/material";
 import { Controller } from "react-hook-form";
-import { FormInputProps } from "./FormInputProps";
+import { FormInputProps } from "./form-input-props";
 
 export const FormInputCheckbox: React.FC<FormInputProps> = ({ name, control, required, label, readOnly }) => {
   return (

@@ -7,6 +7,12 @@ export type MenuItem = {
   value: string;
 };
 
+export type MenuItemType = {
+  label: string;
+  value: string;
+};
+
+
 export type CheckBoxItem = {
   label: string;
   value: boolean;

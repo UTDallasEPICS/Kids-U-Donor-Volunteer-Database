@@ -2,7 +2,7 @@ import { Box, Button, Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import { DonationFormProps, DonorFormProps } from "../formComponents/FormInputProps";
+import { DonationFormProps, DonorFormProps } from "../form-components/form-input-props";
 
 type FooterProps = {
   id: string;

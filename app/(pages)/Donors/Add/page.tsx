@@ -1,8 +1,8 @@
 "use client";
 import { Box, TextField, Typography } from "@mui/material";
 import * as React from "react";
-import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
-import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
+import { FormInputTextfield } from "@/app/components/form-components/form-input-textfield";
+import { FormInputDropdown } from "@/app/components/form-components/form-input-dropdown";
 import { Controller, useForm } from "react-hook-form";
 import {
   addressTypes,
@@ -11,9 +11,9 @@ import {
   donorStatuses,
   donorTypes,
   statesChoices,
-} from "@/app/components/formComponents/FormInputProps";
-import { AddDonorFooter } from "@/app/components/donations/add/AddDonorFooter";
-import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
+} from "@/app/components/form-components/form-input-props";
+import { AddDonorFooter } from "@/app/components/donations/add/add-donor-footer";
+import { FormInputCheckbox } from "@/app/components/form-components/form-input-checkbox";
 
 export default function AddDonor() {
   const {

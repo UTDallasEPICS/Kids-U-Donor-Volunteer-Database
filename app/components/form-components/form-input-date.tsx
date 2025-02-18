@@ -1,5 +1,5 @@
 import { Controller } from "react-hook-form";
-import { FormInputProps } from "./FormInputProps";
+import { FormInputProps } from "./form-input-props";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 

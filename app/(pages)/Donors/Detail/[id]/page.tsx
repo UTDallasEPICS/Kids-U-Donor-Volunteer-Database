@@ -3,16 +3,16 @@ import { useParams, useRouter } from "next/navigation";
 import { Box, TextField, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormInputTextfield } from "../../../../components/formComponents/FormInputTextfield";
+import { FormInputTextfield } from "../../../../components/form-components/form-input-textfield";
 import Loading from "@/app/loading";
-import { addressTypes, DonorFormProps, statesChoices } from "@/app/components/formComponents/FormInputProps";
+import { addressTypes, DonorFormProps, statesChoices } from "@/app/components/form-components/form-input-props";
 import { DonationTableState, DonorResponse } from "@/app/types/states";
-import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
-import { donorCommPreferences, donorStatuses, donorTypes } from "@/app/components/formComponents/FormInputProps";
-import { DetailFooter } from "@/app/components/donations/DetailFooter";
-import { MiniDonationsTable } from "@/app/components/donations/MiniDonationTable";
+import { FormInputDropdown } from "@/app/components/form-components/form-input-dropdown";
+import { donorCommPreferences, donorStatuses, donorTypes } from "@/app/components/form-components/form-input-props";
+import { DetailFooter } from "@/app/components/donations/detail-footer";
+import { MiniDonationsTable } from "@/app/components/donations/mini-donation-table";
 import { grey } from "@mui/material/colors";
-import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
+import { FormInputCheckbox } from "@/app/components/form-components/form-input-checkbox";
 
 export default function DonorDetail() {
   const { id }: { id: string } = useParams();

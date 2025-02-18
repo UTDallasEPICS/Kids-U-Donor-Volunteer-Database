@@ -5,20 +5,20 @@ import { useEffect, useRef, useState } from "react";
 import { DonationResponse } from "@/app/types/states";
 import Loading from "@/app/loading";
 import { useRouter } from "next/navigation";
-import { DetailFooter } from "@/app/components/donations/DetailFooter";
+import { DetailFooter } from "@/app/components/donations/detail-footer";
 import {
   DonationFormProps,
   donationSources,
   donationTypes,
   paymentMethods,
   recurringFrequencies,
-} from "@/app/components/formComponents/FormInputProps";
+} from "@/app/components/form-components/form-input-props";
 import { Controller, useForm } from "react-hook-form";
-import { FormInputDropdown } from "@/app/components/formComponents/FormInputDropdown";
-import { FormInputTextfield } from "@/app/components/formComponents/FormInputTextfield";
-import { FormInputDate } from "@/app/components/formComponents/FormInputDate";
+import { FormInputDropdown } from "@/app/components/form-components/form-input-dropdown";
+import { FormInputTextfield } from "@/app/components/form-components/form-input-textfield";
+import { FormInputDate } from "@/app/components/form-components/form-input-date";
 import { grey } from "@mui/material/colors";
-import { FormInputCheckbox } from "@/app/components/formComponents/FormInputCheckbox";
+import { FormInputCheckbox } from "@/app/components/form-components/form-input-checkbox";
 
 export default function DonationDetail() {
   const { id }: { id: string } = useParams();

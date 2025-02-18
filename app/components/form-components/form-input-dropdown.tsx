@@ -1,7 +1,7 @@
 import { MenuItem } from "@mui/material";
 import { Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
-import { FormInputSelectProps, MenuItemType } from "./FormInputProps";
+import { FormInputSelectProps, MenuItemType } from "./form-input-props";
 
 export const FormInputDropdown: React.FC<FormInputSelectProps> = ({
   name,
