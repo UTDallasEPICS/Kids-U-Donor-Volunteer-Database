@@ -135,7 +135,7 @@ const GrantDetailPage = () => {
         <Breadcrumbs style={styles.breadcrumb}>
           <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
           <Typography>Grants</Typography>
-          <Link href={"/Grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
+          <Link href={"/grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
           <Typography>Grant Details</Typography>
         </Breadcrumbs>
       </Box>

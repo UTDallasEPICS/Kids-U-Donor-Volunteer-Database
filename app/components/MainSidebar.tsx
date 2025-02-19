@@ -11,7 +11,7 @@ const MainSidebarItems: ListItem[] = [
   { name: "Dashboard", reference: "/" },
   { name: "Constituents", reference: "/" },
   { name: "Donations", reference: "/donations" },
-  { name: "Grants", reference: "/Grants" },
+  { name: "Grants", reference: "/grants" },
   { name: "Volunteers", reference: "/Volunteers" },
 ];
 

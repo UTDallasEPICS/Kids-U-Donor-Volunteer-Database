@@ -6,9 +6,9 @@ export default function GrantsLayout({ children }: { children: React.ReactNode }
     <div className="flex">
       <SecondarySideBar
         items={[
-          { name: "Grants List", reference: "/Grants" },
-          { name: "Add a Grant", reference: "/Grants/Add" },
-          { name: "Grantor List", reference: "/Grants/Grantor" },
+          { name: "Grants List", reference: "/grants" },
+          { name: "Add a Grant", reference: "/grants/Add" },
+          { name: "Grantor List", reference: "/grants/Grantor" },
         ]}
       />
       <div className="flex-grow">{children}</div>

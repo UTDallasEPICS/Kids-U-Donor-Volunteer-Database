@@ -32,7 +32,7 @@
     "app/pages/home.js",
     "app/utils/getOrganization.js",
     "frontend/src/pages/ApiTestPage.js",
-    "app/(pages)/Grants/Detail/[id]/page.tsx"
+    "app/(pages)/grants/Detail/[id]/page.tsx"
   ],
   "exclude": ["node_modules"]
 }
