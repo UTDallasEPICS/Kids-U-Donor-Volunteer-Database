@@ -86,7 +86,7 @@ export default function DonorsList() {
                 return (
                   <TableRow hover key={donor.id}>
                     <TableCell sx={styles.tableCell}>
-                      <Link className="text-blue-500" href={`/Donors/Detail/${donor.id}`}>
+                      <Link className="text-blue-500" href={`/donors/Detail/${donor.id}`}>
                         {donor.type}
                       </Link>
                     </TableCell>

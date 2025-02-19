@@ -306,7 +306,7 @@ export default function DonorDetail() {
           <DetailFooter
             id={id}
             name={"donor"}
-            href={"/Donors"}
+            href={"/donors"}
             apiUrl={"/donors"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}

@@ -64,7 +64,7 @@ export const AddDonorFooter = ({ handleSubmit, isDirty, errors }: FooterProps) =
   };
 
   const handleCancel = () => {
-    router.push("/Donors");
+    router.push("/donors");
   };
 
   return (
