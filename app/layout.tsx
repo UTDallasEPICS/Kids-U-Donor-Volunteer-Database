@@ -1,6 +1,6 @@
-import MainSidebar from "./components/MainSidebar";
+import MainSidebar from "./components/main-sidebar";
 import "./globals.css";
-import TopNavigationBar from "./components/TopNavigationBar";
+import TopNavigationBar from "./components/top-navigation-bar";
 
 export const metadata = {
   title: "KIDSU Donor Volunteer Database",

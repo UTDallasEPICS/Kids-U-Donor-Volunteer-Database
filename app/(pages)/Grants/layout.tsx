@@ -1,5 +1,5 @@
 import React from "react";
-import { SecondarySideBar } from "../../components/SecondarySideBar";
+import { SecondarySideBar } from "../../components/secondary-sidebar";
 
 export default function GrantsLayout({ children }: { children: React.ReactNode }) {
   return (
