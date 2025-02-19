@@ -10,7 +10,7 @@ type ListItem = {
 const MainSidebarItems: ListItem[] = [
   { name: "Dashboard", reference: "/" },
   { name: "Constituents", reference: "/" },
-  { name: "Donations", reference: "/Donations" },
+  { name: "Donations", reference: "/donations" },
   { name: "Grants", reference: "/Grants" },
   { name: "Volunteers", reference: "/Volunteers" },
 ];

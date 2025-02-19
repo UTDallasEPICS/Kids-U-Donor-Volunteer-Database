@@ -259,7 +259,7 @@ export default function DonationDetail() {
           <DetailFooter
             id={id}
             name={"donation"}
-            href={"/Donations"}
+            href={"/donations"}
             apiUrl={"/donations"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}

@@ -140,7 +140,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
   };
 
   const handleCancel = () => {
-    router.push("/Donations");
+    router.push("/donations");
   };
 
   return (

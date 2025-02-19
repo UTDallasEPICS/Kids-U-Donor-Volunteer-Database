@@ -6,9 +6,9 @@ export default function DonorsLayout({ children }: { children: React.ReactNode }
     <div className="flex">
       <SecondarySideBar
         items={[
-          { name: "Donations List", reference: "/Donations" },
+          { name: "Donations List", reference: "/donations" },
           { name: "Donors List", reference: "/Donors" },
-          { name: "Add a Donation", reference: "/Donations/Add" },
+          { name: "Add a Donation", reference: "/donations/Add" },
           { name: "Add a Donor", reference: "/Donors/Add" },
         ]}
       />
