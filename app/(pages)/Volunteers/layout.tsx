@@ -6,9 +6,9 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
     <div className="flex">
       <SecondarySideBar
         items={[
-          { name: "Registration", reference: "/Volunteers/Registration" },
-          { name: "Mail", reference: "/Volunteers/Mail" },
-          { name: "Check-In / Out", reference: "/Volunteers/Checkinout" },
+          { name: "Registration", reference: "/volunteers/Registration" },
+          { name: "Mail", reference: "/volunteers/Mail" },
+          { name: "Check-In / Out", reference: "/volunteers/Checkinout" },
         ]}
       />
       <div className="flex-grow">{children}</div>

@@ -36,12 +36,12 @@ export const AdminRegTable: React.FC<TableProps> = ({ data }) => {
     // Create a query string from curEvent
     const queryString = new URLSearchParams(curEvent).toString();
     // Navigate to the desired path with the query string
-    router.push(`/Volunteers/Registration/View_volunteers?${queryString}`);
+    router.push(`/volunteers/Registration/View_volunteers?${queryString}`);
   };
 
   const handleNavigation = (curEvent: Event) => {
     router.push({
-      pathname: "/Volunteers/Registration/View_volunteers",
+      pathname: "/volunteers/Registration/View_volunteers",
       query: { data: JSON.stringify(curEvent) },
     } as any);
   };
@@ -58,7 +58,7 @@ export const AdminRegTable: React.FC<TableProps> = ({ data }) => {
     <div className="flex justify-between items-center mb-5">
       <h1 className="text-2xl font-bold text-gray-800">Events</h1>
       <div className="px-4 py-2 ml-2">
-        <Link href="/Volunteers/Registration/New_event">
+        <Link href="/volunteers/Registration/New_event">
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
             Add A New Event
           </button>
