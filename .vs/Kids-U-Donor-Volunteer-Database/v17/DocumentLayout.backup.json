@@ -1,0 +1,53 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\docs\\setUPProjectV2.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:docs\\setUPProjectV2.md||{EFC0BB08-EA7D-40C6-A696-C870411A895B}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\app\\components\\donations\\DetailFooter.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\components\\donations\\DetailFooter.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "setUPProjectV2.md",
+              "DocumentMoniker": "C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\docs\\setUPProjectV2.md",
+              "RelativeDocumentMoniker": "docs\\setUPProjectV2.md",
+              "ToolTip": "C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\docs\\setUPProjectV2.md",
+              "RelativeToolTip": "docs\\setUPProjectV2.md",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001818|",
+              "WhenOpened": "2025-01-29T21:30:11.478Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DetailFooter.tsx",
+              "DocumentMoniker": "C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\app\\components\\donations\\DetailFooter.tsx",
+              "RelativeDocumentMoniker": "app\\components\\donations\\DetailFooter.tsx",
+              "ToolTip": "C:\\Akshaya\\College\\EPICS\\Kids-U-Donor-Volunteer-Database\\app\\components\\donations\\DetailFooter.tsx",
+              "RelativeToolTip": "app\\components\\donations\\DetailFooter.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2025-01-29T21:25:23.636Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

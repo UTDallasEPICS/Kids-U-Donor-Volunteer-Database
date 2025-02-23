@@ -1,10 +1,13 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Donation } from "@/prisma";
+
+import type { Donation } from "@prisma/client";
 import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
+
 
 /*
 place holder list
@@ -59,31 +62,32 @@ export default function DonationsList() {
 
   const fetchDonationsData = async () => {
     try {
-      const response = await fetch("/api/donations", {
-        method: "GET",
-      });
-
+      setIsLoading(true); 
+  
+      const response = await fetch("api/donations");
+      method: "GET";
+  
       if (!response.ok) {
         const errorData = await response.json();
-        const message = errorData?.message || "Something went wrong";
-        throw new Error(message);
+        throw new Error(errorData?.message || "Something went wrong");
       }
-
+  
       const result = await response.json();
-
       setData(result.data);
-
-      setIsLoading(false);
     } catch (error) {
       console.error("Error fetching:", error);
       router.push("/not-found");
+    } finally {
+      setIsLoading(false); 
     }
   };
+  
   useEffect(() => {
     fetchDonationsData();
-  }, []);
-
+  }, []); 
+  
   return (
+    
     <Box>
       {isLoading ? (
         <Loading />
