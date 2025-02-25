@@ -107,12 +107,29 @@ export async function POST(req: NextRequest) {
 
 // Read
 export async function GET() {
-  try {
-    const data = await prisma.donation.findMany();
+  // try {
+  //   const data = await prisma.donation.findMany();
 
+  //   return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
+  // } catch (error) {
+  //   console.error("Error fetching donations:", error);
+  //   return NextResponse.json({ message: "Failed to fetch donations", error: error }, { status: 500 });
+  // }
+  try {
+    console.log("Database URL:", process.env.PRISMA_DB_URL);
+
+    const data = await prisma.donation.findMany();
     return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
   } catch (error) {
-    console.error("Error fetching donations:", error);
-    return NextResponse.json({ message: "Failed to fetch donations", error: error }, { status: 500 });
+    if (error instanceof Error) {
+      console.error("Error fetching donations:", error.message);
+      return NextResponse.json({ message: "Failed to fetch donations", error: error.message }, { status: 500 });
+    } else {
+      console.error("Unknown error:", error);
+      return NextResponse.json(
+        { message: "Failed to fetch donations", error: "An unknown error occurred" },
+        { status: 500 }
+      );
+    }
   }
 }

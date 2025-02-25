@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Fetch single Donation based on id, Ex. http://localhost:3000/api/v1/donations/[id]
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = await params;
+  const { id } = params;
   try {
     const data = await prisma.donation.findUnique({
       where: {
@@ -43,9 +43,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { id } = await params;
 
   try {
-    const {
-      data: { donation },
-    } = await req.json();
+    const { donation } = await req.json();
 
     const updatedDonation = await prisma.donation.update({
       where: {

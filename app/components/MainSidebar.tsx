@@ -1,6 +1,8 @@
+"use client"
 import React from "react";
 import { List, ListItem, Link } from "@mui/material";
 import NextLink from "next/link";
+
 
 type ListItem = {
   name: string;
