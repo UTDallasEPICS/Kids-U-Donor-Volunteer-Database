@@ -206,7 +206,7 @@ export const MiniDonationsTable = ({ donations }: { donations: DonationTableStat
             return (
               <TableRow hover key={donation.id}>
                 <TableCell sx={styles.tableCell}>
-                  <Link className="text-blue-500" href={`/donations/Detail/${donation.id}`}>
+                  <Link className="text-blue-500" href={`/donations/detail/${donation.id}`}>
                     {donation.type}
                   </Link>
                 </TableCell>

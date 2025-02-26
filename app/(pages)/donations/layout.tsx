@@ -8,8 +8,8 @@ export default function DonationsLayout({ children }: { children: React.ReactNod
         items={[
           { name: "Donations List", reference: "/donations" },
           { name: "Donors List", reference: "/donors" },
-          { name: "Add a Donation", reference: "/donations/Add" },
-          { name: "Add a Donor", reference: "/donors/Add" },
+          { name: "Add a Donation", reference: "/donations/add" },
+          { name: "Add a Donor", reference: "/donors/add" },
         ]}
       />
       <div className="flex-grow">{children}</div>

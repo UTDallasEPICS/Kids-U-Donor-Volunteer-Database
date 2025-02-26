@@ -210,9 +210,9 @@ export default function GrantsPage() {
             <TableBody>
               {grantsData?.map((grant) => (
                 <TableRow key={grant.id}>
-                  {selectedColumns.includes("grantor") && <TableCell style={styles.tableCell}><Link href={`/grants/Grantor/Detail/${grant.representativeGrant[0].representative.grantorId}`}>{grant.representativeGrant[0].representative.grantor.organization.name}</Link></TableCell>}
+                  {selectedColumns.includes("grantor") && <TableCell style={styles.tableCell}><Link href={`/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}>{grant.representativeGrant[0].representative.grantor.organization.name}</Link></TableCell>}
                   {selectedColumns.includes("representative") && <TableCell style={styles.tableCell}>{grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}</TableCell>}
-                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/grants/Detail/${grant.id}`}>{grant.name}</Link></TableCell>}
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/grants/detail/${grant.id}`}>{grant.name}</Link></TableCell>}
                   {selectedColumns.includes("status") && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
                   {selectedColumns.includes("purpose") && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
                   {selectedColumns.includes("startDate") && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
