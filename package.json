@@ -27,7 +27,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "eslint": "8.50.0",
-    "eslint-config-next": "13.5.2",
+    "eslint-config-next": "15.2.0",
     "mime": "^4.0.4",
     "next": "^15.0.2",
     "prettier": "^3.3.3",
