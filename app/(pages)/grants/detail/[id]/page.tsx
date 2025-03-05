@@ -329,7 +329,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
             id="grantor-Text-Field"
             label="Grantor"
             variant="outlined"
-            value={grantDetails.representativeGrant[0].representative.grantor.organization.name}
+            value={grantDetails?.representativeGrant?.[0]?.representative?.grantor?.organization?.name || ''}
             disabled={!isEditing}
             sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
         </Grid>
@@ -341,8 +341,8 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
             id="representative-Text-Field"
             label="Representative"
             variant="outlined"
-            value={grantDetails.representativeGrant[0].representative.person.firstName + " " +
-              grantDetails.representativeGrant[0].representative.person.lastName}
+            value={grantDetails?.representativeGrant?.[0]?.representative?.person?.firstName + " " +
+              grantDetails?.representativeGrant?.[0]?.representative?.person?.lastName || ''}      
             disabled={!isEditing}
             sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
         </Grid>
@@ -354,7 +354,7 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
             id="representative-Email-Text-Field"
             label="Representative Email"
             variant="outlined"
-            value={grantDetails.representativeGrant[0].representative.person.emailAddress}
+            value={grantDetails?.representativeGrant?.[0]?.representative?.person?.emailAddress}
             disabled={!isEditing}
             sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
         </Grid>
@@ -366,8 +366,8 @@ const DetailsTable = ({ grantDetails, isEditing, handleInputChange }: any) => {
             id="representative-Phone-Number-Text-Field"
             label="Representative Phone Number"
             variant="outlined"
-            defaultValue={grantDetails.representativeGrant[0].representative.person.phoneNumber ?
-              grantDetails.representativeGrant[0].representative.person.phoneNumber : "N/A"}
+            defaultValue={grantDetails?.representativeGrant?.[0]?.representative?.person?.phoneNumber ?? "N/A"}
+
             disabled={!isEditing}
             sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
         </Grid>
