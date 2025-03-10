@@ -1,22 +1,49 @@
-import prisma from "@/app/utils/db";
+import prisma, { prismaSoftDelete } from "@/app/utils/db";
+
+import { grantors } from "@/app/utils/grantorTestData";
+import { PrismaClient } from "@prisma/client";
+import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
-// Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
-
 // Create
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = req.json();
+    const grantor = await request.json();
 
-    return NextResponse.json(
-      {
-        message: "POST REQUEST",
-        receivedData: body,
+    const newGrantor = await prisma.grantor.create({
+      data: {
+        type: grantor.type,
+        websiteLink: grantor.websiteLink,
+        communicationPreference: grantor.communicationPreference,
+        recognitionPreference: grantor.recognitionPreference,
+        internalRelationshipManager: grantor.internalRelationshipManager,
+        organization: {
+          create: {
+            name: grantor.organization.name,
+            emailAddress: grantor.organization.emailAddress,
+          },
+        },
+        representative: {
+          create: {
+            positionTitle: grantor.representative.positionTitle,
+            person: {
+              create: {
+                firstName: grantor.representative.person.firstName,
+                lastName: grantor.representative.person.lastName,
+                emailAddress: grantor.representative.person.emailAddress,
+              },
+            },
+          },
+        },
+        deletedAt: grantor.DateTime,
+        status: grantor.status,
       },
-      { status: 200 }
-    );
+    });
+    return new Response(JSON.stringify(newGrantor));
   } catch (error) {
-    console.error("POST ERROR:", error);
+    return new Response("{Error: ${error.message}", { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
