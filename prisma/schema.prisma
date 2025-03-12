@@ -65,6 +65,8 @@ model Grantor {
   recognitionPreference       String
   internalRelationshipManager String
   organizationId              String           @unique
+  deletedAt                   DateTime?
+  status                      Boolean          @default(true)
   organization                Organization     @relation(fields: [organizationId], references: [id])
   representative              Representative[]
 }
