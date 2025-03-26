@@ -216,8 +216,8 @@ model Event {
   name                 String
   schedule             DateTime
   description          String
-  locationId           String
-  location             Location              @relation(fields: [locationId], references: [id])
+  locationId           String?
+  location             Location?             @relation(fields: [locationId], references: [id])
   volunteerAttendances VolunteerAttendance[]
   eventRegistrations   EventRegistration[]
 }
