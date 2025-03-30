@@ -1,8 +1,5 @@
 import prisma, { prismaSoftDelete } from "@/app/utils/db";
-
-import { grantors } from "@/app/utils/grantorTestData";
 import { PrismaClient } from "@prisma/client";
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server";
 
 // Create
@@ -39,9 +36,13 @@ export async function POST(request: Request) {
         status: grantor.status,
       },
     });
-    return new Response(JSON.stringify(newGrantor));
-  } catch (error) {
-    return new Response("{Error: ${error.message}", { status: 500 });
+
+    return new Response(JSON.stringify(newGrantor), { status: 201 });
+  } catch (error: any) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error creating grantor:", errorMessage);
+
+    return NextResponse.json({ message: "Error creating grantor", error: errorMessage }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }
