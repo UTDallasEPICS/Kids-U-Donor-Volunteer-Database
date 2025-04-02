@@ -6,6 +6,7 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
     <div className="flex">
       <SecondarySideBar
         items={[
+          { name: "Volunteers List", reference: "/Volunteers" },
           { name: "Registration", reference: "/Volunteers/Registration" },
           { name: "Mail", reference: "/Volunteers/Mail" },
           { name: "Check-In / Out", reference: "/Volunteers/Checkinout" },

@@ -2,7 +2,7 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = await params;
+  const { id } = params;
   try {
     const data = await prisma.grantor.findUnique({
       where: {
