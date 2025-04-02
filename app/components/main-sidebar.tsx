@@ -8,11 +8,11 @@ type ListItem = {
 };
 
 const MainSidebarItems: ListItem[] = [
-  { name: "Dashboard", reference: "/" },
-  { name: "Constituents", reference: "/" },
-  { name: "Donations", reference: "/donations" },
-  { name: "Grants", reference: "/grants" },
-  { name: "Volunteers", reference: "/volunteers" },
+  { name: "Dashboard", reference: "/admin" },
+  { name: "Constituents", reference: "/admin" },
+  { name: "Donations", reference: "/admin/donations" },
+  { name: "Grants", reference: "/admin/grants" },
+  { name: "Volunteers", reference: "/admin/volunteers" },
 ];
 
 export default function MainSidebar() {

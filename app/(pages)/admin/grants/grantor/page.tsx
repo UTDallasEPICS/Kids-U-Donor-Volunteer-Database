@@ -61,7 +61,7 @@ export default function GrantorsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch(`/api/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/admin/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
       setGrantorsData(result.data);
       setTotalCount(result.count);
@@ -205,15 +205,54 @@ export default function GrantorsPage() {
             <TableBody>
               {grantorsData?.map((grantor) => (
                 <TableRow key={grantor.id}>
-                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/grants/grantor/detail/${grantor.id}`}>{grantor.organization.name}</Link></TableCell>}
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/admin/grants/grantor/detail/${grantor.id}`}>{grantor.organization.name}</Link></TableCell>}
                   {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{grantor.type}</TableCell>}
-                  {selectedColumns.includes("addressLine1") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine1}</TableCell>}
-                  {selectedColumns.includes("addressLine2") && <TableCell style={styles.tableCell}>{grantor.organization.address.addressLine2}</TableCell>}
-                  {selectedColumns.includes("city") && <TableCell style={styles.tableCell}>{grantor.organization.address.city}</TableCell>}
-                  {selectedColumns.includes("state") && <TableCell style={styles.tableCell}>{grantor.organization.address.state}</TableCell>}
-                  {selectedColumns.includes("zipcode") && <TableCell style={styles.tableCell}>{grantor.organization.address.zipCode}</TableCell>}
-                  {selectedColumns.includes("communicationPreference") && <TableCell style={styles.tableCell}>{grantor.communicationPreference}</TableCell>}
-                  {selectedColumns.includes("recognitionPreference") && <TableCell style={styles.tableCell}>{grantor.recognitionPreference}</TableCell>}
+                  {selectedColumns.includes("addressLine1") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.addressLine1 || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("addressLine2") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.addressLine2 || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("addressLine1") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.addressLine1 || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("addressLine2") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.addressLine2 || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("city") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.city || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("state") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.state || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("zipcode") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.organization.address?.zipCode || "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("communicationPreference") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.communicationPreference ?? "N/A"}
+  </TableCell>
+)}
+{selectedColumns.includes("recognitionPreference") && (
+  <TableCell style={styles.tableCell}>
+    {grantor.recognitionPreference ?? "N/A"}
+  </TableCell>
+)}
+
                 </TableRow>
               )) ?? null}
             </TableBody>

@@ -61,7 +61,7 @@ export default function GrantsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch(`/api/grants/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/admin/grants/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
       setGrantsData(result.data);
       setTotalCount(result.count);
@@ -212,7 +212,7 @@ export default function GrantsPage() {
                 <TableRow key={grant.id}>
 {selectedColumns.includes("grantor") && grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
   <TableCell style={styles.tableCell}>
-    <Link href={`/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}>
+    <Link href={`/admin/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}>
       {grant.representativeGrant[0].representative.grantor.organization.name}
     </Link>
   </TableCell>

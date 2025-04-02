@@ -59,7 +59,7 @@ export default function DonationsList() {
 
   const fetchDonationsData = async () => {
     try {
-      const response = await fetch("/api/donations", {
+      const response = await fetch("/api/admin/donations", {
         method: "GET",
       });
 
@@ -96,7 +96,7 @@ export default function DonationsList() {
                 return (
                   <TableRow hover key={donation.id}>
                     <TableCell sx={styles.tableCell}>
-                      <Link className="text-blue-500" href={`/donations/detail/${donation.id}`}>
+                      <Link className="text-blue-500" href={`/admin/donations/detail/${donation.id}`}>
                         {donation.type}
                       </Link>
                     </TableCell>

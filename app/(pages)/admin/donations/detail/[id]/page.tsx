@@ -63,7 +63,7 @@ export default function DonationDetail() {
 
   const fetchDonation = async () => {
     try {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/${id}`, {
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/${id}`, {
         method: "GET",
       });
 
@@ -259,8 +259,8 @@ export default function DonationDetail() {
           <DetailFooter
             id={id}
             name={"donation"}
-            href={"/donations"}
-            apiUrl={"/donations"}
+            href={"/admin/donations"}
+            apiUrl={"/admin/donations"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}
             errors={errors}

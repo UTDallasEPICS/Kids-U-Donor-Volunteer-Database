@@ -29,7 +29,7 @@ const GrantDetailPage = () => {
   useEffect(() => {
     const fetchGrantDetails = async () => {
       try {
-        const response = await fetch(`/api/grants/${id}/get`);
+        const response = await fetch(`/api/admin/grants/${id}/get`);
         const result = await response.json();
         setGrantDetails(result.data);
         setLoading(false);
@@ -60,7 +60,7 @@ const GrantDetailPage = () => {
       //  updatedData: grantDetails,
       //});
       //console.log("Updated grant details:", response.data);
-      const response = await fetch(`/api/grants/${id}/patch`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(grantDetails) });
+      const response = await fetch(`/api/admin/grants/${id}/patch`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(grantDetails) });
       const result = await response.json();
       setGrantDetails(result.data);
       console.log(result.data)
@@ -133,9 +133,9 @@ const GrantDetailPage = () => {
     <Box>
       <Box>
         <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
+          <Link href={"/admin/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
           <Typography>Grants</Typography>
-          <Link href={"/grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
+          <Link href={"/admin/grants"} style={{ textDecoration: 'underline', }}>Grant List</Link>
           <Typography>Grant Details</Typography>
         </Breadcrumbs>
       </Box>

@@ -28,7 +28,7 @@ const GrantorDetailPage = () => {
     useEffect(() => {
         const fetchGrantorDetails = async () => {
             try {
-                const response = await fetch(`/api/grantors/${id}/get`);
+                const response = await fetch(`/api/admin/grantors/${id}/get`);
                 const result = await response.json();
                 setGrantorDetails(result.data);
                 console.log(result.data);
@@ -129,9 +129,9 @@ const GrantorDetailPage = () => {
         <Box>
             <Box>
                 <Breadcrumbs style={styles.breadcrumb}>
-                    <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
+                    <Link href={"/admin/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
                     <Typography>Grants</Typography>
-                    <Link href={"/grants"} style={{ textDecoration: 'underline', }}>Grantor List</Link>
+                    <Link href={"/admin/grants"} style={{ textDecoration: 'underline', }}>Grantor List</Link>
                     <Typography>Grantor Details</Typography>
                 </Breadcrumbs>
             </Box>

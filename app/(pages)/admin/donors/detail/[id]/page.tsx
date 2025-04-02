@@ -3,7 +3,7 @@ import { useParams, useRouter } from "next/navigation";
 import { Box, TextField, Typography } from "@mui/material";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { FormInputTextfield } from "../../../../components/form-components/form-input-textfield";
+import { FormInputTextfield } from "../../../../../components/form-components/form-input-textfield";
 import Loading from "@/app/loading";
 import { addressTypes, DonorFormProps, statesChoices } from "@/app/components/form-components/form-input-props";
 import { DonationTableState, DonorResponse } from "@/app/types/states";
@@ -55,7 +55,7 @@ export default function DonorDetail() {
 
   const fetchDonor = async () => {
     try {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donors/${id}`, {
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donors/${id}`, {
         method: "GET",
       });
 
@@ -306,8 +306,8 @@ export default function DonorDetail() {
           <DetailFooter
             id={id}
             name={"donor"}
-            href={"/donors"}
-            apiUrl={"/donors"}
+            href={"/admin/donors"}
+            apiUrl={"/admin/donors"}
             handleSubmit={handleSubmit}
             isDirty={isDirty}
             errors={errors}
