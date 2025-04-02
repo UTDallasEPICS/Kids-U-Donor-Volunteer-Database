@@ -9,7 +9,8 @@ import {
   Grantor as PGrantor,
   RepresentativeGrant as PRepresentativeGrant,
   Donor as PDonor,
-  Donation as PDonation
+  Donation as PDonation,
+  Volunteer as PVolunteer,
 } from "@prisma/client";
 
 //import { Donor, Address, Donation } from "@prisma/client";
@@ -21,19 +22,25 @@ export type Grant = PGrant & {
 
 export type GrantAttachment = PGrantAttachment & {
   grantor: Grantor;
-}
+};
 
 export type Grantor = PGrantor & {
   organization: Organization;
   representatives: Representative[];
 };
 
+export type Volunteer = PVolunteer;
+/*& {
+  volunteerAttendances: VolunteerAttendance[];
+  eventRegistrations: EventRegistration[];
+  mailRecipients: mailRecipients[];
+}*/
+
 export type Representative = PRepresentative & {
   person: Person;
   grantor: Grantor;
   representativeGrant: RepresentativeGrant[];
 };
-
 
 export type RepresentativeGrant = PRepresentativeGrant & {
   grant: Grant;
@@ -42,13 +49,13 @@ export type RepresentativeGrant = PRepresentativeGrant & {
 
 export type Donation = PDonation & {
   donor: Donor;
-}
+};
 
 export type Donor = PDonor & {
   donations: Donation[];
   person: Person;
   organization: Organization;
-}
+};
 
 export type Organization = POrganization & {
   grantor: Grantor;
@@ -65,9 +72,9 @@ export type Person = PPerson & {
 
 export type User = PUser & {
   person: Person;
-}
+};
 
 export type Address = PAddress & {
   person: Person;
   organization: Organization;
-}
+};
