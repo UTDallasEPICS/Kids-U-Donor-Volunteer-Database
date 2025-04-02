@@ -39,7 +39,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
     try {
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/anonymous`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/anonymous`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
     try {
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
         },
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donations/existing`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/existing`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
   };
 
   const handleCancel = () => {
-    router.push("/donations");
+    router.push("/admin/donations");
   };
 
   return (

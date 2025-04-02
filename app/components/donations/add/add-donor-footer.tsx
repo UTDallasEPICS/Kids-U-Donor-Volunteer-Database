@@ -42,7 +42,7 @@ export const AddDonorFooter = ({ handleSubmit, isDirty, errors }: FooterProps) =
       setIsButtonDisabled(true);
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/donors/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donors/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const AddDonorFooter = ({ handleSubmit, isDirty, errors }: FooterProps) =
   };
 
   const handleCancel = () => {
-    router.push("/donors");
+    router.push("/admin/donors");
   };
 
   return (
