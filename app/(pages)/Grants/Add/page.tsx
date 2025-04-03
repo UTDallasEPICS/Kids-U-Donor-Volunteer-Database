@@ -280,9 +280,7 @@ const GrantAddPage = () => {
             gap: 1,
             p: 4,
             mx: "auto",
-            mt: "10%",
-            maxHeight: "80vh", // Prevent overflow from the viewport
-            overflowY: "auto"
+            mt: "20%",
           }}
         >
           <Typography id="add-grantor-modal-title" variant="h6" component="h2">

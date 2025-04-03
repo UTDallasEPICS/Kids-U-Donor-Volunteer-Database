@@ -3,6 +3,23 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Route handlers are being used (Newer), not API Routes, so we have to use NextRequest/NextResponse
 
+// Create
+export async function POST(req: NextRequest) {
+  try {
+    const body = req.json();
+
+    return NextResponse.json(
+      {
+        message: "POST REQUEST",
+        receivedData: body,
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error("POST ERROR:", error);
+  }
+}
+
 // Read
 export async function GET(req: NextRequest) {
   //For pagination
@@ -72,24 +89,6 @@ export async function GET(req: NextRequest) {
           },
         };
         break;
-      case "email":
-        where.organization = {
-          contains: searchValueParam,
-          mode: "insensitive",
-        };
-        break;
-      case "phone":
-        where.organization = {
-          contains: searchValueParam,
-          mode: "insensitive",
-        };
-        break;
-      case "website":
-        where.organization = {
-          contains: searchValueParam,
-          mode: "insensitive",
-        };
-        break;
       default:
         break; // No filter
     }
@@ -118,27 +117,3 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ message: "Error fetching grants", error: error }, { status: 500 });
   }
 }
-
-/*export async function GET1(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = await params;
-  try {
-    const data = await prisma.grantor.findUnique({
-      where: {
-        id: id,
-      },
-      include: {
-        organization: {
-          include: {
-            address: true,
-          },
-        },
-      },
-    });
-    console.log(data);
-
-    return NextResponse.json({ data: data }, { status: 200 });
-  } catch (error) {
-    console.error("Error fetching grantor with ID: ", id);
-    return NextResponse.json({ message: "Grantor item not found" }, { status: 404 });
-  }
-}*/
