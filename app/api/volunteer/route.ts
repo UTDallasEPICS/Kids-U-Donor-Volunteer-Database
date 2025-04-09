@@ -30,6 +30,66 @@ export async function GET() {
   );
 }
 
-// Update
+// Update a volunteer
+export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const id = params.id;
+    const body = await req.json();
 
-// Delete
+    const updatedVolunteer = await prisma.volunteer.update({
+      where: { id },
+      data: body,
+    });
+
+    return NextResponse.json(
+        { message: 'Volunteer updated successfully', data: updatedVolunteer },
+        { status: 200 }
+    );
+  } catch (error) {
+    console.error('PUT ERROR:', error);
+
+    // @ts-ignore
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+          { error: 'Volunteer not found' },
+          { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+        { error: 'Failed to update volunteer' },
+        { status: 500 }
+    );
+  }
+}
+
+// Delete a volunteer
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const id = params.id;
+
+    await prisma.volunteer.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+        { message: 'Volunteer deleted successfully' },
+        { status: 200 }
+    );
+  } catch (error) {
+    console.error('DELETE ERROR:', error);
+
+    // @ts-ignore
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+          { error: 'Volunteer not found' },
+          { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+        { error: 'Failed to delete volunteer' },
+        { status: 500 }
+    );
+  }
+}

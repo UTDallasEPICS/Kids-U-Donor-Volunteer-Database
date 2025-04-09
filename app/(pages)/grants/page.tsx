@@ -100,7 +100,7 @@ export default function GrantsPage() {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") { //This ensures the code runs only in the browser
+    if (typeof window !== "undefined") {
       //sessionStorage for selected columns
       if (sessionStorage.getItem("page") !== "grantList") {
         sessionStorage.clear();
