@@ -1,6 +1,9 @@
 "use client"; // Add this line to mark the component as a Client Component
 
 import { useState, useEffect } from "react";
+interface volunteer{
+
+}
 
 const Breadcrumb = () => (
   <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
@@ -11,6 +14,8 @@ const Breadcrumb = () => (
     <span className="font-semibold text-gray-700">Checkin : Checkout</span>
   </div>
 );
+
+
 
 export default function Checkinout() {
   const [checkInTime, setCheckInTime] = useState<Date | null>(null);
@@ -33,6 +38,7 @@ export default function Checkinout() {
     console.log(checkInMessage);
   };
 
+
   // Handle automatic Check-Out
   const handleCheckOut = () => {
     if (checkInTime) {
@@ -48,6 +54,29 @@ export default function Checkinout() {
       } else {
         hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minute`;
       }
+      fetch('/api/volunteer/attendance/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hoursWorked: hours,
+          checkInTime: checkInTime,
+          checkOutTime: now,
+           volunteerId: "72ac21c4-2f07-4e64-a2a3-bb643308dec4",
+           eventId: "88da11a0-4d8f-4d99-b216-e99de0ea55dc"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          console.error("API Error:", data.details || data.error);
+        } else {
+          console.log("Success:", data);
+        }
+      })
+      .catch(err => {
+        console.error("Fetch Error:", err);
+      });
+      
 
       console.log(checkOutMessage);
       console.log(hoursMessage);
@@ -173,9 +202,8 @@ export default function Checkinout() {
       {/* Display message */}
       {message && (
         <div
-          className={`mt-4 p-4 border rounded-lg bg-green-100 text-green-700 transition-opacity duration-500 ${
-            visible ? "opacity-100" : "opacity-0"
-          }`}
+          className={`mt-4 p-4 border rounded-lg bg-green-100 text-green-700 transition-opacity duration-500 ${visible ? "opacity-100" : "opacity-0"
+            }`}
         >
           {message.split("\n").map((msg, index) => (
             <p key={index}>{msg}</p>
