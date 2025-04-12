@@ -1,5 +1,6 @@
-
 "use client";
+import Table from "../volunteers/check_in_out/table/page";
+
 export default function VolunteersPage() {
   const Header = () => (
     <div className="flex justify-between items-center mb-5">
@@ -27,8 +28,7 @@ export default function VolunteersPage() {
     <div className={"flex font-sans"}>
       <div className="flex-grow p-5">
         <Header />
-        page
-        {/* <SearchBar /> */}
+        <Table />
       </div>
     </div>
   );
