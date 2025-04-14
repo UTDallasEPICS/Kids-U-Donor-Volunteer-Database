@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Volunteer } from "@/prisma";
+import type { Volunteer } from "../../../../prisma";
 import {
   Box,
   TextField,
