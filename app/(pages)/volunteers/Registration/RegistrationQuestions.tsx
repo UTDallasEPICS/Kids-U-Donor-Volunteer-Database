@@ -1,9 +1,62 @@
-import React from "react";
 
-const RegistrationQuestions = () => {
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
+interface RegistrationQuestionsProps {
+  eventId: string;
+  volunteerId: string;
+}
+
+const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, volunteerId }) => {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setError("");
+
+    const formData = new FormData(event.currentTarget);
+    const data = {
+      eventId: eventId,
+      eventGroup: "individual",
+      date: new Date(),
+      referrelSource: formData.get("referrelSource") || "",
+      reasonForVolunteering: formData.get("reasonForVolunteering") || "",
+      eSignature: formData.get("eSignature") || "",
+      volunteerId: volunteerId,
+    };
+
+    try {
+      const response = await fetch("/api/event-registration/post", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to register for event");
+      }
+
+      // Registration successful
+      router.push("/volunteers/Registration?success=true");
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const Form = () => (
     <div className="space-y-6">
-      <form className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="w-full border-t-4 border-[#1F2839] my-4"></div>
         <h2 className="font-bold text-xl">Event Form</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2">
@@ -452,16 +505,19 @@ const RegistrationQuestions = () => {
             type="submit"
             id="submit"
             name="submit"
-            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1"
-          ></input>
+            value={isSubmitting ? "Registering..." : "Submit Registration"}
+            disabled={isSubmitting}
+            className="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md cursor-pointer transition-all duration-200 focus:ring-offset-1 disabled:bg-gray-400"
+          />
         </div>
+        {error && <div className="text-red-500 text-center">{error}</div>}
       </form>
     </div>
   );
 
   return (
     <div>
-      <Form></Form>
+      <Form />
     </div>
   );
 };

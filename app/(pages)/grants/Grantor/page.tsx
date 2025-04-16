@@ -61,7 +61,7 @@ export default function GrantorsPage() {
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch(`/api/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/Grantors/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
       const result = await response.json();
       setGrantorsData(result.data);
       setTotalCount(result.count);

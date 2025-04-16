@@ -1,9 +1,7 @@
 "use client"; // Add this line to mark the component as a Client Component
 
 import { useState, useEffect } from "react";
-interface volunteer{
-
-}
+interface volunteer {}
 
 const Breadcrumb = () => (
   <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
@@ -15,12 +13,13 @@ const Breadcrumb = () => (
   </div>
 );
 
-
-
 export default function Checkinout() {
   const [checkInTime, setCheckInTime] = useState<Date | null>(null);
   const [message, setMessage] = useState<string>("");
   const [visible, setVisible] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [currentEvent, setCurrentEvent] = useState<any>(null);
+  const volunteerId = "8bf18571-0f32-4a6a-a71b-e267e650dcc2"; // Hardcoded volunteer ID
 
   // Manual entry state for Column 2
   const [manualCheckInDate, setManualCheckInDate] = useState<string>("");
@@ -28,93 +27,151 @@ export default function Checkinout() {
   const [manualCheckOutDate, setManualCheckOutDate] = useState<string>("");
   const [manualCheckOutTime, setManualCheckOutTime] = useState<string>("");
 
+  const showMessage = (msg: string, isError: boolean = false) => {
+    setMessage(msg);
+    setVisible(true);
+    if (isError) console.error(msg);
+    else console.log(msg);
+  };
+
+  const calculateHoursWorked = (checkIn: Date, checkOut: Date) => {
+    const timeDiff = checkOut.getTime() - checkIn.getTime();
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    return {
+      hoursWorked: hours,
+      displayHours: hours,
+      displayMinutes: minutes,
+    };
+  };
+
+  // Fetch current event on component mount
+  useEffect(() => {
+    const fetchCurrentEvent = async () => {
+      try {
+        const response = await fetch('/api/events/get');
+        if (response.ok) {
+          const events = await response.json();
+          // Get the most recent event (assuming events are ordered by schedule desc)
+          const latestEvent = events[0];
+          if (latestEvent) {
+            setCurrentEvent(latestEvent);
+          }
+        }
+      } catch (error) {
+        showMessage("Failed to fetch current event", true);
+      }
+    };
+
+    fetchCurrentEvent();
+  }, []);
+
   // Handle automatic Check-In
   const handleCheckIn = () => {
     const now = new Date();
     setCheckInTime(now);
     const checkInMessage = `Check-In Time: ${now.toLocaleTimeString()}`;
-    setMessage(checkInMessage);
-    setVisible(true);
-    console.log(checkInMessage);
+    showMessage(checkInMessage);
   };
 
-
   // Handle automatic Check-Out
-  const handleCheckOut = () => {
-    if (checkInTime) {
-      const now = new Date();
-      const checkOutMessage = `Check-Out Time: ${now.toLocaleTimeString()}`;
+  const handleCheckOut = async () => {
+    if (isSubmitting || !checkInTime) {
+      showMessage("Please check in first.", true);
+      return;
+    }
 
-      const timeDiff = now.getTime() - checkInTime.getTime();
-      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-      let hoursMessage = "";
-      if (minutes != 1) {
-        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minutes`;
-      } else {
-        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minute`;
-      }
-      fetch('/api/volunteer/attendance/post', {
+    if (!currentEvent) {
+      showMessage("No active event found. Please try again.", true);
+      return;
+    }
+
+    setIsSubmitting(true);
+    const now = new Date();
+    const { hoursWorked, displayHours, displayMinutes } = calculateHoursWorked(checkInTime, now);
+
+    try {
+      const response = await fetch('/api/volunteer/attendance/post', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          hoursWorked: hours,
-          checkInTime: checkInTime,
-          checkOutTime: now,
-           volunteerId: "72ac21c4-2f07-4e64-a2a3-bb643308dec4",
-           eventId: "88da11a0-4d8f-4d99-b216-e99de0ea55dc"
+          hoursWorked,
+          checkInTime: checkInTime.toISOString(),
+          checkOutTime: now.toISOString(),
+          eventId: currentEvent.id,
+          volunteerId
         })
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) {
-          console.error("API Error:", data.details || data.error);
-        } else {
-          console.log("Success:", data);
-        }
-      })
-      .catch(err => {
-        console.error("Fetch Error:", err);
       });
-      
 
-      console.log(checkOutMessage);
-      console.log(hoursMessage);
-      setMessage(`${checkOutMessage}\n${hoursMessage}`);
-      setVisible(true);
-      setCheckInTime(null);
-    } else {
-      const errorMessage = "Please check in first.";
-      console.log(errorMessage);
-      setMessage(errorMessage);
-      setVisible(true);
+      if (!response.ok) {
+        const errorData = await response.json();
+        showMessage(`API Error: ${errorData.details || errorData.error}`, true);
+      } else {
+        const successData = await response.json();
+        showMessage(`Check-Out Time: ${now.toLocaleTimeString()}\nHours Volunteered: ${displayHours} hours and ${displayMinutes} minutes`);
+        setCheckInTime(null);
+      }
+    } catch (err) {
+      showMessage(`Fetch Error: ${err}`, true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   // Handle manual hours calculation
-  const handleManualHours = () => {
+  const handleManualHours = async () => {
+    if (isSubmitting) return;
+
+    if (!manualCheckInDate || !manualCheckInTime || !manualCheckOutDate || !manualCheckOutTime) {
+      showMessage("Please fill in all date and time fields.", true);
+      return;
+    }
+
+    if (!currentEvent) {
+      showMessage("No active event found. Please try again.", true);
+      return;
+    }
+
     const checkIn = new Date(`${manualCheckInDate}T${manualCheckInTime}`);
     const checkOut = new Date(`${manualCheckOutDate}T${manualCheckOutTime}`);
 
-    if (checkIn && checkOut && checkOut > checkIn) {
-      const timeDiff = checkOut.getTime() - checkIn.getTime();
-      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-      let hoursMessage = "";
-      if (minutes != 1) {
-        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minutes`;
-      } else {
-        hoursMessage = `Hours Volunteered: ${hours} hours and ${minutes} minute`;
-      }
+    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) {
+      showMessage("Invalid date or time format.", true);
+      return;
+    }
 
-      setMessage(hoursMessage);
-      setVisible(true);
-      console.log(hoursMessage);
-    } else {
-      const errorMessage = "Invalid dates or times entered.";
-      setMessage(errorMessage);
-      setVisible(true);
-      console.log(errorMessage);
+    if (checkIn >= checkOut) {
+      showMessage("Check-out time must be after check-in time.", true);
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { hoursWorked, displayHours, displayMinutes } = calculateHoursWorked(checkIn, checkOut);
+
+    try {
+      const response = await fetch('/api/volunteer/attendance/post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          hoursWorked,
+          checkInTime: checkIn.toISOString(),
+          checkOutTime: checkOut.toISOString(),
+          eventId: currentEvent.id,
+          volunteerId
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        showMessage(`API Error: ${errorData.details || errorData.error}`, true);
+      } else {
+        const successData = await response.json();
+        showMessage(`Hours Volunteered: ${displayHours} hours and ${displayMinutes} minutes`);
+      }
+    } catch (err) {
+      showMessage(`Fetch Error: ${err}`, true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

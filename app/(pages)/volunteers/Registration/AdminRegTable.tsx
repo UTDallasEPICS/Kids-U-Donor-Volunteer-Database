@@ -1,117 +1,163 @@
-// AdminRegTable.tsx
 "use client";
-import React, { useState } from "react";
-import { format } from "date-fns";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { format } from "date-fns";
+
+interface Volunteer {
+  id: string;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  phoneNumber?: string;
+}
+
+interface EventRegistration {
+  id: string;
+  eventGroup: string;
+  date: Date;
+  referrelSource: string;
+  reasonForVolunteering: string;
+  volunteer: Volunteer;
+}
 
 interface Event {
-  ID: number;
-  Name: string;
-  Date: Date;
-  Time: Date;
-  Description: string;
-  LocationID: number;
+  id: string;
+  name: string;
+  schedule: Date;
+  description: string;
+  locationId: string | null;
+  location?: {
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+  };
+  eventRegistrations: EventRegistration[];
 }
 
-interface TableProps {
-  data: Event[];
-}
+export const AdminRegTable = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
 
-export const AdminRegTable: React.FC<TableProps> = ({ data }) => {
-  const router = useRouter();
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
-  const [events, setEvents] = useState(
-    data.map((item) => ({
-      ID: item.ID,
-      Name: item.Name,
-      Date: item.Date,
-      Time: item.Time,
-      Description: item.Description,
-      LocationID: item.LocationID,
-    }))
-  );
-
-  const handleViewVolunteers = (curEvent: Record<string, any>) => {
-    // Create a query string from curEvent
-    const queryString = new URLSearchParams(curEvent).toString();
-    // Navigate to the desired path with the query string
-    router.push(`/volunteers/Registration/View_volunteers?${queryString}`);
+  const fetchEvents = async () => {
+    try {
+      const response = await fetch('/api/events/get');
+      if (!response.ok) {
+        throw new Error('Failed to fetch events');
+      }
+      const data = await response.json();
+      setEvents(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error fetching events');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleNavigation = (curEvent: Event) => {
-    router.push({
-      pathname: "/volunteers/Registration/View_volunteers",
-      query: { data: JSON.stringify(curEvent) },
-    } as any);
+  const handleRowClick = (eventId: string) => {
+    setExpandedEventId(expandedEventId === eventId ? null : eventId);
   };
 
-  const Breadcrumb = () => (
-    <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
-      <span className="hover:text-blue-500 cursor-pointer transition-colors duration-200">Home</span>
-      <span className="text-gray-400">/</span>
-      <span className="font-semibold text-gray-700">Registration</span>
-    </div>
-  );
+  if (loading) {
+    return <div className="text-center p-4">Loading events...</div>;
+  }
 
-  const Header = () => (
-    <div className="flex justify-between items-center mb-5">
-      <h1 className="text-2xl font-bold text-gray-800">Events</h1>
-      <div className="px-4 py-2 ml-2">
-        <Link href="/volunteers/Registration/New_event">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
-            Add A New Event
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
+  if (error) {
+    return <div className="text-red-600 p-4">{error}</div>;
+  }
 
   return (
-    <div>
-      <Breadcrumb />
-      <Header />
+    <div className="overflow-x-auto">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Events and Registrations</h2>
+        <Link
+          href="/volunteers/Registration/add-event"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Add New Event
+        </Link>
+      </div>
 
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse mb-5">
-          <thead>
-            <tr>
-              <th className="border border-gray-300 p-2 bg-gray-100">ID</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">Name</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">Date</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">Time</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">Description</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">LocationID</th>
-              <th className="border border-gray-300 p-2 bg-gray-100">Volunteers</th>
-              <th className="border border-gray-300 p-2 bg-gray-100"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {events.map((event, index) => (
-              <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                <td className="py-2 px-4 border-b">{event.ID}</td>
-                <td className="py-2 px-4 border-b">{event.Name}</td>
-                <td className="py-2 px-4 border-b">{format(event.Date, "yyyy-MM-dd")}</td>
-                <td className="py-2 px-4 border-b">{format(event.Time, "HH:mm:ss")}</td>
-                <td className="py-2 px-4 border-b">{event.Description}</td>
-                <td className="py-2 px-4 border-b">{event.LocationID}</td>
-                <td className="py-2 px-4 border-b">
-                  <button
-                    onClick={() => handleViewVolunteers(event)}
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                  >
-                    View
-                  </button>
+      <table className="min-w-full bg-white border border-gray-300">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="px-6 py-3 border-b text-left">Name</th>
+            <th className="px-6 py-3 border-b text-left">Date</th>
+            <th className="px-6 py-3 border-b text-left">Time</th>
+            <th className="px-6 py-3 border-b text-left">Location</th>
+            <th className="px-6 py-3 border-b text-left">Registrations</th>
+          </tr>
+        </thead>
+        <tbody>
+          {events.map((event) => (
+            <React.Fragment key={event.id}>
+              <tr 
+                onClick={() => handleRowClick(event.id)}
+                className="hover:bg-gray-50 cursor-pointer"
+              >
+                <td className="px-6 py-4 border-b">{event.name}</td>
+                <td className="px-6 py-4 border-b">
+                  {format(new Date(event.schedule), 'MMM dd, yyyy')}
                 </td>
-                <td className="py-2 px-4 border-b flex flex-col">
-                  <button className="text-blue-500 mb-2">Edit</button>
-                  <button className="text-red-500">Delete</button>
+                <td className="px-6 py-4 border-b">
+                  {format(new Date(event.schedule), 'h:mm a')}
+                </td>
+                <td className="px-6 py-4 border-b">
+                  {event.location ? `${event.location.name}, ${event.location.city}` : 'No location set'}
+                </td>
+                <td className="px-6 py-4 border-b">
+                  {event.eventRegistrations.length} volunteers
                 </td>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+              {expandedEventId === event.id && (
+                <tr>
+                  <td colSpan={5} className="px-6 py-4 bg-gray-50">
+                    <div className="border rounded-lg p-4">
+                      <h3 className="font-semibold mb-2">Registered Volunteers</h3>
+                      {event.eventRegistrations.length > 0 ? (
+                        <table className="min-w-full">
+                          <thead>
+                            <tr className="bg-gray-100">
+                              <th className="px-4 py-2 text-left">Name</th>
+                              <th className="px-4 py-2 text-left">Email</th>
+                              <th className="px-4 py-2 text-left">Phone</th>
+                              <th className="px-4 py-2 text-left">Group</th>
+                              <th className="px-4 py-2 text-left">Registration Date</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {event.eventRegistrations.map((registration) => (
+                              <tr key={registration.id} className="hover:bg-gray-100">
+                                <td className="px-4 py-2">
+                                  {registration.volunteer.firstName} {registration.volunteer.lastName}
+                                </td>
+                                <td className="px-4 py-2">{registration.volunteer.emailAddress}</td>
+                                <td className="px-4 py-2">{registration.volunteer.phoneNumber || 'N/A'}</td>
+                                <td className="px-4 py-2">{registration.eventGroup}</td>
+                                <td className="px-4 py-2">
+                                  {format(new Date(registration.date), 'MMM dd, yyyy')}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      ) : (
+                        <p className="text-gray-500">No volunteers registered for this event yet.</p>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };
