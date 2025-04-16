@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("PRISMA_DB_URL")
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -65,6 +65,8 @@ model Grantor {
   recognitionPreference       String
   internalRelationshipManager String
   organizationId              String           @unique
+  deletedAt                   DateTime?
+  status                      Boolean          @default(true)
   organization                Organization     @relation(fields: [organizationId], references: [id])
   representative              Representative[]
 }
@@ -214,8 +216,8 @@ model Event {
   name                 String
   schedule             DateTime
   description          String
-  locationId           String
-  location             Location              @relation(fields: [locationId], references: [id])
+  locationId           String?
+  location             Location?             @relation(fields: [locationId], references: [id])
   volunteerAttendances VolunteerAttendance[]
   eventRegistrations   EventRegistration[]
 }

@@ -4,7 +4,41 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest, res: NextResponse) {
   const body = await req.json();
 
+  const requiredFields = [
+    "name",
+    "status",
+    "amountRequested",
+    "amountAwarded",
+    "purpose",
+    "startDate",
+    "endDate",
+    "isMultipleYears",
+    "quarter",
+    "acknowledgementSent",
+    "fundingArea",
+    "proposalDueDate",
+    "applicationType",
+    "internalOwner",
+    "useArea",
+    "isEligibleForRenewal",
+  ];
+
+  const missingFields = requiredFields.filter((field) => !(field in body));
+
+  if (missingFields.length > 0) {
+    console.log("Missing fields:", missingFields);
+    return NextResponse.json({ message: "Missing required fields", missingFields }, { status: 400 });
+  }
+
   try {
+    // Ensure proper Date object conversion for DateTime fields
+    const startDate = new Date(body.startDate);
+    const endDate = new Date(body.endDate);
+    const awardNotificationDate = body.awardNotificationDate ? new Date(body.awardNotificationDate) : null;
+    const proposalDueDate = new Date(body.proposalDueDate);
+    const proposalSubmissionDate = body.proposalSubmissionDate ? new Date(body.proposalSubmissionDate) : null;
+    const renewalApplicationDate = body.renewalApplicationDate ? new Date(body.renewalApplicationDate) : null;
+
     const newGrant = await prisma.grant.create({
       data: {
         name: body.name,
@@ -12,52 +46,31 @@ export async function POST(req: NextRequest, res: NextResponse) {
         amountRequested: body.amountRequested,
         amountAwarded: body.amountAwarded,
         purpose: body.purpose,
-        startDate: body.startDate,
-        endDate: body.endDate,
+        startDate: startDate,
+        endDate: endDate,
         isMultipleYears: body.isMultipleYears,
         quarter: body.quarter,
         acknowledgementSent: body.acknowledgementSent,
-        awardNotificationDate: body.awardNotificationDate,
+        awardNotificationDate: awardNotificationDate,
         fundingArea: body.fundingArea,
-        proposalDueDate: body.proposalDueDate,
-        proposalSummary: body.proposalSummary,
-        proposalSubmissionDate: body.proposalSubmissionDate,
+        proposalDueDate: proposalDueDate,
+        proposalSummary: body.proposalSummary || null,
+        proposalSubmissionDate: proposalSubmissionDate,
         applicationType: body.applicationType,
         internalOwner: body.internalOwner,
-        fundingRestriction: body.fundingRestriction,
-        matchingRequirement: body.matchingRequirement,
+        fundingRestriction: body.fundingRestriction || null,
+        matchingRequirement: body.matchingRequirement || null,
         useArea: body.useArea,
         isEligibleForRenewal: body.isEligibleForRenewal,
-        renewalApplicationDate: body.renewalApplicationDate,
-        renewalAwardStatus: body.renewalAwardStatus,
+        renewalApplicationDate: renewalApplicationDate,
+        renewalAwardStatus: body.renewalAwardStatus || null,
       },
     });
 
     return NextResponse.json({ message: "POST REQUEST", grant: newGrant }, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ message: "Error creating grants", error: error }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error creating grant:", errorMessage); // Log the detailed error message
+    return NextResponse.json({ message: "Error creating grants", error: errorMessage }, { status: 500 });
   }
 }
-
-/*export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    const { title, description, amount } = req.body;
-
-    try {
-      const newGrant = await prisma.grant.create({
-        data: {
-          title,
-          description,
-          amount: parseFloat(amount), // Assuming amount is a number
-        },
-      });
-
-      res.status(200).json(newGrant);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to create grant' });
-    }
-  } else {
-    res.status(405).end(); // Method Not Allowed
-  }
-}
-*/
