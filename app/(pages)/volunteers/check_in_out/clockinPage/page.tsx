@@ -1,4 +1,4 @@
-"use client"; // Add this line to mark the component as a Client Component
+"use client"; 
 
 import { useState, useEffect } from "react";
 interface volunteer {}
@@ -19,7 +19,7 @@ export default function Checkinout() {
   const [visible, setVisible] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
-  const volunteerId = "8bf18571-0f32-4a6a-a71b-e267e650dcc2"; // Hardcoded volunteer ID
+  const volunteerId = "8bf18571-0f32-4a6a-a71b-e267e650dcc2"; // Hardcoded volunteer ID add your own ID
 
   // Manual entry state for Column 2
   const [manualCheckInDate, setManualCheckInDate] = useState<string>("");
