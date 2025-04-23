@@ -1,5 +1,5 @@
 import React from "react";
-import { SecondarySideBar } from "@/app/components/SecondarySideBar";
+import { SecondarySideBar } from "../../../components/secondary-sidebar";
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
