@@ -163,32 +163,61 @@ model Donation {
   donor               Donor?   @relation(fields: [donorId], references: [id])
 }
 
-// Volunteer databse
 model Volunteer {
-  id                   String                @id @default(uuid())
-  ssn                  String                @unique
-  username             String
-  password             String
-  firstName            String
-  lastName             String
-  emailAddress         String                @unique
-  phoneNumber          String?               @unique
-  preferredName        String?
-  addressLine          String
-  city                 String
-  state                String
-  zipCode              String
-  usCitizen            Boolean
-  driversLicense       Boolean
-  reliableTransport    Boolean
-  speakSpanish         Boolean
-  emergencyContact     EmergencyContact?
-  referenceName        String
-  volunteerAttendances VolunteerAttendance[]
-  eventRegistrations   EventRegistration[]
-  mailRecipients       MailRecipient[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  id            String   @id @default(uuid())
+  dateSubmitted DateTime @default(now())
+
+  // Personal Info
+  firstName     String
+  middleInitial String?
+  lastName      String
+  addressLine   String
+  city          String
+  state         String
+  zipCode       String
+  phoneNumber   String
+  emailAddress  String
+
+  // Business or School Info
+  businessOrSchoolName String?
+
+  // Volunteer Preferences & Skills
+  volunteerPreference String   @default("No preference")
+  preferredRoles      String[]
+  availability        String[]
+  location            String[]
+  preferredEvents     String[]
+
+  // Compliance & Requirements
+  volunteerApplicationCompleted Boolean @default(false)
+  backgroundCheckCompleted      Boolean @default(false)
+  codeOfEthicsFormSigned        Boolean @default(false)
+  abuseNeglectReportFormSigned  Boolean @default(false)
+  personnelPoliciesFormSigned   Boolean @default(false)
+  orientationCompleted          Boolean @default(false)
+  trainingModulesCompleted      Boolean @default(false)
+
+  // Volunteer Events & Hours
+  volunteerEvents  Event[]
+  eventHoursLogged EventHour[]
+
+  // Relations
+  application         VolunteerApplication? @relation(fields: [applicationId], references: [id])
+  applicationId       String?
+  EmergencyContact    EmergencyContact?
+  VolunteerAttendance VolunteerAttendance[]
+  EventRegistration   EventRegistration[]
+  MailRecipient       MailRecipient[]
+}
+
+model EventHour {
+  id             String    @id @default(uuid())
+  volunteerId    String
+  eventId        String
+  loginTime      DateTime
+  logoutTime     DateTime
+  volunteer      Volunteer @relation(fields: [volunteerId], references: [id])
+  volunteerEvent Event     @relation(fields: [eventId], references: [id])
 }
 
 model EmergencyContact {
@@ -211,6 +240,52 @@ model VolunteerAttendance {
   event        Event     @relation(fields: [eventId], references: [id])
 }
 
+model VolunteerApplication {
+  id            String    @id @default(uuid())
+  createdAt     DateTime  @default(now())
+  dateSubmitted DateTime?
+
+  legalName      String
+  maidenName     String?
+  ssn            String
+  preferredName  String?
+  currentAddress String
+  phoneNumber    String
+  email          String
+
+  usCitizen      Boolean
+  driversLicense Boolean
+  ownCar         Boolean
+  speakSpanish   Boolean
+  otherLanguages String?
+
+  heardAbout String?
+
+  emergencyContactName  String
+  emergencyContactPhone String
+
+  professionalRefName  String
+  professionalRefPhone String
+
+  personalRefName  String
+  personalRefPhone String
+
+  educationLevel String
+  highSchoolName String?
+  collegeName    String?
+  degreeObtained String?
+
+  additionalInfo1       String?
+  additionalInfo2       String?
+  arrestedOrConvicted   Boolean
+  convictionExplanation String?
+
+  agreedToTerms Boolean
+  eSignature    String
+
+  volunteer Volunteer[]
+}
+
 model Event {
   id                   String                @id @default(uuid())
   name                 String
@@ -220,6 +295,9 @@ model Event {
   location             Location?             @relation(fields: [locationId], references: [id])
   volunteerAttendances VolunteerAttendance[]
   eventRegistrations   EventRegistration[]
+  Volunteer            Volunteer?            @relation(fields: [volunteerId], references: [id])
+  volunteerId          String?
+  EventHour            EventHour[]
 }
 
 model EventRegistration {
