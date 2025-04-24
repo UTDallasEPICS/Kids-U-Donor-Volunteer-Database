@@ -236,7 +236,7 @@ model EventRegistration {
 }
 
 model Location {
-  id           String  @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   address      String
   city         String
@@ -247,6 +247,17 @@ model Location {
   hours        String
   events       Event[]
   admins       Admin[]
+  orientations Orientation[]
+}
+
+model Orientation {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  schedule    DateTime
+  capacity    Int
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
 }
 
 model Admin {

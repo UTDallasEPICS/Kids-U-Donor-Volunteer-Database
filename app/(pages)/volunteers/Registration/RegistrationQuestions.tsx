@@ -39,6 +39,8 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
 
       if (!response.ok) {
         throw new Error("Failed to register for event");
+        console.error("Error:", response.statusText);
+        console.error(data);
       }
 
       // Registration successful

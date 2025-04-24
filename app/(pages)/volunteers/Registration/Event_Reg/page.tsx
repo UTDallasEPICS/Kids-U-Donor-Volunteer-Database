@@ -7,7 +7,7 @@ import { Event } from "@/app/types/event";
 export default function EventRegPage() {
   const searchParams = useSearchParams();
   const eventID = searchParams.get('eventID');
-  const VOLUNTEER_ID = "72ac21c4-2f07-4e64-a2a3-bb643308dec4"; // We'll keep this for now
+  const VOLUNTEER_ID = "72ac21c4-2f07-4e64-a2a3-bb643308dec4"; 
 
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
