@@ -34,7 +34,7 @@ export const VolRegTable: React.FC<TableProps> = ({ data }) => {
 
   const handleViewEvent = (id: number) => {
     // Navigate to the event details page with the id
-    router.push(`/volunteers/Registration/Event_Reg?eventID=${id}`);
+    router.push(`/Volunteers/Registration/Event_Reg?eventID=${id}`);
   };
 
   const Breadcrumb = () => (

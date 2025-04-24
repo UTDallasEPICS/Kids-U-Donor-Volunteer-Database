@@ -122,7 +122,7 @@ export default function AddEvent() {
         <Breadcrumb />
         <Header />
         <div className="px-4 py-2 ml-2">
-          <Link href="/volunteers/Registration/New_event/new_page">
+          <Link href="/Volunteers/Registration/New_event/new_page">
             {/* Link content */}
           </Link>
         </div>

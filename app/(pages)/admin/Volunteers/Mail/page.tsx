@@ -60,7 +60,7 @@ const Mail: React.FC = () => {
         Volunteer Mail Messages
       </h1>
       <div className="px-4 py-2 ml-2">
-        <Link href="/volunteers/Mail/NewMail">
+        <Link href="/Volunteers/Mail/NewMail">
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
             Create New Mail Message
           </button>

@@ -1,0 +1,18 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Next.js: Debug Server",
+        "type": "node-terminal",
+        "request": "launch",
+        "command": "npm run dev",
+        "cwd": "${workspaceFolder}",
+        "console": "integratedTerminal",
+        "serverReadyAction": {
+          "pattern": "started server on .*, url: (https?://.+)",
+          "uriFormat": "%s",
+          "action": "debugWithChrome"
+        }
+      }
+    ]
+  }
