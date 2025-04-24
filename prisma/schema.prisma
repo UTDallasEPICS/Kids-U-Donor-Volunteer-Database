@@ -34,10 +34,15 @@ model Organization {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  role     Role
-  personId String? @unique
-  person   Person? @relation(fields: [personId], references: [id])
+  id            String    @id @default(uuid())
+  role          Role
+  personId      String?   @unique
+  person        Person?   @relation(fields: [personId], references: [id])
+  email         String    @unique
+  password      String
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 //Volunteer profile and Admin profile
