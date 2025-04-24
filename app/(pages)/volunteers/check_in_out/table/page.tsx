@@ -1,4 +1,3 @@
-
 "use client";
 import * as React from "react";
 import Table from "@mui/material/Table";
@@ -10,7 +9,8 @@ import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-interface EventItem{
+
+interface EventItem {
   id: string;
   name: string;
   schedule: string;
@@ -27,16 +27,20 @@ export default function BasicTable() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const router = useRouter();
-  const formatDate = (dateString:string) => {
+
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US');
   }
-  const formatTime = (dateString:string) => {
+
+  const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US');
   }
-  
-   
+
+  const handleClick = (eventId: string) => {
+    router.push(`/volunteers/check_in_out/clockinPage?eventId=${eventId}`);
+  };
 
   useEffect(() => {
     fetch("/api/events/get")
@@ -55,36 +59,37 @@ export default function BasicTable() {
   if (error) return <p>Error loading data</p>;
   if (!items.length) return <p>No events available</p>;
 
-  const handleClick = () => {
-    router.push("/volunteers/check_in_out/clockinPage");
-  };
- 
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="simple table">
         <TableHead>
-          <TableRow >
+          <TableRow>
             <TableCell sx={{ fontWeight: '600' }}>Event Name</TableCell>
-            <TableCell sx={{ fontWeight: '600' }}align="right">Date</TableCell>
-            <TableCell sx={{ fontWeight: '600' }}align="right">Time</TableCell>
-            <TableCell sx={{ fontWeight: '600' }}align="right">Location</TableCell>
-            <TableCell sx={{ fontWeight: '600' }}align="right">Clock-in/Clock-out</TableCell>
+            <TableCell sx={{ fontWeight: '600' }} align="right">Date</TableCell>
+            <TableCell sx={{ fontWeight: '600' }} align="right">Time</TableCell>
+            <TableCell sx={{ fontWeight: '600' }} align="right">Location</TableCell>
+            <TableCell sx={{ fontWeight: '600' }} align="right">Clock-in/Clock-out</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {items.map((item) => (
             <TableRow
-              key={item.id} 
+              key={item.id}
               sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
             >
               <TableCell component="th" scope="row">
-                {item.name} 
+                {item.name}
               </TableCell>
               <TableCell align="right">{formatDate(item.schedule)}</TableCell>
               <TableCell align="right">{formatTime(item.schedule)}</TableCell>
-              <TableCell align="right">{item.location.address} , {item.location.city} {item.location.state}, {item.location.zipCode}</TableCell>
-              <TableCell align="right" >
-                <button className="bg-[#0d1a2d] text-white px-4 py-2 rounded-lg"onClick={handleClick}>Clock-in</button>
+              <TableCell align="right">{item.location.address}, {item.location.city} {item.location.state}, {item.location.zipCode}</TableCell>
+              <TableCell align="right">
+                <button 
+                  className="bg-[#0d1a2d] text-white px-4 py-2 rounded-lg"
+                  onClick={() => handleClick(item.id)}
+                >
+                  Clock-in
+                </button>
               </TableCell>
             </TableRow>
           ))}

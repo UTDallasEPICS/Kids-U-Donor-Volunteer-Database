@@ -61,7 +61,11 @@ export default function GrantorsPage() {
 
   const fetchGrantsData = async () => {
     try {
+<<<<<<< HEAD:app/(pages)/admin/grants/grantor/page.tsx
       const response = await fetch(`/api/admin/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+=======
+      const response = await fetch(`/api/Grantors/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+>>>>>>> clockin-Akshaya:app/(pages)/grants/Grantor/page.tsx
       const result = await response.json();
       setGrantorsData(result.data);
       setTotalCount(result.count);
