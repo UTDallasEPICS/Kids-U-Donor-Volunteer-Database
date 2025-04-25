@@ -47,7 +47,7 @@ export const AdminRegTable = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/admin/events/get');
+      const response = await fetch('/api/events/get');
       if (!response.ok) {
         throw new Error('Failed to fetch events');
       }
