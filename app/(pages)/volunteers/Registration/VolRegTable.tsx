@@ -42,14 +42,10 @@ export const VolRegTable = () => {
       });
   }, []);
 
-<<<<<<< HEAD:app/(pages)/admin/Volunteers/Registration/VolRegTable.tsx
-  const handleViewEvent = (id: number) => {
-    // Navigate to the event details page with the id
-    router.push(`/Volunteers/Registration/Event_Reg?eventID=${id}`);
-=======
+
   const handleViewEvent = (id: string) => {
     router.push(`/volunteers/Registration/Event_Reg?eventID=${id}`);
->>>>>>> clockin-Akshaya:app/(pages)/volunteers/Registration/VolRegTable.tsx
+ 
   };
 
   const Breadcrumb = () => (

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
-import { AdminRegTable } from "../../Registration/AdminRegTable";
+import { AdminRegTable } from "./components/view_registrations/AdminRegTable";
+import { useRouter } from "next/navigation";
 
 export default function EventsOverviewPage() {
   const Breadcrumb = () => (

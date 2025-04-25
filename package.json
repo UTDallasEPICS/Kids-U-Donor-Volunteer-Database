@@ -10,14 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-<<<<<<< Updated upstream
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.1.10",
-    "@mui/material": "^6.4.9",
-    "@mui/x-charts": "^7.23.0",
-    "@mui/x-date-pickers": "^7.19.0",
-=======
+
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.10",
@@ -25,17 +18,13 @@
     "@mui/x-charts": "^6.19.4",
     "@mui/x-date-pickers": "^6.19.4",
     "@next-auth/prisma-adapter": "^1.0.7",
->>>>>>> Stashed changes
+
     "@opentelemetry/api": "^1.9.0",
     "@prisma/client": "^5.22.0",
     "@types/node": "20.6.5",
     "@types/react": "18.2.22",
-<<<<<<< Updated upstream
-    "axios": "^1.8.4",
-=======
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
->>>>>>> Stashed changes
     "connect": "^3.7.0",
     "cookie": "^0.7.1",
     "csv-parse": "^5.6.0",

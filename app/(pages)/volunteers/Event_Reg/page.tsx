@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import RegistrationQuestions from "../RegistrationQuestions";
+import RegistrationQuestions from "../Registration/registration_form/RegistrationQuestions";
 import { useEffect, useState } from "react";
 import { Event } from "@/app/types/event";
 

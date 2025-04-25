@@ -1,5 +1,5 @@
 
-import OrientationList from "../../../components/orientation/OrientationList";
+import OrientationList from "@/app/components/orientation/OrientationList";
 export default function OrientationPage() {
   return (
     <main className="max-w-4xl mx-auto mt-8">

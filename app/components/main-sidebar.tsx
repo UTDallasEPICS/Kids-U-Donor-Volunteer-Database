@@ -12,7 +12,7 @@ const MainSidebarItems: ListItem[] = [
   { name: "Constituents", reference: "/admin" },
   { name: "Donations", reference: "/admin/donations" },
   { name: "Grants", reference: "/admin/grants" },
-  { name: "Volunteers", reference: "/admin/volunteers" },
+  { name: "Volunteers", reference: "/admin/volunteer" },
 ];
 
 export default function MainSidebar() {

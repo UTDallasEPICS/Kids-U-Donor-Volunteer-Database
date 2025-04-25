@@ -81,7 +81,7 @@ export default function AddEvent() {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const response = await fetch("/api/locations/post", {
+      const response = await fetch("/api/admin/locations/post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -112,7 +112,7 @@ export default function AddEvent() {
     setIsSubmitting(true);
     setError("");
     try {
-      const response = await fetch("/api/events/post", {
+      const response = await fetch("/api/admin/events/post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

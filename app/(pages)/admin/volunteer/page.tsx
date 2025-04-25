@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import type { Volunteer } from "../../../../prisma";
+import type { Volunteer } from "../../../prisma";
 import {
   Box,
   TextField,
@@ -25,7 +25,7 @@ import {
   ListItemText,
   SelectChangeEvent,
 } from "@mui/material"
-import Grid from "@mui/material/Grid2";
+import Grid from "@mui/material/Grid";
 import Link from "next/link"
 
 const columns = [

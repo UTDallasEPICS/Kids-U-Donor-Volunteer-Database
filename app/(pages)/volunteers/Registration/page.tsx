@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import { VolRegTable } from "./VolRegTable";
-import { AdminRegTable } from "./AdminRegTable";
-import RegistrationQuestions from "./RegistrationQuestions";
+import { AdminRegTable } from "../../admin/events/overview/components/view_registrations/AdminRegTable";
+import RegistrationQuestions from "./registration_form/RegistrationQuestions";
 
 export default function Registration() {
   //test user object

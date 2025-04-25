@@ -45,34 +45,9 @@ export const AdminRegTable = () => {
     fetchEvents();
   }, []);
 
-<<<<<<< HEAD:app/(pages)/admin/Volunteers/Registration/AdminRegTable.tsx
-  const [events, setEvents] = useState(
-    data.map((item) => ({
-      ID: item.ID,
-      Name: item.Name,
-      Date: item.Date,
-      Time: item.Time,
-      Description: item.Description,
-      LocationID: item.LocationID,
-    }))
-  );
-
-  const handleViewVolunteers = (curEvent: Record<string, any>) => {
-    // Create a query string from curEvent
-    const queryString = new URLSearchParams(curEvent).toString();
-    // Navigate to the desired path with the query string
-    router.push(`/Volunteers/Registration/View_volunteers?${queryString}`);
-  };
-
-  const handleNavigation = (curEvent: Event) => {
-    router.push({
-      pathname: "/Volunteers/Registration/View_volunteers",
-      query: { data: JSON.stringify(curEvent) },
-    } as any);
-=======
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/events/get');
+      const response = await fetch('/api/admin/events/get');
       if (!response.ok) {
         throw new Error('Failed to fetch events');
       }
@@ -87,14 +62,12 @@ export const AdminRegTable = () => {
 
   const handleRowClick = (eventId: string) => {
     setExpandedEventId(expandedEventId === eventId ? null : eventId);
->>>>>>> clockin-Akshaya:app/(pages)/volunteers/Registration/AdminRegTable.tsx
   };
 
   if (loading) {
     return <div className="text-center p-4">Loading events...</div>;
   }
 
-<<<<<<< HEAD:app/(pages)/admin/Volunteers/Registration/AdminRegTable.tsx
   const Header = () => (
     <div className="flex justify-between items-center mb-5">
       <h1 className="text-2xl font-bold text-gray-800">Events</h1>
@@ -107,11 +80,9 @@ export const AdminRegTable = () => {
       </div>
     </div>
   );
-=======
   if (error) {
     return <div className="text-red-600 p-4">{error}</div>;
   }
->>>>>>> clockin-Akshaya:app/(pages)/volunteers/Registration/AdminRegTable.tsx
 
   return (
     <div className="overflow-x-auto">
