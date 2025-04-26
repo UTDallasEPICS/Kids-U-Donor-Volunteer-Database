@@ -16,9 +16,11 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
    
         <MainSidebar
           items={[
-            { name: "Register For Event", reference: "/volunteers/registration" },
-            { name: "Mail", reference: "/volunteers/mail" },
-            { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
+            { name: "Dashboard", reference: "./" },
+            { name: "Donations", reference: "./donations" },
+            { name: "Donors", reference: "./donors" },
+            { name: "Grants", reference: "./grants" },
+            { name: "Volunteers", reference: "./volunteer" },
           ]}
         />
 
