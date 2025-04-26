@@ -8,7 +8,6 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
         items={[
           { name: "Volunteers List", reference: "./volunteer" },
           { name: "Mail", reference: "/volunteers/Mail" },
-          { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
           { name: "Add Orientation", reference: "./orientations/add_orientation" },
           { name: "View Orientations", reference: "./orientations/view_orientations" },
           { name: "Add Event", reference: "./events/add-event" },

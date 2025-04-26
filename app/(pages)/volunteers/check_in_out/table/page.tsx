@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import * as React from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -10,16 +11,17 @@ import Paper from "@mui/material/Paper";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
+// Updated EventItem type with optional location
 interface EventItem {
   id: string;
   name: string;
   schedule: string;
   location: {
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-  }
+    address?: string;  // Optional properties to handle cases where location might be missing
+    city?: string;
+    state?: string;
+    zipCode?: string;
+  } | null;  // location can also be null
 }
 
 export default function BasicTable() {
@@ -31,12 +33,12 @@ export default function BasicTable() {
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US');
-  }
+  };
 
   const formatTime = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleTimeString('en-US');
-  }
+  };
 
   const handleClick = (eventId: string) => {
     router.push(`/volunteers/check_in_out/clockinPage?eventId=${eventId}`);
@@ -82,9 +84,15 @@ export default function BasicTable() {
               </TableCell>
               <TableCell align="right">{formatDate(item.schedule)}</TableCell>
               <TableCell align="right">{formatTime(item.schedule)}</TableCell>
-              <TableCell align="right">{item.location.address}, {item.location.city} {item.location.state}, {item.location.zipCode}</TableCell>
               <TableCell align="right">
-                <button 
+                {item.location ? (
+                  `${item.location.address ?? 'N/A'}, ${item.location.city ?? 'N/A'} ${item.location.state ?? 'N/A'}, ${item.location.zipCode ?? 'N/A'}`
+                ) : (
+                  'No location available'
+                )}
+              </TableCell>
+              <TableCell align="right">
+                <button
                   className="bg-[#0d1a2d] text-white px-4 py-2 rounded-lg"
                   onClick={() => handleClick(item.id)}
                 >
