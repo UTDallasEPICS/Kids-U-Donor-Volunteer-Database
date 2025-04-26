@@ -7,7 +7,6 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
       <SecondarySideBar
         items={[
           { name: "Volunteers List", reference: "./volunteer" },
-          { name: "Mail", reference: "/volunteers/Mail" },
           { name: "Add Orientation", reference: "./orientations/add_orientation" },
           { name: "View Orientations", reference: "./orientations/view_orientations" },
           { name: "Add Event", reference: "./events/add-event" },

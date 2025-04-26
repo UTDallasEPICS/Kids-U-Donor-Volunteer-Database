@@ -2,7 +2,7 @@
 
 import React from "react";
 import MainSidebar from "@/app/components/main-sidebar";
-import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar";
+import TopNavigationBar from "@/app/components/admin-top-navigation-bar";
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
