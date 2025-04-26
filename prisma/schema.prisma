@@ -172,6 +172,8 @@ model Volunteer {
   id            String   @id @default(uuid())
   dateSubmitted DateTime @default(now())
 
+  registration Boolean @default(false)
+
   // Personal Info
   firstName     String
   middleInitial String?
@@ -287,6 +289,8 @@ model VolunteerApplication {
 
   agreedToTerms Boolean
   eSignature    String
+
+  accepted Boolean @default(false)
 
   volunteer Volunteer[]
 }
