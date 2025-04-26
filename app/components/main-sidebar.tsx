@@ -2,25 +2,30 @@ import React from "react";
 import { List, ListItem, Link } from "@mui/material";
 import NextLink from "next/link";
 
-type ListItem = {
+type SidebarItem = {
   name: string;
   reference: string;
 };
 
-const MainSidebarItems: ListItem[] = [
-  { name: "Dashboard", reference: "/admin" },
-  { name: "Constituents", reference: "/admin" },
-  { name: "Donations", reference: "/admin/donations" },
-  { name: "Grants", reference: "/admin/grants" },
-  { name: "Volunteers", reference: "/admin/Volunteers" },
-];
+type MainSidebarProps = {
+  items: SidebarItem[];
+};
 
-export default function MainSidebar() {
+export default function MainSidebar({ items }: MainSidebarProps) {
+  if (!items || !Array.isArray(items)) {
+    return <div>No sidebar items</div>;
+  }
+
   return (
     <List sx={styles.container}>
-      {MainSidebarItems.map((item, index) => (
+      {items.map((item, index) => (
         <ListItem sx={{ px: 0.5 }} key={index}>
-          <Link sx={styles.button} href={item.reference} component={NextLink} underline="none">
+          <Link
+            sx={styles.button}
+            href={item.reference}
+            component={NextLink}
+            underline="none"
+          >
             {item.name}
           </Link>
         </ListItem>

@@ -34,10 +34,15 @@ model Organization {
 }
 
 model User {
-  id       String  @id @default(uuid())
-  role     Role
-  personId String? @unique
-  person   Person? @relation(fields: [personId], references: [id])
+  id            String    @id @default(uuid())
+  role          Role
+  personId      String?   @unique
+  person        Person?   @relation(fields: [personId], references: [id])
+  email         String    @unique
+  password      String
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 }
 
 //Volunteer profile and Admin profile
@@ -318,7 +323,7 @@ model EventRegistration {
 }
 
 model Location {
-  id           String  @id @default(uuid())
+  id           String        @id @default(uuid())
   name         String
   address      String
   city         String
@@ -329,6 +334,17 @@ model Location {
   hours        String
   events       Event[]
   admins       Admin[]
+  orientations Orientation[]
+}
+
+model Orientation {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  schedule    DateTime
+  capacity    Int
+  locationId  String
+  location    Location @relation(fields: [locationId], references: [id])
 }
 
 model Admin {

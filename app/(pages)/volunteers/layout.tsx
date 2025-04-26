@@ -1,20 +1,52 @@
 import React from "react";
-import { SecondarySideBar } from "@/app/components/secondary-sidebar";
+import MainSidebar from "@/app/components/main-sidebar";
+import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar"; 
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
+    <div className="flex flex-col">
+  
+      <div className="w-full">
+        <TopNavigationBar />
+      </div>
     <div className="flex">
-      <SecondarySideBar
+      <MainSidebar
         items={[
-          { name: "Volunteers Overview", reference: "/volunteers" },
-          { name: "Events Overview", reference: "/volunteers/events/overview" },
-          { name: "Register For Event", reference: "/volunteers/events" },
-          { name: "Add New Event", reference: "/volunteers/Registration/add-event" },
-          { name: "Mail", reference: "/volunteers/Mail" },
+
+          { name: "Register For Event", reference: "/volunteers/registration" },
+          { name: "Mail", reference: "/volunteers/mail" },
           { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
         ]}
       />
       <div className="flex-grow">{children}</div>
     </div>
+    </div>
   );
 }
+{/*import React from "react";
+import MainSidebar from "@/app/components/main-sidebar";
+import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar"; 
+
+export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col">
+  
+      <div className="w-full">
+        <TopNavigationBar />
+      </div>
+
+      <div className="flex">
+        <MainSidebar
+          items={[
+            { name: "Register For Event", reference: "/volunteers/registration" },
+            { name: "Mail", reference: "/volunteers/mail" },
+            { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
+          ]}
+        />
+        <div className="flex-grow">{children}</div>
+      </div>
+    </div>
+  );
+}
+
+ */}
