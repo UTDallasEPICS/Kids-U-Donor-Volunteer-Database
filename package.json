@@ -2,22 +2,20 @@
   "name": "next-js-template",
   "version": "0.1.0",
   "private": true,
- "scripts": {
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-
-    "@emotion/react": "^11.11.3",
-    "@emotion/styled": "^11.11.0",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
     "@mui/icons-material": "^5.15.10",
-    "@mui/material": "^5.15.10",
+    "@mui/material": "^5.17.1",
     "@mui/x-charts": "^6.19.4",
     "@mui/x-date-pickers": "^6.19.4",
     "@next-auth/prisma-adapter": "^1.0.7",
-
     "@opentelemetry/api": "^1.9.0",
     "@prisma/client": "^5.22.0",
     "@types/node": "20.6.5",
@@ -50,5 +48,24 @@
     "postcss": "^8.4.40",
     "prisma": "^5.22.0",
     "tailwindcss": "^3.4.7"
-  }
+  },
+  "description": "<!-- markdownlint-disable-next-line MD033 --> <details open><summary><h2>Table of Contents</h2></summary>",
+  "main": "next.config.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/UTDallasEPICS/Kids-U-Donor-Volunteer-Database.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/UTDallasEPICS/Kids-U-Donor-Volunteer-Database/issues"
+  },
+  "homepage": "https://github.com/UTDallasEPICS/Kids-U-Donor-Volunteer-Database#readme",
+  "eslintIgnore": [
+  "scripts/"
+  ]
 }

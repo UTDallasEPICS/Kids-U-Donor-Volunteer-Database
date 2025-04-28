@@ -1,10 +1,14 @@
 "use client";
 import * as React from "react";
+import { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
+import {Checkbox, TextField, Button } from "@mui/material";
 import Typography from "@mui/material/Typography";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { PieChart } from "@mui/x-charts/PieChart";
 import LinearProgress from "@mui/material/LinearProgress/LinearProgress";
+import IconButton from '@mui/material/IconButton';
+
 
 const theme = createTheme({
   palette: {
@@ -29,7 +33,133 @@ const theme = createTheme({
   },
 });
 
+
+function TasksBox() {
+  const [tasks, setTasks] = useState([
+    { id: 1, text: "Follow up with grant applicants.", done: false },
+    // ...other initial tasks
+  ]);
+  const [newTask, setNewTask] = useState("");
+
+  const handleAddTask = () => {
+    if (newTask.trim()) {
+      setTasks([...tasks, { id: Date.now(), text: newTask, done: false }]);
+      setNewTask("");
+    }
+  };
+
+  const handleToggle = (id: number) => {
+    setTasks(tasks.map(task =>
+      task.id === id ? { ...task, done: !task.done } : task
+    ));
+  };
+
+  const handleDelete = (id: number) => {
+    setTasks(tasks.filter(task => task.id !== id));
+  };
+
+  return (
+    <Box>
+      <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 2 }}>
+            Tasks
+          </Typography>
+      <Box>
+      <TextField
+          value={newTask}
+          onChange={e => setNewTask(e.target.value)}
+          placeholder="Add a task"
+          size="small"
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              handleAddTask();
+            }
+          }}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              '& fieldset': {
+                borderColor: '#08111f', // default border color
+              },
+              '&:hover fieldset': {
+                borderColor: '#2d4e8a', // border color on hover
+              },
+              '&.Mui-focused fieldset': {
+                borderColor: '#08111f', // border color when focused
+              },
+            },
+          }}
+        />
+        <Button
+          onClick={handleAddTask}
+          variant="contained"
+          sx={{
+            backgroundColor: "#08111f",
+            color: "#fff",
+            borderRadius: "16px",
+            textTransform: "none",
+            marginLeft: 1,
+            "&:hover": {
+              backgroundColor: "#112244", // optional: darker on hover
+            },
+          }}
+          >Add</Button>
+      </Box>
+      {tasks.map(task => (
+          <Box key={task.id} display="flex" alignItems="center" mb={1}>
+            <Checkbox checked={task.done} onChange={() => handleToggle(task.id)}
+            sx={{
+              '&.Mui-checked': {
+                color: "#08111f", // checked color 
+              },
+            }}
+           />
+            <Typography
+              variant="body1"
+              sx={{ textDecoration: task.done ? "line-through" : "none" }}
+            >
+              {task.text}
+            </Typography>
+            <IconButton
+              onClick={() => handleDelete(task.id)}
+              size="small"
+              sx={{
+                color: '#08111f',
+                marginLeft: 'auto',
+                borderRadius: '50%',
+              }}
+              aria-label="delete"
+            >
+              <span style={{ fontSize: 18, fontWeight: 'bold', lineHeight: 1 }}>-</span>
+            </IconButton>
+          </Box>
+      ))}
+    </Box>
+  );
+}
+
 export default function Home() {
+  const [totalVolunteers, setTotalVolunteers] = React.useState<number | null>(null);
+    React.useEffect(() => {
+      fetch('/api/dashboard/box1')
+        .then(res => res.json())
+        .then(data => setTotalVolunteers(data.total))
+        .catch(() => setTotalVolunteers(null));
+    }, []);
+    const [totalDonors, setTotalDonors] = React.useState<number | null>(null);
+    React.useEffect(() => {
+      fetch('/api/dashboard/box2')
+        .then(res => res.json())
+        .then(data => setTotalDonors(data.total))
+        .catch(() => setTotalDonors(null));
+    }, []);
+    const [totalGrants, setTotalGrants] = React.useState<number | null>(null);
+    React.useEffect(() => {
+      fetch('/api/dashboard/box2')
+        .then(res => res.json())
+        .then(data => setTotalGrants(data.total))
+        .catch(() => setTotalGrants(null));
+    }, []);
+
   return (
     <ThemeProvider theme={theme}>
       <Box>
@@ -47,7 +177,7 @@ export default function Home() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", padding: 2, color: "text.primary" }}>
-            250
+            {totalVolunteers !== null ? totalVolunteers : "-"}
           </Typography>
           <Typography variant="subtitle1" sx={{ paddingLeft: 2, color: "text.primary" }}>
             Total Volunteers
@@ -68,7 +198,7 @@ export default function Home() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", padding: 2, color: "text.primary" }}>
-            400
+            {totalDonors !== null ? totalDonors : "-"}
           </Typography>
           <Typography variant="subtitle1" sx={{ paddingLeft: 2, color: "text.primary" }}>
             Total Donors
@@ -89,7 +219,7 @@ export default function Home() {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: "bold", padding: 2, color: "text.primary" }}>
-            630
+            {totalGrants !== null ? totalGrants : "-"}
           </Typography>
           <Typography variant="subtitle1" sx={{ paddingLeft: 2, color: "text.primary" }}>
             Total Grants
@@ -179,11 +309,30 @@ export default function Home() {
             padding: 2,
           }}
         >
+          <TasksBox />
+        </Box>
+
+        {/*
+        <Box
+          sx={{
+            width: 360,
+            height: 489,
+            borderRadius: 0,
+            bgcolor: "#FFFFFF",
+            position: "absolute",
+            top: "60%",
+            left: "70%",
+            transform: "translate(10%, -38%)",
+            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
+            overflowY: "auto",
+            padding: 2,
+          }}
+        >
           <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 2 }}>
             Tasks
           </Typography>
           <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Random tasks */}
+            {/* Random tasks *
             <Typography variant="body1" sx={{ color: "text.primary" }}>
               - Follow up with grant applicants.
             </Typography>
@@ -222,6 +371,7 @@ export default function Home() {
             </Typography>
           </Box>
         </Box>
+        */}
 
         {/* Box 7: Key Metrics */}
         <Box
@@ -391,3 +541,4 @@ export default function Home() {
     </ThemeProvider>
   );
 }
+
