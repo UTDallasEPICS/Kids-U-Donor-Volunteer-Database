@@ -34,37 +34,65 @@ const theme = createTheme({
 });
 
 
-function TasksBox() {
-  const [tasks, setTasks] = useState([
-    { id: 1, text: "Follow up with grant applicants.", done: false },
-    // ...other initial tasks
-  ]);
-  const [newTask, setNewTask] = useState("");
 
-  const handleAddTask = () => {
+function TasksBox() {
+  type Task = {
+    id: number;
+    title: string;
+    completed: boolean;
+  };  
+  
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [newTask, setNewTask] = useState("");
+  // Fetch tasks from API on mount
+  useEffect(() => {
+    fetch('/api/tasks')
+      .then(res => res.json())
+      .then(data => setTasks(data))
+      .catch(err => console.error("Failed to fetch tasks:", err));
+  }, []);
+
+  const handleAddTask = async () => {
     if (newTask.trim()) {
-      setTasks([...tasks, { id: Date.now(), text: newTask, done: false }]);
+      const res = await fetch('/api/admin/tasks', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: newTask, completed: false })
+      });
+      const createdTask = await res.json();
+      console.log('Created task:', createdTask); 
+      setTasks([...tasks, createdTask]);
       setNewTask("");
     }
   };
 
-  const handleToggle = (id: number) => {
-    setTasks(tasks.map(task =>
-      task.id === id ? { ...task, done: !task.done } : task
-    ));
+  const handleToggle = async (id: any) => {
+    const task = tasks.find(t => t.id === id);
+    if (!task) {
+      // Optionally show a warning or just return
+      console.warn(`Task with id ${id} not found.`);
+      return;
+    }
+    const res = await fetch(`/api/tasks/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title: task.title, completed: !task.completed })
+    });
+    const updatedTask = await res.json();
+    setTasks(tasks.map(t => t.id === id ? updatedTask : t));
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: any) => {
+    await fetch(`/api/tasks/${id}`, { method: "DELETE" });
     setTasks(tasks.filter(task => task.id !== id));
   };
-
   return (
     <Box>
       <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 2 }}>
-            Tasks
-          </Typography>
+        Tasks
+      </Typography>
       <Box>
-      <TextField
+        <TextField
           value={newTask}
           onChange={e => setNewTask(e.target.value)}
           placeholder="Add a task"
@@ -77,20 +105,14 @@ function TasksBox() {
           }}
           sx={{
             '& .MuiOutlinedInput-root': {
-              '& fieldset': {
-                borderColor: '#08111f', // default border color
-              },
-              '&:hover fieldset': {
-                borderColor: '#2d4e8a', // border color on hover
-              },
-              '&.Mui-focused fieldset': {
-                borderColor: '#08111f', // border color when focused
-              },
+              '& fieldset': { borderColor: '#08111f' },
+              '&:hover fieldset': { borderColor: '#2d4e8a' },
+              '&.Mui-focused fieldset': { borderColor: '#08111f' },
             },
           }}
         />
         <Button
-          onClick={handleAddTask}
+          //onClick={handleAddTask}
           variant="contained"
           sx={{
             backgroundColor: "#08111f",
@@ -98,44 +120,38 @@ function TasksBox() {
             borderRadius: "16px",
             textTransform: "none",
             marginLeft: 1,
-            "&:hover": {
-              backgroundColor: "#112244", // optional: darker on hover
-            },
+            "&:hover": { backgroundColor: "#112244" },
           }}
-          >Add</Button>
+        >Add</Button>
       </Box>
       {tasks.map(task => (
-          <Box key={task.id} display="flex" alignItems="center" mb={1}>
-            <Checkbox checked={task.done} onChange={() => handleToggle(task.id)}
+        <Box key={task.id} display="flex" alignItems="center" mb={1}>
+          <Checkbox checked={task.completed} onChange={() => handleToggle(task.id)} />
+          <Typography
+            variant="body1"
+            sx={{ textDecoration: task.completed ? "line-through" : "none" }}
+          >
+            {task.title}
+          </Typography>
+          <IconButton
+            onClick={() => handleDelete(task.id)}
+            size="small"
             sx={{
-              '&.Mui-checked': {
-                color: "#08111f", // checked color 
-              },
+              color: '#08111f',
+              marginLeft: 'auto',
+              borderRadius: '50%',
             }}
-           />
-            <Typography
-              variant="body1"
-              sx={{ textDecoration: task.done ? "line-through" : "none" }}
-            >
-              {task.text}
-            </Typography>
-            <IconButton
-              onClick={() => handleDelete(task.id)}
-              size="small"
-              sx={{
-                color: '#08111f',
-                marginLeft: 'auto',
-                borderRadius: '50%',
-              }}
-              aria-label="delete"
-            >
-              <span style={{ fontSize: 18, fontWeight: 'bold', lineHeight: 1 }}>-</span>
-            </IconButton>
-          </Box>
+            aria-label="delete"
+          >
+            <span style={{ fontSize: 18, fontWeight: 'bold', lineHeight: 1 }}>×</span>
+          </IconButton>
+        </Box>
       ))}
     </Box>
   );
+
 }
+
 
 export default function Home() {
   const [totalVolunteers, setTotalVolunteers] = React.useState<number | null>(null);

@@ -46,9 +46,10 @@ model User {
 }
 
 model Task {
-  id        Int     @id @default(autoincrement())
+  id        Int      @id @default(autoincrement())
   title     String
   completed Boolean
+  createdAt DateTime @default(now())
 }
 
 //Volunteer profile and Admin profile
