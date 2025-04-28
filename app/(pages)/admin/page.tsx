@@ -112,7 +112,7 @@ function TasksBox() {
           }}
         />
         <Button
-          //onClick={handleAddTask}
+          onClick={handleAddTask}
           variant="contained"
           sx={{
             backgroundColor: "#08111f",
