@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { PieChart } from "@mui/x-charts/PieChart";
 import LinearProgress from "@mui/material/LinearProgress/LinearProgress";
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import IconButton from '@mui/material/IconButton';
 
 
@@ -46,7 +47,7 @@ function TasksBox() {
   const [newTask, setNewTask] = useState("");
   // Fetch tasks from API on mount
   useEffect(() => {
-    fetch('/api/admin/tasks')
+    fetch('/api/admin/dashboard/box6')
       .then(res => res.json())
       .then(data => setTasks(data))
       .catch(err => console.error("Failed to fetch tasks:", err));
@@ -54,7 +55,7 @@ function TasksBox() {
 
   const handleAddTask = async () => {
     if (newTask.trim()) {
-      const res = await fetch('/api/admin/tasks', {
+      const res = await fetch('/api/admin/dashboard/box6', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTask, completed: false })
@@ -73,7 +74,7 @@ function TasksBox() {
       console.warn(`Task with id ${id} not found.`);
       return;
     }
-    const res = await fetch(`/api/admin/tasks/${id}`, {
+    const res = await fetch(`/api/admin/dashboard/box6/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: task.title, completed: !task.completed })
@@ -83,7 +84,7 @@ function TasksBox() {
   };
 
   const handleDelete = async (id: any) => {
-    await fetch(`/api/admin/tasks/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/dashboard/box6/${id}`, { method: "DELETE" });
     setTasks(tasks.filter(task => task.id !== id));
   };
   return (
@@ -154,11 +155,8 @@ function TasksBox() {
 
 
 export default function Home() {
-  type Event = {
-    id: string;
-    name: string;
-    schedule: string;
-  };
+  
+  //for box 1
   const [totalVolunteers, setTotalVolunteers] = React.useState<number | null>(null);
     React.useEffect(() => {
       fetch('/api/admin/dashboard/box1')
@@ -166,6 +164,7 @@ export default function Home() {
         .then(data => setTotalVolunteers(data.total))
         .catch(() => setTotalVolunteers(null));
     }, []);
+    //for box 2
     const [totalDonors, setTotalDonors] = React.useState<number | null>(null);
     React.useEffect(() => {
       fetch('/api/admin/dashboard/box2')
@@ -173,6 +172,7 @@ export default function Home() {
         .then(data => setTotalDonors(data.total))
         .catch(() => setTotalDonors(null));
     }, []);
+    //for box 3
     const [totalGrants, setTotalGrants] = React.useState<number | null>(null);
     React.useEffect(() => {
       fetch('/api/admin/dashboard/box2')
@@ -180,6 +180,12 @@ export default function Home() {
         .then(data => setTotalGrants(data.total))
         .catch(() => setTotalGrants(null));
     }, []);
+    //for boxes 4 & 5
+    type Event = {
+      id: string;
+      name: string;
+      schedule: string;
+    };
     const [events, setEvents] = useState<Event[]>([]);
     useEffect(() => {
       fetch('/api/admin/dashboard/box4')
@@ -187,6 +193,32 @@ export default function Home() {
         .then(data => setEvents(data))
         .catch(() => setEvents([]));;
     }, []);
+    //for box 7
+    const [volunteerHours, setVolunteerHours] = React.useState<number | null>(null);
+    const [averageDonation, setAverageDonation] = React.useState<number | null>(null);
+    const [pendingGrants, setPendingGrants] = React.useState<number | null>(null);
+
+    React.useEffect(() => {
+      fetch('/api/admin/dashboard/box7/hours')
+        .then(res => res.json())
+        .then(data => setVolunteerHours(data.total))
+        .catch(() => setVolunteerHours(null));
+    }, []);
+
+    React.useEffect(() => {
+      fetch('/api/admin/dashboard/box7/donation')
+        .then(res => res.json())
+        .then(data => setAverageDonation(data.average))
+        .catch(() => setAverageDonation(null));
+    }, []);
+
+    React.useEffect(() => {
+      fetch('/api/admin/dashboard/box7/grants')
+        .then(res => res.json())
+        .then(data => setPendingGrants(data.total))
+        .catch(() => setPendingGrants(null));
+    }, []);
+
     
 
   return (
@@ -255,79 +287,11 @@ export default function Home() {
           </Typography>
         </Box>
 
-        {/* Box 4: Text for Upcoming Events
-        <Box
-          sx={{
-            width: 260,
-            height: 137,
-            bgcolor: "info.main",
-            position: "absolute",
-            top: "60%",
-            left: "70%",
-            transform: "translate(14%, -255%)",
-            padding: 2,
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "flex-start",
-            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 4 }}>
-            Upcoming Events
-          </Typography>
-          <Typography variant="body1" sx={{ color: "text.primary", lineHeight: 1.5 }}>
-            Community/guest speaker event
-          </Typography>
-        </Box>
-
-        {/* Box 5: Date or number of days left until event 
-
-        <Box
-          sx={{
-            width: 106,
-            height: 137,
-            bgcolor: "warning.main",
-            position: "absolute",
-            top: "60%",
-            left: "70%",
-            transform: "translate(275%, -255%)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
-            padding: 1,
-          }}
-        >
-          <Typography
-            variant="h5"
-            sx={{
-              color: "text.primary",
-              fontWeight: "bold",
-              textAlign: "center",
-            }}
-          >
-            In
-          </Typography>
-          <Typography
-            variant="h4"
-            sx={{
-              color: "text.primary",
-              fontWeight: "bold",
-              textAlign: "center",
-              marginTop: 1,
-            }}
-          >
-            5 Days
-          </Typography>
-        </Box> */}
-
         {/* Box 4: Upcoming Events */}
         <Box
           sx={{
-            width: 260,
-            height: 137,
+            width: 357,
+            minHeight: 137,
             bgcolor: "info.main",
             position: "absolute",
             top: "60%",
@@ -339,6 +303,7 @@ export default function Home() {
             justifyContent: "center",
             alignItems: "flex-start",
             boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
+            gap: 1,
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 1 }}>
@@ -349,59 +314,106 @@ export default function Home() {
               No upcoming events
             </Typography>
           ) : (
-            events.map((event, idx) => (
-              <Typography key={event.id} variant="body1" sx={{ color: "text.primary", lineHeight: 1.5 }}>
-                {event.name} {/* or event.title, adjust to your schema */}
-              </Typography>
-            ))
-          )}
-        </Box>
-
-        {/* Box 5: Days left until next event */}
-        <Box
-          sx={{
-            width: 106,
-            height: 137,
-            bgcolor: "warning.main",
-            position: "absolute",
-            top: "60%",
-            left: "70%",
-            transform: "translate(275%, -255%)",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
-            padding: 1,
-          }}
-        >
-          {events.length === 0 ? (
-            <>
-              <Typography variant="h5" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center" }}>
-                No
-              </Typography>
-              <Typography variant="h4" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center", marginTop: 1 }}>
-                Event
-              </Typography>
-            </>
-          ) : (
-            (() => {
-              const eventDate = new Date(events[0].schedule); 
+            events.map(event => {
+              const eventDate = new Date(event.schedule);
               const now = new Date();
               const daysLeft = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
               return (
-                <>
-                  <Typography variant="h5" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center" }}>
-                    In
+                <Box key={event.id} sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <Typography variant="body1" sx={{ color: "text.primary", fontWeight: "bold" }}>
+                    {event.name}
                   </Typography>
-                  <Typography variant="h4" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center", marginTop: 1 }}>
-                    {daysLeft} Days
+                  <Typography variant="body2" sx={{ color: "text.primary" }}>
+                    {daysLeft > 0 ? `In ${daysLeft} day${daysLeft > 1 ? "s" : ""}` : "Today"}
                   </Typography>
-                </>
+                </Box>
               );
-            })()
+            })
           )}
         </Box>
+
+      
+          {/* Box 5: Days Till Next Event */}
+        <Box
+            sx={{
+              width: 106,
+              height: 137,
+              bgcolor: "warning.main",
+              position: "absolute",
+              top: "60%",
+              left: "70%",
+              transform: "translate(275%, -255%)",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              //boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
+              padding: 1,
+              gap: 0.5,
+            }}
+          >
+            <CalendarTodayIcon sx={{ fontSize: 36, color: "text.primary", mb: 0.5 }} />
+            <Typography
+              variant="caption"
+              sx={{
+                color: "text.primary",
+                fontWeight: 500,
+                fontSize: 12,
+                textAlign: "center",
+                letterSpacing: 1,
+              }}
+            >
+              Next Event In:
+            </Typography>
+            {events.length === 0 ? (
+              <Typography
+                variant="h5"
+                sx={{
+                  color: "text.primary",
+                  fontWeight: "bold",
+                  textAlign: "center",
+                  mt: 1,
+                }}
+              >
+                --
+              </Typography>
+            ) : (
+              (() => {
+                const eventDate = new Date(events[0].schedule);
+                const now = new Date();
+                const daysLeft = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                return (
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      color: "text.primary",
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      mt: 1,
+                      fontSize: 36,
+                    }}
+                  >
+                    {daysLeft}
+                    <Typography
+                      component="span"
+                      variant="body2"
+                      sx={{
+                        color: "text.primary",
+                        fontWeight: "normal",
+                        fontSize: 14,
+                        ml: 0.5,
+                      }}
+                    >
+                      days
+                    </Typography>
+                  </Typography>
+                );
+              })()
+            )}
+          </Box>
+          
+
+
 
         {/* Box 6: Tasks */}
         <Box
@@ -421,9 +433,11 @@ export default function Home() {
         >
           <TasksBox />
         </Box>
+
+
         {/* Box 7: Key Metrics */}
         <Box
-          sx={{
+            sx={{
             width: 357,
             height: 333,
             bgcolor: "#FFFFFF",
@@ -447,7 +461,7 @@ export default function Home() {
               Volunteer Hours Logged
             </Typography>
             <Typography variant="h5" sx={{ color: "text.primary" }}>
-              1,200 hrs
+              {volunteerHours !== null ? `${volunteerHours} hrs` : "-"}
             </Typography>
           </Box>
 
@@ -456,7 +470,7 @@ export default function Home() {
               Average Donation Amount
             </Typography>
             <Typography variant="h5" sx={{ color: "text.primary" }}>
-              $50
+              {averageDonation !== null ? `$${averageDonation.toFixed(2)}` : "-"}
             </Typography>
           </Box>
 
@@ -465,10 +479,11 @@ export default function Home() {
               Pending Grant Applications
             </Typography>
             <Typography variant="h5" sx={{ color: "text.primary" }}>
-              15
+              {pendingGrants !== null ? pendingGrants : "-"}
             </Typography>
           </Box>
         </Box>
+
 
         {/* Box 8: Campaign Performance */}
         <Box
