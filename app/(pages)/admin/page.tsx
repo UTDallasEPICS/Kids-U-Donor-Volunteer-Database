@@ -73,7 +73,7 @@ function TasksBox() {
       console.warn(`Task with id ${id} not found.`);
       return;
     }
-    const res = await fetch(`/api/tasks/${id}`, {
+    const res = await fetch(`/api/admin/tasks/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: task.title, completed: !task.completed })
@@ -83,7 +83,7 @@ function TasksBox() {
   };
 
   const handleDelete = async (id: any) => {
-    await fetch(`/api/tasks/${id}`, { method: "DELETE" });
+    await fetch(`/api/admin/tasks/${id}`, { method: "DELETE" });
     setTasks(tasks.filter(task => task.id !== id));
   };
   return (
