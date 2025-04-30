@@ -46,7 +46,7 @@ function TasksBox() {
   const [newTask, setNewTask] = useState("");
   // Fetch tasks from API on mount
   useEffect(() => {
-    fetch('/api/tasks')
+    fetch('/api/admin/tasks')
       .then(res => res.json())
       .then(data => setTasks(data))
       .catch(err => console.error("Failed to fetch tasks:", err));
