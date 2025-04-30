@@ -16,6 +16,9 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
           { name: "Register For Event", reference: "/volunteers/registration" },
           { name: "Mail", reference: "/volunteers/mail" },
           { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
+          { name: "Apply", reference: "/volunteers/apply" },
+
+          
         ]}
       />
       <div className="flex-grow">{children}</div>

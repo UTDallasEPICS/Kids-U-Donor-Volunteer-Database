@@ -11,6 +11,8 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
           { name: "View Orientations", reference: "./orientations/view_orientations" },
           { name: "Add Event", reference: "./events/add-event" },
           { name: "View Registrations", reference: "./events/overview" },
+          { name: "View Applications", reference: "./volunteer/application" },
+
           
          
         ]}
