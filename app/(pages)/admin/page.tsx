@@ -127,7 +127,13 @@ function TasksBox() {
       </Box>
       {tasks.map(task => (
         <Box key={task.id} display="flex" alignItems="center" mb={1}>
-          <Checkbox checked={task.completed} onChange={() => handleToggle(task.id)} />
+          <Checkbox checked={task.completed} 
+          onChange={() => handleToggle(task.id)} 
+          sx={{ color: "#08111f",
+            '&.Mui-checked': {
+              color: "#08111f", 
+            }
+          }} />
           <Typography
             variant="body1"
             sx={{ textDecoration: task.completed ? "line-through" : "none" }}
