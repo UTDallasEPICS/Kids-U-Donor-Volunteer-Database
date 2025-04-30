@@ -218,7 +218,16 @@ export default function Home() {
         .then(data => setPendingGrants(data.total))
         .catch(() => setPendingGrants(null));
     }, []);
+    //for box8
+    const [fundraising, setFundraising] = React.useState<{ raised: number, goal: number } | null>(null);
 
+    React.useEffect(() => {
+      fetch('/api/admin/dashboard/box8')
+        .then(res => res.json())
+        .then(data => setFundraising(data))
+        .catch(() => setFundraising(null));
+    }, []);
+    
     
 
   return (
@@ -569,7 +578,7 @@ export default function Home() {
 
         {/* Box 9: Fundraising Progress */}
         <Box
-          sx={{
+            sx={{
             width: 735,
             height: 135,
             bgcolor: "#FFFFFF",
@@ -585,11 +594,13 @@ export default function Home() {
             Fundraising Progress
           </Typography>
           <Typography variant="body1" sx={{ color: "text.primary", marginBottom: 1 }}>
-            $2,000 raised out of $5,000 goal
+            {fundraising
+              ? `$${fundraising.raised.toLocaleString()} raised out of $${fundraising.goal.toLocaleString()} goal`
+              : "Loading..."}
           </Typography>
           <LinearProgress
             variant="determinate"
-            value={(2000 / 5000) * 100}
+            value={fundraising ? (fundraising.raised / fundraising.goal) * 100 : 0}
             sx={{
               height: 12,
               borderRadius: 6,
