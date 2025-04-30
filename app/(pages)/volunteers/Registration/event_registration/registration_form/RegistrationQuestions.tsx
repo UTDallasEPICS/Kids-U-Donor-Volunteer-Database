@@ -44,7 +44,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
       }
 
       // Registration successful
-      router.push("/volunteers/Registration?success=true");
+      router.push("/volunteers/registration?success=true");
     } catch (err) {
       if (err instanceof Error) {
         setError(err.message);
