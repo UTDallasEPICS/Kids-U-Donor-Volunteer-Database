@@ -154,27 +154,40 @@ function TasksBox() {
 
 
 export default function Home() {
+  type Event = {
+    id: string;
+    name: string;
+    schedule: string;
+  };
   const [totalVolunteers, setTotalVolunteers] = React.useState<number | null>(null);
     React.useEffect(() => {
-      fetch('/api/dashboard/box1')
+      fetch('/api/admin/dashboard/box1')
         .then(res => res.json())
         .then(data => setTotalVolunteers(data.total))
         .catch(() => setTotalVolunteers(null));
     }, []);
     const [totalDonors, setTotalDonors] = React.useState<number | null>(null);
     React.useEffect(() => {
-      fetch('/api/dashboard/box2')
+      fetch('/api/admin/dashboard/box2')
         .then(res => res.json())
         .then(data => setTotalDonors(data.total))
         .catch(() => setTotalDonors(null));
     }, []);
     const [totalGrants, setTotalGrants] = React.useState<number | null>(null);
     React.useEffect(() => {
-      fetch('/api/dashboard/box2')
+      fetch('/api/admin/dashboard/box2')
         .then(res => res.json())
         .then(data => setTotalGrants(data.total))
         .catch(() => setTotalGrants(null));
     }, []);
+    const [events, setEvents] = useState<Event[]>([]);
+    useEffect(() => {
+      fetch('/api/admin/dashboard/box4')
+        .then(res => res.json())
+        .then(data => setEvents(data))
+        .catch(() => setEvents([]));;
+    }, []);
+    
 
   return (
     <ThemeProvider theme={theme}>
@@ -242,7 +255,7 @@ export default function Home() {
           </Typography>
         </Box>
 
-        {/* Box 4: Text for Upcoming Events */}
+        {/* Box 4: Text for Upcoming Events
         <Box
           sx={{
             width: 260,
@@ -268,7 +281,8 @@ export default function Home() {
           </Typography>
         </Box>
 
-        {/* Box 5: Date or number of days left until event */}
+        {/* Box 5: Date or number of days left until event 
+
         <Box
           sx={{
             width: 106,
@@ -307,6 +321,86 @@ export default function Home() {
           >
             5 Days
           </Typography>
+        </Box> */}
+
+        {/* Box 4: Upcoming Events */}
+        <Box
+          sx={{
+            width: 260,
+            height: 137,
+            bgcolor: "info.main",
+            position: "absolute",
+            top: "60%",
+            left: "70%",
+            transform: "translate(14%, -255%)",
+            padding: 2,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "flex-start",
+            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
+          }}
+        >
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 1 }}>
+            Upcoming Events
+          </Typography>
+          {events.length === 0 ? (
+            <Typography variant="body1" sx={{ color: "text.primary" }}>
+              No upcoming events
+            </Typography>
+          ) : (
+            events.map((event, idx) => (
+              <Typography key={event.id} variant="body1" sx={{ color: "text.primary", lineHeight: 1.5 }}>
+                {event.name} {/* or event.title, adjust to your schema */}
+              </Typography>
+            ))
+          )}
+        </Box>
+
+        {/* Box 5: Days left until next event */}
+        <Box
+          sx={{
+            width: 106,
+            height: 137,
+            bgcolor: "warning.main",
+            position: "absolute",
+            top: "60%",
+            left: "70%",
+            transform: "translate(275%, -255%)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
+            padding: 1,
+          }}
+        >
+          {events.length === 0 ? (
+            <>
+              <Typography variant="h5" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center" }}>
+                No
+              </Typography>
+              <Typography variant="h4" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center", marginTop: 1 }}>
+                Event
+              </Typography>
+            </>
+          ) : (
+            (() => {
+              const eventDate = new Date(events[0].schedule); 
+              const now = new Date();
+              const daysLeft = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+              return (
+                <>
+                  <Typography variant="h5" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center" }}>
+                    In
+                  </Typography>
+                  <Typography variant="h4" sx={{ color: "text.primary", fontWeight: "bold", textAlign: "center", marginTop: 1 }}>
+                    {daysLeft} Days
+                  </Typography>
+                </>
+              );
+            })()
+          )}
         </Box>
 
         {/* Box 6: Tasks */}
@@ -327,68 +421,6 @@ export default function Home() {
         >
           <TasksBox />
         </Box>
-
-        {/*
-        <Box
-          sx={{
-            width: 360,
-            height: 489,
-            borderRadius: 0,
-            bgcolor: "#FFFFFF",
-            position: "absolute",
-            top: "60%",
-            left: "70%",
-            transform: "translate(10%, -38%)",
-            boxShadow: "5px 5px 15px rgba(0, 0, 0, 0.3)",
-            overflowY: "auto",
-            padding: 2,
-          }}
-        >
-          <Typography variant="h6" sx={{ fontWeight: "bold", color: "text.primary", marginBottom: 2 }}>
-            Tasks
-          </Typography>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-            {/* Random tasks *
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Follow up with grant applicants.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Schedule next volunteer meeting.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Send thank-you notes to donors.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Review upcoming event logistics.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Update the donor database.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Contact local businesses for potential sponsorships.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Create a flyer for the next charity drive.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Assign roles for the upcoming volunteer event.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Add recent donor contributions to the database.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Analyze volunteer participation trends over the last quarter.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Partner with other non-profits for collaborative events.
-            </Typography>
-            <Typography variant="body1" sx={{ color: "text.primary" }}>
-              - Post updates about ongoing campaigns on social media.
-            </Typography>
-          </Box>
-        </Box>
-        */}
-
         {/* Box 7: Key Metrics */}
         <Box
           sx={{
