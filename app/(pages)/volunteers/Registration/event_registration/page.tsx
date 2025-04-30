@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import RegistrationQuestions from "../registration/components/registration_form/RegistrationQuestions";
+import RegistrationQuestions from "./registration_form/RegistrationQuestions";
 import { useEffect, useState } from "react";
 import { Event } from "@/app/types/event";
 
@@ -22,7 +22,7 @@ export default function EventRegPage() {
       }
 
       try {
-        const response = await fetch(`/api/events/${eventID}/get`);
+        const response = await fetch(`/api/admin/events/${eventID}/get`);
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || "Failed to fetch event");

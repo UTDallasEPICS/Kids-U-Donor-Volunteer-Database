@@ -44,7 +44,7 @@ export const VolRegTable = () => {
 
 
   const handleViewEvent = (id: string) => {
-    router.push(`/volunteers/Registration/Event_Reg?eventID=${id}`);
+    router.push(`/volunteers/registration/event_registration?eventID=${id}`);
  
   };
 
