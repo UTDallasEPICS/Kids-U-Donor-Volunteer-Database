@@ -1,6 +1,52 @@
 # Functional Requirements
 
-## This semester (Fall 2024)
+## This semester (Spring 2025)
+
+### Admin Portal
+
+#### Dashboard Page
+- Allows admin to view and manage tasks (add, complete, delete).
+- Allows admin to see key information like the number of volunteers, donors, and upcoming events.
+- Allows admin to view a countdown for upcoming events.
+
+#### Donations Page
+- Allows admin to add donations
+- Records and displays donations
+- Allows admin to edit donations
+
+#### Donors Page
+- Allows admin to add donors
+- Records and displays donors
+- Allows admin to edit donors
+
+#### Grants Page
+- Allows admin to add grants
+- Records and displays grants
+- Allows admin to edit grants
+
+#### Grantors Page
+- Allows admin to add grantors
+- Records and displays grantors
+- Allows admin to edit grantors
+
+#### Volunteers Page
+- Records and displays volunteers
+- Allows admin to add and view orientations
+- Allows admin to add events and view event registrations
+- Allows admin to view volunteer applications and accept/reject
+
+### Volunteer Portal
+
+#### Event Registration Page
+- Allows volunteer to register for events
+
+#### Check-in/out page
+- Allows volunteer to check-in/out of events
+
+#### Application page
+- Allows user to apply to be a volunteer
+ 
+## Past semester (Fall 2024)
 
 ### Volunteer Module
 
