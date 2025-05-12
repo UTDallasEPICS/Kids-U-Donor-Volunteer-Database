@@ -1,101 +1,117 @@
-import prisma, { prismaSoftDelete } from "@/app/utils/db";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-// Read
 export async function GET(req: NextRequest) {
-  //For pagination
-  const pageParam = req.nextUrl.searchParams.get("page");
-  const rowsPerPageParam = req.nextUrl.searchParams.get("rowsPerPage");
-  const pageNum = pageParam ? parseInt(pageParam, 10) : 0;
-  const rowsPerPageNum = rowsPerPageParam ? parseInt(rowsPerPageParam, 10) : 5;
-  //For searching
-  const searchCriteriaParam = req.nextUrl.searchParams.get("searchCriteria") || "";
-  const searchValueParam = req.nextUrl.searchParams.get("searchValue") || "";
+  // Handle single grantor request
+  const id = req.nextUrl.searchParams.get("id");
+  if (id) {
+    try {
+      const grantor = await prisma.grantor.findUnique({
+        where: { id },
+        include: {
+          organization: {
+            include: { address: true },
+          },
+          representative: {
+            include: { person: true },
+          },
+        },
+      });
 
-  const where: any = {};
-  if (searchCriteriaParam && searchValueParam) {
-    // Dynamically build the filter based on the criteria and value
-    switch (searchCriteriaParam) {
+      if (!grantor) {
+        return NextResponse.json({ success: false, message: "Grantor not found" }, { status: 404 });
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: grantor,
+      });
+    } catch (error) {
+      console.error("Error fetching grantor:", error);
+      return NextResponse.json({ success: false, message: "Error fetching grantor" }, { status: 500 });
+    }
+  }
+
+  // Handle list request
+  const page = Number(req.nextUrl.searchParams.get("page")) || 0;
+  const rowsPerPage = Number(req.nextUrl.searchParams.get("rowsPerPage")) || 5;
+  const searchCriteria = req.nextUrl.searchParams.get("searchCriteria") || "";
+  const searchValue = req.nextUrl.searchParams.get("searchValue") || "";
+
+  const where: any = { deletedAt: null };
+
+  if (searchCriteria && searchValue) {
+    switch (searchCriteria) {
       case "name":
         where.organization = {
-          name: {
-            contains: searchValueParam,
-            mode: "insensitive",
-          },
+          name: { contains: searchValue, mode: "insensitive" },
         };
         break;
       case "type":
-        where.type = {
-          contains: searchValueParam,
-          mode: "insensitive",
-        };
+        where.type = { contains: searchValue, mode: "insensitive" };
         break;
       case "addressLine1":
         where.organization = {
           address: {
-            addressLine1: {
-              contains: searchValueParam,
-              mode: "insensitive",
-            },
+            addressLine1: { contains: searchValue, mode: "insensitive" },
           },
         };
         break;
       case "city":
         where.organization = {
           address: {
-            city: {
-              contains: searchValueParam,
-              mode: "insensitive",
-            },
+            city: { contains: searchValue, mode: "insensitive" },
           },
         };
         break;
       case "state":
         where.organization = {
           address: {
-            state: {
-              contains: searchValueParam,
-              mode: "insensitive",
-            },
+            state: { contains: searchValue, mode: "insensitive" },
           },
         };
         break;
       case "zipcode":
         where.organization = {
           address: {
-            zipCode: {
-              contains: searchValueParam,
-              mode: "insensitive",
-            },
+            zipCode: { contains: searchValue, mode: "insensitive" },
           },
         };
         break;
-      default:
-        break; // No filter
     }
   }
 
   try {
-    const data = await prisma.grantor.findMany({
-      skip: pageNum * rowsPerPageNum,
-      take: rowsPerPageNum,
-      where, // Applies search filters if any
-      include: {
-        organization: {
-          include: {
-            address: true,
+    const [data, count] = await Promise.all([
+      prisma.grantor.findMany({
+        skip: page * rowsPerPage,
+        take: rowsPerPage,
+        where,
+        include: {
+          organization: {
+            include: { address: true },
+          },
+          representative: {
+            include: { person: true },
           },
         },
+        orderBy: { id: "desc" },
+      }),
+      prisma.grantor.count({ where }),
+    ]);
+
+    return NextResponse.json({
+      success: true,
+      data,
+      pagination: {
+        total: count,
+        page,
+        pageSize: rowsPerPage,
+        totalPages: Math.ceil(count / rowsPerPage),
       },
     });
-    const count = await prisma.grantor.count({
-      where,
-    });
-
-    return NextResponse.json({ message: "GET REQUEST", data: data, count: count }, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Error fetching grants", error: error }, { status: 500 });
+    console.error("Error fetching grantors:", error);
+    return NextResponse.json({ success: false, message: "Error fetching grantors" }, { status: 500 });
   }
 }
