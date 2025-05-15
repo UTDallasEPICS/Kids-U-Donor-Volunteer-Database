@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
@@ -40,6 +41,11 @@ export const AdminRegTable = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
+  const [isSendingEmails, setIsSendingEmails] = useState(false);
+  const [emailStatus, setEmailStatus] = useState<{
+    message: string;
+    success: boolean;
+  } | null>(null);
 
   useEffect(() => {
     fetchEvents();
@@ -64,22 +70,45 @@ export const AdminRegTable = () => {
     setExpandedEventId(expandedEventId === eventId ? null : eventId);
   };
 
+  const sendReminderEmails = async () => {
+    setIsSendingEmails(true);
+    setEmailStatus(null);
+    
+    try {
+      // Update: Use the correct path to match your actual API route
+      const response = await fetch('/api/admin/emails', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
+        throw new Error(errorData.error || `Failed with status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      
+      setEmailStatus({
+        message: result.message || 'Emails sent successfully!',
+        success: true
+      });
+    } catch (err) {
+      console.error("Email sending error:", err);
+      setEmailStatus({
+        message: err instanceof Error ? err.message : 'Failed to send emails. Please try again later.',
+        success: false
+      });
+    } finally {
+      setIsSendingEmails(false);
+    }
+  };
+
   if (loading) {
     return <div className="text-center p-4">Loading events...</div>;
   }
 
-  const Header = () => (
-    <div className="flex justify-between items-center mb-5">
-      <h1 className="text-2xl font-bold text-gray-800">Events</h1>
-      <div className="px-4 py-2 ml-2">
-        <Link href="/Volunteers/Registration/New_event">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
-            Add A New Event
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
   if (error) {
     return <div className="text-red-600 p-4">{error}</div>;
   }
@@ -88,13 +117,34 @@ export const AdminRegTable = () => {
     <div className="overflow-x-auto">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Events and Registrations</h2>
-        <Link
-          href="/volunteers/Registration/add-event"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Add New Event
-        </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={sendReminderEmails}
+            disabled={isSendingEmails}
+            className={`px-4 py-2 rounded-md font-medium ${
+              isSendingEmails
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            {isSendingEmails ? 'Sending...' : 'Send Reminder for Latest Event'}
+          </button>
+          <Link
+            href="/volunteers/Registration/add-event"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Add New Event
+          </Link>
+        </div>
       </div>
+
+      {emailStatus && (
+        <div className={`mb-4 p-3 rounded-md ${
+          emailStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          {emailStatus.message}
+        </div>
+      )}
 
       <table className="min-w-full bg-white border border-gray-300">
         <thead>
