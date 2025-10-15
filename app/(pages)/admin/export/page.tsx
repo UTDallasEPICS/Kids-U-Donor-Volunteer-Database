@@ -62,18 +62,19 @@ export default function Export() {
         {/* Export Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
           
-          {/* Export Donations Card */}
+          {/* Export Grants Card */}
           <div className="bg-gray-50 p-6 rounded-lg flex flex-col items-center text-center">
-            <h2 className="text-xl font-semibold text-gray-700">Export Donations</h2>
-            <p className="text-gray-500 mt-2 mb-4 text-sm">Download a complete spreadsheet of all donation records in the database.</p>
+            <h2 className="text-xl font-semibold text-gray-700">Export Grants</h2>
+            <p className="text-gray-500 mt-2 mb-4 text-sm">Download a complete spreadsheet of all Grant records in the database.</p>
             <button
               type="button"
-              onClick={() => handleExport('donations')}
+              // edit this to certain key word of routing for each data type
+              onClick={() => handleExport('grants')}
               disabled={!!isExporting}
               className="w-full max-w-xs flex justify-center items-center gap-2 bg-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
                 <DownloadIcon />
-                {isExporting === 'donations' ? 'Exporting...' : 'Download Donations'}
+                {isExporting === 'grants' ? 'Exporting...' : 'Download Grants'}
             </button>
           </div>
 
