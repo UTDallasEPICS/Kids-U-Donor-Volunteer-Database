@@ -9,6 +9,7 @@ export default function GrantsLayout({ children }: { children: React.ReactNode }
           { name: "Grants List", reference: "/admin/grants" },
           { name: "Add a Grant", reference: "/admin/grants/add" },
           { name: "Grantor List", reference: "/admin/grants/grantor" },
+          { name: "Import", reference: "/admin/grants/import" },
         ]}
       />
       <div className="flex-grow">{children}</div>
