@@ -10,6 +10,7 @@ export default function DonationsLayout({ children }: { children: React.ReactNod
           { name: "Donors List", reference: "/admin/donors" },
           { name: "Add a Donation", reference: "/admin/donations/add" },
           { name: "Add a Donor", reference: "/admin/donors/add" },
+          { name: "Import", reference: "/admin/donors/import" },
         ]}
       />
       <div className="flex-grow">{children}</div>
