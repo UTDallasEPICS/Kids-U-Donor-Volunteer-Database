@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
-
-function escapeCsv(value: any) {
-	if (value === null || value === undefined) return "";
-	const s = String(value);
-	if (s.includes(",") || s.includes("\n") || s.includes('"')) {
-		return `"${s.replace(/"/g, '""')}"`;
-	}
-	return s;
-}
+import * as xlsx from 'xlsx';
 
 export async function GET(request: Request) {
 	try {
@@ -77,7 +69,8 @@ export async function GET(request: Request) {
 			"Thank you/Follow Up Sent?"
 		];
 
-		const rows = [headers.join(",")];
+		const rows: any[] = [];
+		rows.push(headers);
 
 		for (const d of donations) {
 			const donor = d.donor;
@@ -91,33 +84,43 @@ export async function GET(request: Request) {
 				"";
 
 			const row = [
-				escapeCsv(d.id),
-				escapeCsv(donor?.type ?? ""),
-				escapeCsv(person?.firstName ?? ""),
-				escapeCsv(person?.lastName ?? ""),
-				escapeCsv((person?.emailAddress ?? "") || (org?.emailAddress ?? "")),
-				escapeCsv(person?.phoneNumber ?? ""),
-				escapeCsv(addressLine1),
-				escapeCsv(donor?.communicationPreference ?? ""),
-				escapeCsv(org?.name ?? ""),
-				escapeCsv(d.amount),
-				escapeCsv(d.paymentMethod ?? ""),
-				escapeCsv(d.date?.toLocaleDateString() ?? ""),
-				escapeCsv(d.campaign ?? ""),
-				escapeCsv(d.recurringFrequency ?? ""),
-				escapeCsv(d.acknowledgementSent ? "Yes" : "No")
+				d.id,
+				donor?.type ?? "",
+				person?.firstName ?? "",
+				person?.lastName ?? "",
+				(person?.emailAddress ?? "") || (org?.emailAddress ?? ""),
+				person?.phoneNumber ?? "",
+				addressLine1,
+				donor?.communicationPreference ?? "",
+				org?.name ?? "",
+				d.amount,
+				d.paymentMethod ?? "",
+				d.date ? d.date.toLocaleDateString() : "",
+				d.campaign ?? "",
+				d.recurringFrequency ?? "",
+				d.acknowledgementSent ? "Yes" : "No",
 			];
 
-			rows.push(row.join(","));
+			rows.push(row);
 		}
 
-		const csv = rows.join("\n");
+		// Create worksheet and workbook using xlsx
+		const worksheet = xlsx.utils.aoa_to_sheet(rows);
+		const workbook = xlsx.utils.book_new();
+		xlsx.utils.book_append_sheet(workbook, worksheet, 'Donations');
 
-		return new NextResponse(csv, {
+		const wbOpts: xlsx.WritingOptions = { bookType: 'xlsx', type: 'array' };
+		const wbOut: any = xlsx.write(workbook, wbOpts); // ArrayBuffer-like (Uint8Array)
+
+		const filename = 'donations_export.xlsx';
+
+		// wbOut is an ArrayBuffer-like (Uint8Array); ensure we return an ArrayBuffer
+		const uint8 = typeof wbOut === 'object' && 'buffer' in wbOut ? wbOut : new Uint8Array(wbOut);
+		return new NextResponse(uint8.buffer, {
 			status: 200,
 			headers: {
-				"Content-Type": "text/csv; charset=utf-8",
-				"Content-Disposition": `attachment; filename="donations_export.csv"`,
+				'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				'Content-Disposition': `attachment; filename="${filename}"`,
 			},
 		});
 	} catch (err) {

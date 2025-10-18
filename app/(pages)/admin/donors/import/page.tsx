@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
+import convertExcelToCSV from '@/app/components/convertExcelToCSV';
 
 export default function Import() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -12,7 +13,7 @@ export default function Import() {
     const file = event.target.files?.[0] || null;
     if (file) {
       setSelectedFile(file);
-      setStatusMessage(''); 
+      setStatusMessage('');
     }
   };
 
@@ -20,7 +21,7 @@ export default function Import() {
   const handleAreaClick = () => {
     fileInputRef.current?.click();
   };
-   
+
   const handleUpload = async () => {
     if (!selectedFile) {
       setStatusMessage('Error: Please select a file first.');
@@ -31,16 +32,19 @@ export default function Import() {
     setStatusMessage('Uploading Excel file...');
 
     try {
-      const formData = new FormData();
-      // NOTE: The backend will expect a field named 'excel-file' 
-      // change name accordingly to what backend expects
-      formData.append("excel-file", selectedFile);
+      // Convert Excel -> CSV in the browser, then send CSV as 'csv' field
+      const csvText = await convertExcelToCSV(selectedFile);
+      const blob = new Blob([csvText], { type: 'text/csv' });
+      const csvFileName = selectedFile.name.replace(/\.(xlsx|xls)$/i, '.csv');
 
-      // *change endpoint here*
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/endpoint`;
+      const formData = new FormData();
+      // backend import route expects 'csv' field
+      formData.append('csv', new File([blob], csvFileName, { type: 'text/csv' }));
+
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/donations/import`;
 
       const response = await fetch(apiUrl, {
-        method: "POST",
+        method: 'POST',
         body: formData,
       });
 
@@ -60,7 +64,7 @@ export default function Import() {
 
       await response.json();
       setStatusMessage(`'${selectedFile.name}' was successfully processed and imported!`);
-      setSelectedFile(null); 
+      setSelectedFile(null);
 
     } catch (error: any) {
       setStatusMessage(`Error: ${error.message}`);
@@ -71,7 +75,7 @@ export default function Import() {
   };
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>) => {
-    event.preventDefault(); 
+    event.preventDefault();
     setIsDragging(true);
   };
 
@@ -88,7 +92,7 @@ export default function Import() {
       const allowedExtensions = ['.xlsx', '.xls'];
       const fileNameParts = file.name.split('.');
       const fileExtension = `.${fileNameParts[fileNameParts.length - 1]}`.toLowerCase();
-      
+
       const allowedMimeTypes = [
         'application/vnd.ms-excel',
         'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -112,12 +116,12 @@ export default function Import() {
       <line x1="12" y1="3" x2="12" y2="15" />
     </svg>
   );
-  
+
   // expected database fields for the user's reference
   const dbFields = [
-      "Donor Type", "Donor First Name", "Donor Last Name",	"Email Address",	"Contact Number",	"Mailing Address",	
-      "Preferred Contact Method",	"Company Name (if applicable)",	"Donation Amount", "Donation Method",
-      "Donation Date", "Campaign/Event Name",	"Donation Frequency",	" Thank you/Follow Up Sent? ",
+    "Donor Type", "Donor First Name", "Donor Last Name", "Email Address", "Contact Number", "Mailing Address",
+    "Preferred Contact Method", "Company Name (if applicable)", "Donation Amount", "Donation Method",
+    "Donation Date", "Campaign/Event Name", "Donation Frequency", " Thank you/Follow Up Sent? ",
   ];
 
   return (
@@ -167,23 +171,23 @@ export default function Import() {
             {isUploading ? 'Uploading...' : 'Import Now'}
           </button>
         </div>
-        
+
         {/* Status Message */}
         {statusMessage && (
-            <div className={`text-center text-sm p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                <p className="font-medium">{statusMessage}</p>
-            </div>
+          <div className={`text-center text-sm p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <p className="font-medium">{statusMessage}</p>
+          </div>
         )}
 
         {/* Database Fields Reference Section */}
-          <div className="pt-4 border-t">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel Columns</h2>
-            <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg">
-                <p className="mb-3">Ensure the first row of your Excel file contains columns matching these fields.</p>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
-                    {dbFields.map(field => <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">{field}</p>)}
-                </div>
+        <div className="pt-4 border-t">
+          <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel Columns</h2>
+          <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg">
+            <p className="mb-3">Ensure the first row of your Excel file contains columns matching these fields.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
+              {dbFields.map(field => <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">{field}</p>)}
             </div>
+          </div>
         </div>
       </div>
     </div>

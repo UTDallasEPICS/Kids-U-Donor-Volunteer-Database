@@ -1,7 +1,7 @@
 import * as xlsx from 'xlsx';
 import * as fs from 'fs';
 
-export function convertExcelToCsv (excelFilePath: string, csvFilePath: string): String | void {
+export function convertExcelToCsv (excelFilePath: string): String | void {
   try {
     // Read the Excel workbook
     const workbook = xlsx.readFile(excelFilePath);
@@ -14,9 +14,9 @@ export function convertExcelToCsv (excelFilePath: string, csvFilePath: string): 
     const csvData = xlsx.utils.sheet_to_csv(worksheet);
 
     // Write the CSV data to a file
-    fs.writeFileSync(csvFilePath, csvData);
+    fs.writeFileSync("./app/components/csv", csvData);
 
-    console.log(`Successfully converted ${excelFilePath} to ${csvFilePath}`);
+    console.log(`Successfully converted ${excelFilePath} to ./csv`);
   } catch (error) {
     console.error(`Error converting Excel to CSV: ${error}`);
   }

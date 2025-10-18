@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
+import convertExcelToCSV from '@/app/components/convertExcelToCSV';
 
 export default function Import() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -31,18 +32,13 @@ export default function Import() {
     setStatusMessage('Uploading Excel file...');
 
     try {
+      const csv = await convertExcelToCSV(selectedFile);
+
       const formData = new FormData();
-      // NOTE: The backend will expect a field named 'excel-file' 
-      // change name accordingly to what backend expects
-      formData.append("excel-file", selectedFile);
+      formData.append('csv', new Blob([csv], { type: 'text/csv' }), `${selectedFile.name.replace(/\..+$/, '')}.csv`);
 
-      // *change excel to csv endpoint here*
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/convert-excel`;
-
-      const response = await fetch(apiUrl, {
-        method: "POST",
-        body: formData,
-      });
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/grants/import`;
+      const response = await fetch(apiUrl, { method: 'POST', body: formData });
 
       //error handling
       if (!response.ok) {

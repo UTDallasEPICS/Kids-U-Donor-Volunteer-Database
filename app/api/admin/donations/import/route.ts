@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
 
           }
 
-        } else if (type == "Corporate" || type == "corporate" || type == "In-Kind" || type == "In-kind" || type == "in-kind" || type == "In Kind" || type == "In kind" || type == "in kind" ) {
+        } else if (type == "Corporate" || type == "corporate" || type == "In-Kind" || type == "In-kind" || type == "in-kind" || type == "In Kind" || type == "In kind" || type == "in kind") {
           let organization = null;
           if (orgName) {
             organization = await prisma.organization.findFirst({ where: { name: String(orgName) } }).catch(() => null);
@@ -166,12 +166,50 @@ export async function POST(req: NextRequest) {
               await prisma.address.update({ where: { id: existingAddr.id }, data: { addressLine1: String(mailingAddress) } }).catch(() => null);
             }
           }
+          // Ensure we also store a contact Person for organization-linked donors
+          let contactPerson = null;
+          if (personFirst || personLast || email) {
+            if (email) {
+              contactPerson = await prisma.person.findUnique({ where: { emailAddress: String(email) } }).catch(() => null);
+            }
+            if (!contactPerson && personFirst && personLast) {
+              contactPerson = await prisma.person.findFirst({ where: { firstName: String(personFirst), lastName: String(personLast) } }).catch(() => null);
+            }
+            if (!contactPerson) {
+              contactPerson = await prisma.person.create({
+                data: {
+                  firstName: personFirst ? String(personFirst) : (personLast ? String(personLast) : ""),
+                  lastName: personLast ? String(personLast) : (personFirst ? String(personFirst) : ""),
+                  emailAddress: email ? String(email) : `${(personFirst ?? "").toString().replace(/\s+/g, '')}.${(personLast ?? "").toString().replace(/\s+/g, '')}@temp.com`,
+                  phoneNumber: phone ? String(phone) : undefined,
+                },
+              }).catch(() => null);
+              if (contactPerson) summary.peopleCreated += 1;
+            }
+
+            // Attach mailing address to the contact person if provided and missing
+            if (contactPerson && mailingAddress) {
+              const existingPersonAddr = await prisma.address.findUnique({ where: { personId: contactPerson.id } }).catch(() => null);
+              if (!existingPersonAddr) {
+                await prisma.address.create({ data: { addressLine1: String(mailingAddress), addressLine2: null, city: "", state: "", zipCode: "", type: "Mailing", personId: contactPerson.id } }).catch(() => null);
+              } else if (!existingPersonAddr.addressLine1) {
+                await prisma.address.update({ where: { id: existingPersonAddr.id }, data: { addressLine1: String(mailingAddress) } }).catch(() => null);
+              }
+            }
+          }
+
           let donor = await prisma.donor.findUnique({ where: { organizationId: organization.id } }).catch(() => null);
           if (!donor) {
-            donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, organizationId: organization.id } });
-            summary.donorsCreated += 1;
+            donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, organizationId: organization.id, personId: contactPerson ? contactPerson.id : undefined } }).catch(() => null);
+            if (donor) summary.donorsCreated += 1;
+          } else {
+            // DOES NOT WORK
+            // if a donor exists for this organization but has no linked person (or linked person doesn't match what is stored in database), attach contactPerson
+            if ((contactPerson && !donor.personId) || (contactPerson && donor.personId !== contactPerson.id)) {
+              await prisma.donor.update({ where: { id: donor.id }, data: { personId: contactPerson.id } }).catch(() => null);
+            }
           }
-          donorId = donor.id;
+          donorId = donor ? donor.id : null;
         }
 
         // Create Donation record

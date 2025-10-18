@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 export default function Export() {
-  const [isExporting, setIsExporting] = useState<string | null>(null); 
+  const [isExporting, setIsExporting] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState('');
 
   /**
@@ -14,7 +14,10 @@ export default function Export() {
 
     try {
       // NOTE: API endpoint must be programmed to return a file, edit the endpoint here
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/${dataType}/export`;
+      // Use the admin API path
+      // donations export handler is used for donors export as well
+      const route = dataType === 'donors' ? 'donations' : dataType;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/${route}/export`;
       const response = await fetch(apiUrl);
 
       if (!response.ok) {
@@ -26,11 +29,13 @@ export default function Export() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${dataType}_export_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
-      document.body.appendChild(a); 
-      a.click(); 
-      a.remove(); 
-      window.URL.revokeObjectURL(url); 
+      // keep the filename friendly: use 'donors' in the filename when dataType is donors
+      const filenameKey = dataType === 'donors' ? 'donors' : dataType;
+      a.download = `${filenameKey}_export_${new Date().toLocaleDateString().replace(/\//g, '-')}.xlsx`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
 
       setStatusMessage('Export completed successfully!');
 
@@ -38,16 +43,16 @@ export default function Export() {
       setStatusMessage(`Error: ${error.message}`);
       console.error(error);
     } finally {
-      setIsExporting(null); 
+      setIsExporting(null);
     }
   };
 
   // svg icon: downloading
   const DownloadIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-        <polyline points="7 10 12 15 17 10" />
-        <line x1="12" y1="15" x2="12" y2="3" />
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" />
+      <line x1="12" y1="15" x2="12" y2="3" />
     </svg>
   );
 
@@ -61,7 +66,7 @@ export default function Export() {
 
         {/* Export Options */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
-          
+
           {/* Export Grants Card */}
           <div className="bg-gray-50 p-6 rounded-lg flex flex-col items-center text-center">
             <h2 className="text-xl font-semibold text-gray-700">Export Grants</h2>
@@ -73,8 +78,8 @@ export default function Export() {
               disabled={!!isExporting}
               className="w-full max-w-xs flex justify-center items-center gap-2 bg-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                <DownloadIcon />
-                {isExporting === 'grants' ? 'Exporting...' : 'Download Grants'}
+              <DownloadIcon />
+              {isExporting === 'grants' ? 'Exporting...' : 'Download Grants'}
             </button>
           </div>
 
@@ -88,17 +93,17 @@ export default function Export() {
               disabled={!!isExporting}
               className="w-full max-w-xs flex justify-center items-center gap-2 bg-green-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-                <DownloadIcon />
-                {isExporting === 'donors' ? 'Exporting...' : 'Download Donors'}
+              <DownloadIcon />
+              {isExporting === 'donors' ? 'Exporting...' : 'Download Donors'}
             </button>
           </div>
         </div>
-        
+
         {/* Status Message */}
         {statusMessage && (
-            <div className={`text-center text-sm mt-6 p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                <p className="font-medium">{statusMessage}</p>
-            </div>
+          <div className={`text-center text-sm mt-6 p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <p className="font-medium">{statusMessage}</p>
+          </div>
         )}
       </div>
     </div>
