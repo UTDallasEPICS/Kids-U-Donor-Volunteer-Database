@@ -182,15 +182,20 @@ model Volunteer {
   registration Boolean @default(false)
 
   // Personal Info
-  firstName     String
-  middleInitial String?
-  lastName      String
-  addressLine   String
-  city          String
-  state         String
-  zipCode       String
-  phoneNumber   String
-  emailAddress  String
+  firstName         String
+  middleInitial     String?
+  lastName          String
+  addressLine       String
+  city              String
+  state             String
+  zipCode           String
+  phoneNumber       String
+  emailAddress      String
+  usCitizen         Boolean?
+  driversLicense    Boolean?
+  reliableTransport Boolean?
+  speakSpanish      Boolean?
+  referenceName     String?
 
   // Business or School Info
   businessOrSchoolName String?
@@ -222,6 +227,14 @@ model Volunteer {
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+}
+
+model volunteerAccount {
+  id          String @id @default(uuid())
+  username    String @unique
+  email       String @unique
+  password    String
+  volunteerId String @unique
 }
 
 model EventHour {
@@ -356,6 +369,7 @@ model Orientation {
 
 model Admin {
   id         String   @id @default(uuid())
+  email      String   @unique
   username   String
   password   String
   firstName  String
