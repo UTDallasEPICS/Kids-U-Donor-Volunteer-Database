@@ -2,10 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
-import logo from "./CreateUser.png";
+import logo from "./LoginPage.png";
 import rectangle4 from "./rectangle-4.svg";
 
-export default function CreateUserPage() {
+export const LoginPage = (): JSX.Element => {
   return (
     <div className="w-[1440px] h-[1024px] flex flex-col gap-9 border border-solid border-black [background:conic-gradient(from_30deg_at_50%_50%,rgba(47,85,151,1)_47%,rgba(255,255,255,1)_95%)]">
       
@@ -19,7 +19,7 @@ export default function CreateUserPage() {
         priority
       />
 
-      {/* Card */}
+      {/* Main Card */}
       <div className="ml-[396px] w-[649px] h-[711px] flex flex-col bg-[#fffbfb] rounded-[20px]">
         
         {/* Welcome Text */}
@@ -83,4 +83,4 @@ export default function CreateUserPage() {
       </div>
     </div>
   );
-}
+};
