@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 
 export default function AccountSettings() {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("john@example.com");
-  const [username, setUsername] = useState("john123");
-  const [phone, setPhone] = useState("+1 (555) 123-4567");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [phone, setPhone] = useState("");
   const [avatar, setAvatar] = useState("/default-avatar.png"); // image in /public
 
   // Optional: handle photo change (preview only)
