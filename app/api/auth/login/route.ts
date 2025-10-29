@@ -3,8 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { cookies } from 'next/headers'; 
 
 const prisma = new PrismaClient();
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,6 +65,15 @@ export async function POST(request: NextRequest) {
       { expiresIn: '7d' }
     );
 
+    const cookieStore = await cookies(); 
+    cookieStore.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, 
+      path: '/',
+      sameSite: 'lax', 
+    });
+    
     // Return user data (excluding password) and token
     return NextResponse.json(
       {
@@ -72,6 +83,8 @@ export async function POST(request: NextRequest) {
           id: user.id,
           email: user.email,
           role: user.role,
+          firstName: user.person?.firstName,
+          lastName: user.person?.lastName,
         },
       },
       { status: 200 }
