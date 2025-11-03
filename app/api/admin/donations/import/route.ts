@@ -23,6 +23,59 @@ function parseBoolean(value: any): boolean {
   return false;
 }
 
+// Prefer Net Amount when present; fall back to Amount variants.
+function pickAmountRaw(row: Record<string, any>): string {
+  const get = (k: string) => {
+    const v = row[k];
+    if (v === undefined || v === null) return null;
+    const s = String(v).trim();
+    return s.length ? s : null;
+  };
+
+  const netKeys = [
+    "Net Amount",
+    "net amount",
+    "Net amount",
+    "netAmount",
+    "NetAmount",
+  ];
+  for (const k of netKeys) {
+    const v = get(k);
+    if (v) return v;
+  }
+
+  const amountKeys = [
+    "Amount",
+    "amount",
+    "Donation Amount",
+    "Amount (total)",
+    "Gift Amount",
+  ];
+  for (const k of amountKeys) {
+    const v = get(k);
+    if (v) return v;
+  }
+  return "0";
+}
+
+// Split a full name into first and last. Supports "Last, First ..." and "First ... Last".
+function splitFullName(value: any): { first: string | null; last: string | null } {
+  if (!value) return { first: null, last: null };
+  const raw = String(value).trim().replace(/\s+/g, " ");
+  if (!raw) return { first: null, last: null };
+  if (raw.includes(",")) {
+    const [lastPart, firstPartRaw] = raw.split(",", 2).map((s) => s.trim());
+    const first = (firstPartRaw || "").split(" ")[0] || "";
+    const last = lastPart || "";
+    return { first: first || null, last: last || null };
+  }
+  const parts = raw.split(" ");
+  if (parts.length === 1) return { first: parts[0] || null, last: null };
+  const first = parts[0] || null;
+  const last = parts[parts.length - 1] || null;
+  return { first, last };
+}
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,7 +93,20 @@ export async function POST(req: NextRequest) {
     if (!file) {
       return NextResponse.json({ error: "No file uploaded" }, { status: 400 });
     }
-    const fileContent = await file.text();
+    let fileContent = await file.text();
+
+    // Check for Venmo format: has "Account Statement -" or "Account Activity"
+    const isVenmoFile = fileContent.includes("Account Statement -") || 
+                         fileContent.includes("Account Activity");
+    
+    if (isVenmoFile) {
+      const lines = fileContent.split("\n");
+      // Skip first TWO rows (header rows), keep the rest
+      // Row 0: "Account Statement - (@kids-u)"
+      // Row 1: "Account Activity"
+      // Row 2: Actual headers (Datetime, Type, Status, Note, From, To, Amount (total))
+      fileContent = lines.slice(2).join("\n");
+    }
 
     const records = parse(fileContent, {
       columns: true,
@@ -52,9 +118,11 @@ export async function POST(req: NextRequest) {
     const normalizedRecords: Record<string, any>[] = records.map((record: Record<string, any>) => {
       const normalizedRecord: Record<string, any> = {};
       for (const key in record) {
-        const trimmedKey = key.trim();
+        // Trim whitespace and strip a leading UTF-8 BOM if present (affects first header when exported from Excel)
+        const cleanedKey = key.trim().replace(/^\uFEFF/, "");
         const value = record[key];
-        normalizedRecord[trimmedKey] = typeof value === "string" ? value.trim() : value;
+        const cleanedValue = typeof value === "string" ? value.replace(/^\uFEFF/, "").trim() : value;
+        normalizedRecord[cleanedKey] = cleanedValue;
       }
       return normalizedRecord;
     });
@@ -71,22 +139,39 @@ export async function POST(req: NextRequest) {
       const row = normalizedRecords[idx];
       try {
         // Heuristics for donor info
-        const personFirst = row["Donor First Name"] || row["firstName"] || row["First"] || row["First Name"] || null;
-        const personLast = row["Donor Last Name"] || row["lastName"] || row["Last"] || row["Last Name"] || null;
+        let personFirst = row["Donor First Name"] || row["firstName"] || row["First"] || row["First Name"] || null;
+        let personLast = row["Donor Last Name"] || row["lastName"] || row["Last"] || row["Last Name"] || null;
+        // If a consolidated "From" column exists, use it to fill missing first/last
+        const fromFullName = row["From"] || row["from"] || null;
+        if ((!personFirst || !personLast) && fromFullName) {
+          const parsed = splitFullName(fromFullName);
+          if (!personFirst && parsed.first) personFirst = parsed.first;
+          if (!personLast && parsed.last) personLast = parsed.last;
+        }
         const email = row["Email"] || row["Email Address"] || row["email"] || row["Donor Email"] || null;
         const phone = row["Contact Number"] || row["Phone Number"] || row["phone"] || row["Phone"] || null;
         const preferredContact = row["Preferred Contact Method"] || row["Preferred Contact"] || row["Contact Method"] || row["preferredContactMethod"] || row["contactMethod"] || null;
         const mailingAddress = row["Mailing Address"] || row["Address"] || row["address"] || row["Street Address"] || null;
-        const type = row["Donor Type"] || row["Type"] || row["donorType"] || row["type"] || null;
+        
+        // Add default donor type if missing (assume Individual)
+        if (!row["Donor Type"] && !row["Type"] && !row["type"]) {
+          row["Donor Type"] = "Individual";
+        }
+
+        // Normalize type values
+        let type = row["Donor Type"] || row["Type"] || row["type"] || "Individual";
+        if (type != "Individual" && type != "individual" && type != "Corporate" && type != "corporate" && type != "In-Kind" && type != "In-kind" && type != "in-kind" && type != "In Kind" && type != "In kind" && type != "in kind") {
+          type = "Individual";
+        }
 
         // Organization fields
         const orgName = row["Organization"] || row["Organization Name"] || row["Company Name (if applicable)"] || row["Company"] || null;
         const orgEmail = email;
 
         // Donation fields
-        const amountRaw = row["Amount"] || row["Donation Amount"] || row["amount"] || row["Gift Amount"] || "0";
+        const amountRaw = pickAmountRaw(row);
         const amount = Number(String(amountRaw).replace(/[^0-9.-]+/g, "")) || 0;
-        const date = parseDate(row["Date"] || row["Donation Date"] || row["date"] || row["Gift Date"]);
+        const date = parseDate(row["Date"] || row["Donation Date"] || row["date"] || row["Datetime"]);
         const fund = row["Fund"] || row["Kids-U Program"] || row["fund"] || row["Fund Designation"] || null;
         const paymentMethod = row["Donation Method"] || row["paymentMethod"] || row["Payment Method"] || row["Payment Type"] || null;
         const isAnonymous = parseBoolean(row["Anonymous"] || row["anonymous"]);
@@ -97,6 +182,8 @@ export async function POST(req: NextRequest) {
         const receiptNumber = row["Receipt Number"] || row["receiptNumber"] || row["Receipt ID"] || null;
 
         let donorId: string | null = null;
+
+        
 
         // Individual donor logic
         if (type == "Individual" || type == "individual") {
