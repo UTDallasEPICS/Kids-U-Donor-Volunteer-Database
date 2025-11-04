@@ -9,9 +9,11 @@ import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function TopNavigationBar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const router = useRouter();
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -19,6 +21,23 @@ export default function TopNavigationBar() {
 
   const handleMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } catch (e) {
+      // ignore
+    }
+    try {
+      if (typeof window !== 'undefined') {
+        sessionStorage.clear();
+        localStorage.clear();
+      }
+    } catch { }
+    handleMenuClose();
+    router.push('/');
+    router.refresh();
   };
 
   return (
@@ -32,7 +51,7 @@ export default function TopNavigationBar() {
           <Avatar
             alt="Kids-U Icon"
             src="https://kids-u.org/wp-content/uploads/2024/03/cropped-kids-u-logo-round-small.png"
-            sx={{ width: 40, height: 40 }} 
+            sx={{ width: 40, height: 40 }}
           />
           <Typography
             variant="h6"
@@ -59,7 +78,7 @@ export default function TopNavigationBar() {
           >
             <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
-            <MenuItem onClick={handleMenuClose}>Logout</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </Box>
       </Toolbar>
