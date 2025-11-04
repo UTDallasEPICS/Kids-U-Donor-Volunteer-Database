@@ -1,23 +1,19 @@
-import * as xlsx from 'xlsx';
-import * as fs from 'fs';
+"use client";
+import * as XLSX from 'xlsx';
 
-export function convertExcelToCsv (excelFilePath: string): String | void {
-  try {
-    // Read the Excel workbook
-    const workbook = xlsx.readFile(excelFilePath);
-
-    // Get the first sheet name
-    const sheetName = workbook.SheetNames[0];
-    const worksheet = workbook.Sheets[sheetName];
-
-    // Convert the worksheet to CSV format
-    const csvData = xlsx.utils.sheet_to_csv(worksheet);
-
-    // Write the CSV data to a file
-    fs.writeFileSync("./app/components/csv", csvData);
-
-    console.log(`Successfully converted ${excelFilePath} to ./csv`);
-  } catch (error) {
-    console.error(`Error converting Excel to CSV: ${error}`);
+// Convert an uploaded Excel File (from the browser) into CSV text.
+// Returns CSV string of the first worksheet.
+export default async function convertExcelToCSV(file: File): Promise<string> {
+  const data = await file.arrayBuffer();
+  const workbook = XLSX.read(data, { type: 'array' });
+  if (!workbook.SheetNames.length) {
+    throw new Error('No sheets found in the uploaded Excel file.');
   }
-};
+
+  const firstSheetName = workbook.SheetNames[0];
+  const csv = XLSX.utils.sheet_to_csv(workbook.Sheets[firstSheetName]);
+  if (!csv || csv.trim().length === 0) {
+    throw new Error('The worksheet is empty or could not be converted to CSV.');
+  }
+  return csv;
+}
