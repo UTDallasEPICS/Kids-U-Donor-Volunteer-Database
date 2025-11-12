@@ -12,7 +12,13 @@ function formatCurrency(n: number | null | undefined) {
 }
 
 function fmtDate(d?: Date | null) {
-  return d ? new Date(d).toLocaleDateString("en-US") : "";
+  if (!d) return "";
+  try {
+    // Render dates in UTC to avoid off-by-one shifts in spreadsheets
+    return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(new Date(d));
+  } catch {
+    return "";
+  }
 }
 
 // Exact header layout from the example; first column is intentionally blank.
@@ -62,7 +68,9 @@ export async function GET(request: Request) {
     // Optional filters
     const startDateParam = params.get("startDate");
     const endDateParam = params.get("endDate");
-    const fund = params.get("fund");
+  const dueStartParam = params.get("dueStart");
+  const dueEndParam = params.get("dueEnd");
+  const fund = params.get("fund");
     const minAmount = params.get("minAmount");
     const maxAmount = params.get("maxAmount");
     const status = params.get("status");
@@ -75,6 +83,21 @@ export async function GET(request: Request) {
       where.startDate = {};
       if (startDateParam) where.startDate.gte = new Date(startDateParam);
       if (endDateParam) where.startDate.lte = new Date(endDateParam);
+    }
+    // Filter by proposalDueDate when provided (inclusive range)
+    if (dueStartParam || dueEndParam) {
+      const range: any = {};
+      if (dueStartParam) {
+        const start = new Date(`${dueStartParam}T00:00:00.000Z`);
+        if (!isNaN(start.getTime())) range.gte = start;
+      }
+      if (dueEndParam) {
+        const end = new Date(`${dueEndParam}T23:59:59.999Z`);
+        if (!isNaN(end.getTime())) range.lte = end;
+      }
+      if (Object.keys(range).length) {
+        where.proposalDueDate = range;
+      }
     }
     if (fund) {
       where.fundingArea = { contains: fund, mode: "insensitive" };

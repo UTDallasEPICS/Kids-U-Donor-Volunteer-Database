@@ -2,25 +2,41 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
 import * as xlsx from 'xlsx';
 
+function fmtDate(d?: Date | null) {
+	if (!d) return "";
+	try {
+		return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(new Date(d));
+	} catch {
+		return "";
+	}
+}
+
 export async function GET(request: Request) {
 	try {
 		const url = new URL(request.url);
 		const params = url.searchParams;
 
 		// Parse filters
-		const startDateParam = params.get("startDate");
-		const endDateParam = params.get("endDate");
-		const donorType = params.get("donorType"); // e.g. 'Individual' or 'Organization'
-		const fund = params.get("fund");
-		const minAmount = params.get("minAmount");
-		const maxAmount = params.get("maxAmount");
+	const startDateParam = params.get("startDate");
+	const endDateParam = params.get("endDate");
+	const donorType = params.get("donorType"); // e.g. 'Individual' or 'Organization'
+	const donorStatus = params.get("donorStatus");
+	const commPref = params.get("commPref");
+	const fund = params.get("fund");
+	const minAmount = params.get("minAmount");
+	const maxAmount = params.get("maxAmount");
+	const paymentMethod = params.get("paymentMethod");
+	const campaign = params.get("campaign");
+	const acknowledgementSent = params.get("acknowledgementSent"); // 'true' | 'false'
+	const recurringFrequency = params.get("recurringFrequency");
 
 		const where: any = {};
 
 		if (startDateParam || endDateParam) {
-			where.date = {};
-			if (startDateParam) where.date.gte = new Date(startDateParam);
-			if (endDateParam) where.date.lte = new Date(endDateParam);
+			const range: any = {};
+			if (startDateParam) range.gte = new Date(`${startDateParam}T00:00:00.000Z`);
+			if (endDateParam) range.lte = new Date(`${endDateParam}T23:59:59.999Z`);
+			where.date = range;
 		}
 
 		if (fund) {
@@ -33,9 +49,21 @@ export async function GET(request: Request) {
 			if (maxAmount) where.amount.lte = Number(maxAmount);
 		}
 
-		if (donorType) {
-			// filter by related donor.type
-			where.donor = { some: { type: donorType } };
+		// Donation-level filters
+		if (paymentMethod) where.paymentMethod = { equals: paymentMethod, mode: "insensitive" };
+		if (campaign) where.campaign = { contains: campaign, mode: "insensitive" };
+		if (acknowledgementSent === 'true' || acknowledgementSent === 'false') {
+			where.acknowledgementSent = acknowledgementSent === 'true';
+		}
+		if (recurringFrequency) where.recurringFrequency = { equals: recurringFrequency, mode: "insensitive" };
+
+		// Donor-level composite filters
+		const donorWhere: any = {};
+		if (donorType) donorWhere.type = donorType;
+		if (donorStatus) donorWhere.status = { equals: donorStatus, mode: "insensitive" };
+		if (commPref) donorWhere.communicationPreference = { equals: commPref, mode: "insensitive" };
+		if (Object.keys(donorWhere).length) {
+			where.donor = { is: donorWhere };
 		}
 
 		const donations = await prisma.donation.findMany({
@@ -95,7 +123,7 @@ export async function GET(request: Request) {
 				org?.name ?? "",
 				d.amount,
 				d.paymentMethod ?? "",
-				d.date ? d.date.toLocaleDateString() : "",
+				fmtDate(d.date),
 				d.campaign ?? "",
 				d.recurringFrequency ?? "",
 				d.acknowledgementSent ? "Yes" : "No",
