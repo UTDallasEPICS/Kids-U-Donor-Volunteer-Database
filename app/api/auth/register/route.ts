@@ -34,12 +34,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!addressLine || !city || !state || !zipCode || !phoneNumber) {
-      return NextResponse.json(
-        { error: 'Address, city, state, zip code, and phone number are required' },
-        { status: 400 }
-      );
-    }
 
     if (password.length < 8) {
       return NextResponse.json(
@@ -87,11 +81,11 @@ export async function POST(request: NextRequest) {
           middleInitial: middleInitial || null,
           lastName,
           emailAddress: email,
-          phoneNumber,
-          addressLine,
-          city,
-          state,
-          zipCode,
+          phoneNumber: phoneNumber || 'Not provided',        
+          addressLine: addressLine || 'Not provided',        
+          city: city || 'Not provided',                      
+          state: state || 'Not provided',                    
+          zipCode: zipCode || '00000',                       
           usCitizen: usCitizen ?? null,
           driversLicense: driversLicense ?? null,
           reliableTransport: reliableTransport ?? null,
