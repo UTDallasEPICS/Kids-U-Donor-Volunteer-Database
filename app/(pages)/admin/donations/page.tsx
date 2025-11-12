@@ -11,7 +11,7 @@ place holder list
 */
 
 const headCells = [
-  { id: "id", numeric: false, label: "ID" },
+  { id: "donorType", numeric: false, label: "Donor Type" },
   { id: "donor", numeric: false, label: "Donor" },
   { id: "amount", numeric: true, label: "Amount" },
   { id: "date", numeric: false, label: "Date" },
@@ -79,11 +79,12 @@ export default function DonationsList() {
                   ? `${donation.donor.person.firstName} ${donation.donor.person.lastName}`
                   : donation?.donor?.organization?.name || "—";
                 const amount = typeof donation.amount === "number" ? donation.amount : Number(donation.amount ?? 0);
+                const donorType = donation?.donor?.type || "";
                 return (
                   <TableRow hover key={donation.id}>
                     <TableCell sx={styles.tableCell}>
                       <Link className="text-blue-500" href={`/admin/donations/detail/${donation.id}`}>
-                        {donation.id}
+                        {donorType}
                       </Link>
                     </TableCell>
                     <TableCell sx={styles.tableCell}>{donorName}</TableCell>

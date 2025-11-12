@@ -11,7 +11,7 @@ place holder list
 */
 
 const headCells = [
-  { id: "id", numeric: false, label: "ID" },
+  { id: "type", numeric: false, label: "Donor Type" },
   { id: "name", numeric: false, label: "Name" },
   { id: "email", numeric: false, label: "Email" },
   { id: "phone", numeric: false, label: "Phone" },
@@ -94,7 +94,7 @@ export default function DonorsList() {
                   <TableRow hover key={donor.id}>
                     <TableCell sx={styles.tableCell}>
                       <Link className="text-blue-500" href={`/admin/donors/detail/${donor.id}`}>
-                        {donor.id}
+                        {donor.type}
                       </Link>
                     </TableCell>
                     <TableCell sx={styles.tableCell}>{name}</TableCell>
