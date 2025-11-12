@@ -108,7 +108,17 @@ export async function POST(req: NextRequest) {
 // Read
 export async function GET() {
   try {
-    const data = await prisma.donation.findMany();
+    const data = await prisma.donation.findMany({
+      include: {
+        donor: {
+          include: {
+            person: { select: { firstName: true, lastName: true } },
+            organization: { select: { name: true } },
+          },
+        },
+      },
+      orderBy: { date: "desc" },
+    });
 
     return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
   } catch (error) {
