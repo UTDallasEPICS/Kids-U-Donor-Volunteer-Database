@@ -43,6 +43,14 @@ model User {
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  verified        Boolean   @default(false)
+  verificationToken    String?   @unique
+  verificationExpiry   DateTime?
+  twoFactorEnabled     Boolean   @default(false)
+  twoFactorCode        String?
+  twoFactorExpiry      DateTime?
+  resetToken           String?   @unique
+  resetTokenExpiry     DateTime?
 }
 
 model Task {

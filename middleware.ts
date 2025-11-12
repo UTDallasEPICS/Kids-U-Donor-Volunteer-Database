@@ -32,8 +32,18 @@ async function verifyToken(
   }
 }
 
-const publicPaths = ['/login', '/api/auth/login'];
-
+const publicPaths = [
+  '/login', 
+  '/api/auth/login',
+  '/api/auth/register',
+  '/api/auth/forgot-password',
+  '/api/auth/reset-password',
+  '/api/auth/emailverify',
+  '/verification/verify-email',
+  '/verification/verify-2fa',
+  '/verification/forgot-password',
+  '/verification/reset-password'
+];
 const adminPaths = ['/admin', '/api/admin', '/api/grantors'];
 
 const volunteerPaths = ['/volunteers', '/api/volunteer', '/api/event-registration', '/api/events', '/api/locations', '/api/orientations'];
@@ -41,7 +51,7 @@ const volunteerPaths = ['/volunteers', '/api/volunteer', '/api/event-registratio
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (publicPaths.some((path) => pathname.startsWith(path))) {
+  if (publicPaths.some((path) => pathname === path || pathname.startsWith(path + '/'))) {
     return NextResponse.next();
   }
 
