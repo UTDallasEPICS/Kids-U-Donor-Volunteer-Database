@@ -82,7 +82,31 @@ export async function POST(req: NextRequest) {
 // Read
 export async function GET() {
   try {
-    const data = await prisma.donor.findMany();
+    const data = await prisma.donor.findMany({
+      include: {
+        person: {
+          select: {
+            firstName: true,
+            lastName: true,
+            emailAddress: true,
+            phoneNumber: true,
+          },
+        },
+        organization: {
+          select: {
+            name: true,
+            emailAddress: true,
+          },
+        },
+        donation: {
+          select: {
+            amount: true,
+            date: true,
+          },
+          orderBy: { date: "desc" },
+        },
+      },
+    });
 
     return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
   } catch (error) {
