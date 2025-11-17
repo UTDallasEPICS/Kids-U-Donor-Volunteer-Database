@@ -1,5 +1,6 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation'; 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -8,8 +9,6 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function TopNavigationBar() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -38,8 +37,12 @@ export default function TopNavigationBar() {
     handleMenuClose();
     router.push('/');
     router.refresh();
+  
+  const handleProfileClick = () => {
+    handleMenuClose();
+    router.push('/accountSetting'); 
   };
-
+  
   return (
     <AppBar
       position="static"
@@ -47,6 +50,7 @@ export default function TopNavigationBar() {
       className="bg-white shadow-1x border-b border-gray-300"
     >
       <Toolbar className="flex justify-between items-center px-6 h-16">
+        {/* Left side logo + title */}
         <Box className="flex items-center gap-2">
           <Avatar
             alt="Kids-U Icon"
@@ -61,22 +65,24 @@ export default function TopNavigationBar() {
           </Typography>
         </Box>
 
+        {/* Right side user menu */}
         <Box className="flex items-center gap-2">
           <Typography variant="subtitle1" className="text-gray-700 text-sm">
             Admin Profile
           </Typography>
-          <IconButton
-            onClick={handleMenuOpen}
-            className="p-0"
-          >
-            <Avatar alt="Admin" src="https://static-00.iconduck.com/assets.00/user-avatar-icon-512x512-vufpcmdn.png" />
+          <IconButton onClick={handleMenuOpen} className="p-0">
+            <Avatar 
+              alt="Admin" 
+              src="https://static-00.iconduck.com/assets.00/user-avatar-icon-512x512-vufpcmdn.png" 
+            />
           </IconButton>
+
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
             onClose={handleMenuClose}
           >
-            <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
+            <MenuItem onClick={handleProfileClick}>Profile</MenuItem> 
             <MenuItem onClick={handleMenuClose}>Settings</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
@@ -85,5 +91,4 @@ export default function TopNavigationBar() {
     </AppBar>
   );
 }
-
-
+}
