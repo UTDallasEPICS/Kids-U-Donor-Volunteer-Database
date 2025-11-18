@@ -17,12 +17,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             reference: "/admin/donations", 
             hasSubmenu: true,
             submenuItems: [
-              { name: "Donation List", reference: "/admin/donations" },
-              { name: "Donor List", reference: "/admin/donors" },
+              { name: "Donations List", reference: "/admin/donations" },
+              { name: "Donors List", reference: "/admin/donors" },
               { name: "Add a Donation", reference: "/admin/donations/add" },
               { name: "Add a Donor", reference: "/admin/donors/add" },
-              { name: "Import", reference: "/admin/donations/import" },
-              { name: "Export", reference: "/admin/donations/export" },
             ]
           },
           { 
@@ -41,8 +39,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             hasSubmenu: true,
             submenuItems: [
               { name: "Volunteers List", reference: "/admin/volunteer" },
-              { name: "Add a Volunteer", reference: "/admin/volunteer/add" },
-              { name: "Hours Log", reference: "/admin/volunteer/hours" },
+              { name: "View Registrations", reference: "/admin/events/overview" },
+              { name: "View Applications", reference: "/admin/volunteer/application" },
+            ]
+          },
+          { 
+            name: "Events", 
+            reference: "/admin/events", 
+            hasSubmenu: true,
+            submenuItems: [
+              { name: "Add Orientation", reference: "/admin/orientations/add_orientation" },
+              { name: "View Orientations", reference: "/admin/orientations/view_orientations" },
+              { name: "Add Event", reference: "/admin/events/add-event" },
             ]
           },
         ]}
@@ -54,17 +62,3 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     </div>
   );
 }
-
-          // { name: "Donations List", reference: "/admin/donations" },
-          // { name: "Donors List", reference: "/admin/donors" },
-          // { name: "Add a Donation", reference: "/admin/donations/add" },
-          // { name: "Add a Donor", reference: "/admin/donors/add" },
-          // { name: "Grants List", reference: "/admin/grants" },
-          // { name: "Add a Grant", reference: "/admin/grants/add" },
-          // { name: "Grantor List", reference: "/admin/grants/grantor" },
-          // { name: "Volunteers List", reference: "/admin/volunteer" },
-          // { name: "Add Orientation", reference: "./orientations/add_orientation" },
-          // { name: "View Orientations", reference: "./orientations/view_orientations" },
-          // { name: "Add Event", reference: "./events/add-event" },
-          // { name: "View Registrations", reference: "./events/overview" },
-          // { name: "View Applications", reference: "./volunteer/application" },
