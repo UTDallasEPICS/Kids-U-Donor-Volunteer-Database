@@ -33,7 +33,9 @@ async function verifyToken(
 }
 
 const publicPaths = [
+  '/',
   '/login', 
+  '/CreateUser/login',
   '/api/auth/login',
   '/api/auth/register',
   '/api/auth/forgot-password',
