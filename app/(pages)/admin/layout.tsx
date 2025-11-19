@@ -1,32 +1,64 @@
-'use client'; 
+"use client"; 
 
 import React from "react";
 import MainSidebar from "@/app/components/main-sidebar";
 import TopNavigationBar from "@/app/components/admin-top-navigation-bar";
 
-export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex flex-col">
-  
-      <div className="w-full">
-        <TopNavigationBar />
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <TopNavigationBar />
 
-      <div className="flex">
-   
-        <MainSidebar
-          items={[
-            { name: "Dashboard", reference: "./" },
-            { name: "Donations", reference: "/admin/donations" },
-            { name: "Donors", reference: "/admin/donors" },
-            { name: "Grants", reference: "/admin/grants" },
-            { name: "Volunteers", reference: "/admin/volunteer" },
-            { name: "Export", reference: "/admin/export" },
-          ]}
-        />
+      <MainSidebar
+        items={[
+          { name: "Dashboard", reference: "/admin" },
+          { 
+            name: "Donations", 
+            reference: "/admin/donations", 
+            hasSubmenu: true,
+            submenuItems: [
+              { name: "Donations List", reference: "/admin/donations" },
+              { name: "Donors List", reference: "/admin/donors" },
+              { name: "Add a Donation", reference: "/admin/donations/add" },
+              { name: "Add a Donor", reference: "/admin/donors/add" },
+            ]
+          },
+          { 
+            name: "Grants", 
+            reference: "/admin/grants", 
+            hasSubmenu: true,
+            submenuItems: [
+              { name: "Grants List", reference: "/admin/grants" },
+              { name: "Add a Grant", reference: "/admin/grants/add" },
+              { name: "Grantor List", reference: "/admin/grants/grantor" },
+            ]
+          },
+          { 
+            name: "Volunteers", 
+            reference: "/admin/volunteer", 
+            hasSubmenu: true,
+            submenuItems: [
+              { name: "Volunteers List", reference: "/admin/volunteer" },
+              { name: "View Registrations", reference: "/admin/events/overview" },
+              { name: "View Applications", reference: "/admin/volunteer/application" },
+            ]
+          },
+          { 
+            name: "Events", 
+            reference: "/admin/events", 
+            hasSubmenu: true,
+            submenuItems: [
+              { name: "Add Orientation", reference: "/admin/orientations/add_orientation" },
+              { name: "View Orientations", reference: "/admin/orientations/view_orientations" },
+              { name: "Add Event", reference: "/admin/events/add-event" },
+            ]
+          },
+        ]}
+      />
 
-        <div className="flex-grow">{children}</div>
-      </div>
+      <main className="ml-64 mt-16 min-h-screen">
+        {children}
+      </main>
     </div>
   );
 }

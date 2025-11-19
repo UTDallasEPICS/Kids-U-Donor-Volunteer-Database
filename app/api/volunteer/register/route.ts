@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { 
-      firstName, 
-      lastName, 
+    const {
+      firstName,
+      lastName,
       email,
       phoneNumber,
       username,
@@ -21,23 +21,23 @@ export async function POST(req: NextRequest) {
       driversLicense,
       reliableTransport,
       speakSpanish,
-      referenceName
+      referenceName,
     } = body;
 
     // Check if volunteer account already exists with this email or username
     const existingAccount = await prisma.volunteerAccount.findFirst({
       where: {
-        OR: [
-          { email: email },
-          { username: username }
-        ]
+        OR: [{ email: email }, { username: username }],
       },
     });
 
     if (existingAccount) {
-      return NextResponse.json({ 
-        error: "An account with this email or username already exists" 
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: "An account with this email or username already exists",
+        },
+        { status: 400 }
+      );
     }
 
     // Hash the password
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
           driversLicense: driversLicense || false,
           reliableTransport: reliableTransport || false,
           speakSpanish: speakSpanish || false,
-          referenceName
+          referenceName,
         },
       });
 
@@ -70,24 +70,30 @@ export async function POST(req: NextRequest) {
           username,
           password: hashedPassword,
           email,
-          volunteerId: volunteer.id
+          volunteerId: volunteer.id,
         },
       });
 
       return { volunteer, account };
     });
 
-    return NextResponse.json({
-      id: result.volunteer.id,
-      firstName: result.volunteer.firstName,
-      lastName: result.volunteer.lastName,
-      email: result.volunteer.emailAddress,
-      username: result.account.username
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        id: result.volunteer.id,
+        firstName: result.volunteer.firstName,
+        lastName: result.volunteer.lastName,
+        email: result.volunteer.emailAddress,
+        username: result.account.username,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json({ 
-      error: "Registration failed" 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Registration failed",
+      },
+      { status: 500 }
+    );
   }
 }
