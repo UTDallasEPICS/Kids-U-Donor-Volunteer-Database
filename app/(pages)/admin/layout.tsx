@@ -21,6 +21,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Donors List", reference: "/admin/donors" },
               { name: "Add a Donation", reference: "/admin/donations/add" },
               { name: "Add a Donor", reference: "/admin/donors/add" },
+              { name: "Import", reference: "/admin/donors/import" },
             ]
           },
           { 
@@ -31,7 +32,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Grants List", reference: "/admin/grants" },
               { name: "Add a Grant", reference: "/admin/grants/add" },
               { name: "Grantor List", reference: "/admin/grants/grantor" },
+              { name: "Import", reference: "/admin/grants/import" },
             ]
+          },
+          {
+            name: "Export",
+            reference: "/admin/export",
           },
           { 
             name: "Volunteers", 
