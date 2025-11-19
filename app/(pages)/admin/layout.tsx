@@ -59,9 +59,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Add Event", reference: "/admin/events/add-event" },
             ]
           },
+          { 
+            name: "Mail", 
+            reference: "/admin/mail" 
+          }
         ]}
       />
-
       <main className="ml-64 mt-16 min-h-screen">
         {children}
       </main>
