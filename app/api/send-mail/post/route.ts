@@ -47,8 +47,6 @@ export async function POST(request: Request) {
         },
       });
       recipients = users.map((user) => user.email);
-
-      return NextResponse.json({ error: "Database query not implemented." }, { status: 501 });
     }
 
     if (recipients.length === 0) {

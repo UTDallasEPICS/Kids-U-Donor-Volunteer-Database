@@ -126,7 +126,7 @@ export default function LoginPage(): JSX.Element {
           
           {/* Welcome Text */}
           <h1 className="text-4xl text-[#2f4b7c] font-light text-center mb-10">
-            Welcome to Kids U
+            Welcome to Kids-U
           </h1>
 
           <form onSubmit={handleSubmit} className="space-y-5">
