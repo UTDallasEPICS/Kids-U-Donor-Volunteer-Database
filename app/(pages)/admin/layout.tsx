@@ -21,6 +21,7 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
             { name: "Donors", reference: "/admin/donors" },
             { name: "Grants", reference: "/admin/grants" },
             { name: "Volunteers", reference: "/admin/volunteer" },
+            { name: "Mail", reference: "/admin/mail" },
           ]}
         />
 
