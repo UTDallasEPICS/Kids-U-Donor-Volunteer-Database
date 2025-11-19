@@ -30,8 +30,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             hasSubmenu: true,
             submenuItems: [
               { name: "Grants List", reference: "/admin/grants" },
-              { name: "Add a Grant", reference: "/admin/grants/add" },
               { name: "Grantor List", reference: "/admin/grants/grantor" },
+              { name: "Add a Grant", reference: "/admin/grants/add" },
               { name: "Import", reference: "/admin/grants/import" },
             ]
           },
