@@ -217,7 +217,7 @@ export default function VolunteerDashboard() {
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">No Upcoming Events</h3>
                   <p className="text-sm text-gray-600 mb-6 max-w-md leading-relaxed">
-                    Check back soon for exciting volunteer opportunities. Events are posted regularly and we'd love to see you there!
+                    Check back soon for exciting volunteer opportunities. Events are posted regularly and we&apos;d love to see you there!
                   </p>
                   <button 
                     onClick={() => window.location.href = '/volunteers/registration'}
@@ -284,7 +284,28 @@ export default function VolunteerDashboard() {
                 </svg>
                 <span className="font-semibold">Follow us on Instagram</span>
               </a>
-
+              <a
+                href="https://www.facebook.com/KidsuDallas" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-[#1877F2] hover:bg-[#145db8] text-white rounded-xl transition-all shadow-sm hover:shadow-md hover:scale-[1.02]"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M22 12.07C22 6.51 17.52 2 12 2S2 6.51 2 12.07C2 17.1 5.66 21.23 10.44 22v-7.02H7.9v-2.91h2.54V9.84c0-2.5 1.49-3.89 3.77-3.89 1.09 0 2.24.2 2.24.2v2.48h-1.26c-1.24 0-1.63.78-1.63 1.57v1.89h2.78l-.44 2.91h-2.34V22C18.34 21.23 22 17.1 22 12.07z" />
+                </svg>
+                <span className="font-semibold">Like us on Facebook</span>
+              </a>
+              <a
+                href="https://www.linkedin.com/company/kidsudallas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 p-4 bg-[#0A66C2] hover:bg-[#084f95] text-white rounded-xl transition-all shadow-sm hover:shadow-md hover:scale-[1.02]"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4.98 3.5C4.98 4.88 3.9 6 2.5 6S0 4.88 0 3.5 1.08 1 2.48 1s2.5 1.12 2.5 2.5zM.32 8.16h4.36V24H.32V8.16zM8.34 8.16h4.18v2.15h.06c.58-1.1 2-2.26 4.12-2.26 4.4 0 5.21 2.9 5.21 6.68V24h-4.36v-8.04c0-1.92-.03-4.39-2.68-4.39-2.68 0-3.09 2.09-3.09 4.26V24H8.34V8.16z" />
+                </svg>
+                <span className="font-semibold">Connect on LinkedIn</span>
+              </a>
 
               <a 
                 href="https://kids-u.org" 
