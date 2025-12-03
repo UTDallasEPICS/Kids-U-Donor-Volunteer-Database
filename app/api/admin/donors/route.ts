@@ -98,6 +98,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Send thank you email if email address exists
+    if (body.data.donor.type !== "Individual") {
+      // Organization
+      const email = body.data.organization.emailAddress;
+      const name = body.data.organization.name;
+      if (email && email.trim() !== "") {
+        await sendThankYouEmail(email, name);
+      }
+    } else {
+      // Individual
+      const email = body.data.person.emailAddress;
+      const name = `${body.data.person.firstName} ${body.data.person.lastName}`.trim();
+      if (email && email.trim() !== "") {
+        await sendThankYouEmail(email, name || "Friend");
+      }
+    }
+
     return NextResponse.json(
       {
         message: "Successfully created a new donor",
@@ -124,7 +141,31 @@ export async function POST(req: NextRequest) {
 // Read
 export async function GET() {
   try {
-    const data = await prisma.donor.findMany();
+    const data = await prisma.donor.findMany({
+      include: {
+        person: {
+          select: {
+            firstName: true,
+            lastName: true,
+            emailAddress: true,
+            phoneNumber: true,
+          },
+        },
+        organization: {
+          select: {
+            name: true,
+            emailAddress: true,
+          },
+        },
+        donation: {
+          select: {
+            amount: true,
+            date: true,
+          },
+          orderBy: { date: "desc" },
+        },
+      },
+    });
 
     return NextResponse.json({ message: "Successful fetch", data: data }, { status: 200 });
   } catch (error) {
