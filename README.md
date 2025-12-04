@@ -16,7 +16,11 @@
 
 ## Overview
 
-This project is focused on developing a database alongside a web application that will help Kids-U manage donors, both individual and organizations, and volunteers along with related funding (via donations and grants) and events. There will be two types of users: administrators and volunteers.
+This project is focused on developing a database alongside a web application that will help Kids-U manage donors, both individual and organizations, and volunteers along with related funding (via donations and grants) and events. There will be three types of users: Super Admin, administrators and volunteers.
+
+**Super Admin**
+- Ability to manage roles of users
+- All Admin Abilities
 
 **Admin**
 - Ability to manage and utilize data
@@ -37,5 +41,5 @@ Currently, we do not have any migration scripts.
 
 ## Figma
 
-The volunteer section of the project has Figma files, as seen in the Figma folder.
-Currently, there are no figma files for the grant team since Kids-U gave us their desired UI design for the grants portion of the project.
+We have the figma files of all current dashboard & login flow designs.
+We do not have the design of any specific database pages and refining for both the admin/volunteer side.
