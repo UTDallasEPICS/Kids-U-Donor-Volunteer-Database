@@ -1,6 +1,63 @@
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
+
+// Helper function to send thank you email for donation
+async function sendDonationThankYouEmail(email: string, name: string, amount: number, date: Date) {
+  const formattedAmount = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: "Thank You for Your Generous Donation!",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Thank You for Your Donation, ${name}!</h2>
+        <p style="color: #555; line-height: 1.6;">
+          We are deeply grateful for your generous donation of <strong>${formattedAmount}</strong> 
+          on ${formattedDate}.
+        </p>
+        <p style="color: #555; line-height: 1.6;">
+          Your contribution makes a meaningful impact and helps us continue our important work. 
+          Supporters like you are the foundation of our mission, and we couldn't do it without you.
+        </p>
+        <p style="color: #555; line-height: 1.6;">
+          You will receive a formal donation receipt shortly for your tax records.
+        </p>
+        <p style="color: #555; line-height: 1.6;">
+          With heartfelt gratitude,<br>
+          <strong>The Kids-University Team</strong>
+        </p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Donation thank you email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send donation email to ${email}:`, error);
+  }
+}
 
 // Add new donation
 export async function POST(req: NextRequest) {
@@ -81,6 +138,29 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    // Send thank you email for donation if email address exists
+    const donationAmount =
+      typeof body.data.donation.amount === "string"
+        ? parseFloat(body.data.donation.amount)
+        : body.data.donation.amount || 0;
+    const donationDate = new Date(body.data.donation.date) || new Date();
+
+    if (body.data.donor.type !== "Individual") {
+      // Organization
+      const email = body.data.organization.emailAddress;
+      const name = body.data.organization.name;
+      if (email && email.trim() !== "") {
+        await sendDonationThankYouEmail(email, name, donationAmount, donationDate);
+      }
+    } else {
+      // Individual
+      const email = body.data.person.emailAddress;
+      const name = `${body.data.person.firstName} ${body.data.person.lastName}`.trim();
+      if (email && email.trim() !== "") {
+        await sendDonationThankYouEmail(email, name || "Friend", donationAmount, donationDate);
+      }
+    }
 
     return NextResponse.json(
       {

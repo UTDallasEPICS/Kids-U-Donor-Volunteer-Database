@@ -1,6 +1,48 @@
 import { Prisma } from "@prisma/client";
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
+import nodemailer from "nodemailer";
+
+// Configure nodemailer transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_PASS,
+  },
+});
+
+// Helper function to send thank you email
+async function sendThankYouEmail(email: string, name: string) {
+  const mailOptions = {
+    from: process.env.GMAIL_USER,
+    to: email,
+    subject: "Thank You for Your Support!",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #333;">Thank You, ${name}!</h2>
+        <p style="color: #555; line-height: 1.6;">
+          We are incredibly grateful for your generous support. Your contribution makes a real difference 
+          and helps us continue our mission.
+        </p>
+        <p style="color: #555; line-height: 1.6;">
+          We truly appreciate your trust in our organization and your commitment to our cause.
+        </p>
+        <p style="color: #555; line-height: 1.6;">
+          With heartfelt thanks,<br>
+          <strong>The Kids-University Team</strong>
+        </p>
+      </div>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Thank you email sent to ${email}`);
+  } catch (error) {
+    console.error(`Failed to send email to ${email}:`, error);
+  }
+}
 
 // Add new donor
 export async function POST(req: NextRequest) {
@@ -55,6 +97,23 @@ export async function POST(req: NextRequest) {
             }),
       },
     });
+
+    // Send thank you email if email address exists
+    if (body.data.donor.type !== "Individual") {
+      // Organization
+      const email = body.data.organization.emailAddress;
+      const name = body.data.organization.name;
+      if (email && email.trim() !== "") {
+        await sendThankYouEmail(email, name);
+      }
+    } else {
+      // Individual
+      const email = body.data.person.emailAddress;
+      const name = `${body.data.person.firstName} ${body.data.person.lastName}`.trim();
+      if (email && email.trim() !== "") {
+        await sendThankYouEmail(email, name || "Friend");
+      }
+    }
 
     return NextResponse.json(
       {
