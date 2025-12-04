@@ -43,6 +43,14 @@ model User {
   emailVerified DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  verified        Boolean   @default(false)
+  verificationToken    String?   @unique
+  verificationExpiry   DateTime?
+  twoFactorEnabled     Boolean   @default(false)
+  twoFactorCode        String?
+  twoFactorExpiry      DateTime?
+  resetToken           String?   @unique
+  resetTokenExpiry     DateTime?
 }
 
 model Task {
@@ -182,15 +190,20 @@ model Volunteer {
   registration Boolean @default(false)
 
   // Personal Info
-  firstName     String
-  middleInitial String?
-  lastName      String
-  addressLine   String
-  city          String
-  state         String
-  zipCode       String
-  phoneNumber   String
-  emailAddress  String
+  firstName         String
+  middleInitial     String?
+  lastName          String
+  addressLine       String
+  city              String
+  state             String
+  zipCode           String
+  phoneNumber       String
+  emailAddress      String
+  usCitizen         Boolean?
+  driversLicense    Boolean?
+  reliableTransport Boolean?
+  speakSpanish      Boolean?
+  referenceName     String?
 
   // Business or School Info
   businessOrSchoolName String?
@@ -222,6 +235,14 @@ model Volunteer {
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+}
+
+model volunteerAccount {
+  id          String @id @default(uuid())
+  username    String @unique
+  email       String @unique
+  password    String
+  volunteerId String @unique
 }
 
 model EventHour {
@@ -356,6 +377,7 @@ model Orientation {
 
 model Admin {
   id         String   @id @default(uuid())
+  email      String   @unique
   username   String
   password   String
   firstName  String
