@@ -29,7 +29,9 @@
 
 - In VSCode, create a new .env file at the project repository root
 - Copy the text from the .env.example file and paste into the .env file
+- Generate JWT Token & paste into env: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 - Change the `PORT` to 5432, `USER`, `PASSWORD` and `DATABASE` to kidsu
+- Create Mailtrap account, paste from sandbox `HOST`,`PORT`, `USER`, and `PASS`
 - In the VSCode terminal, run `npm install`
 - Open the docker application, then in the VSCode terminal, run `docker compose up -d`
 -   Don't register/login to Docker, just press skip

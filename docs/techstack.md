@@ -44,3 +44,21 @@ This project utilizses JavaScript/TypeScript, HTML, and CSS.
 - [CSS Documentation](https://developer.mozilla.org/en-US/docs/Web/CSS)
 - [JavaScript Documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs/)
+
+## Libraries/DevTools
+
+## jose
+A modern library for signing and verifying JSON Web Tokens (JWT). We use this instead of jsonwebtoken because jose is compatible with the Next.js Edge Runtime (Middleware).
+[jose Documentation](https://github.com/panva/jose)
+- Used primarily in middleware.ts to validate user sessions and protect routes.
+
+## Nodemailer
+A module for Node.js applications to allow easy email sending. It acts as the "transport" mechanism to deliver 2FA codes and password reset links.
+[Nodemailer Documentation](https://nodemailer.com/)
+- This requires an SMTP configuration (host, port, user, pass) to function.
+
+## MailTrap
+Mailtrap is a fake SMTP server used for testing and development. It "traps" emails sent by Nodemailer so they don't go to real email addresses, allowing developers to inspect the content safely.
+[MailTrap Documentation](https://mailtrap.io/fake-smtp-server/)
+- Login to Mailtrap and copy the SMTP credentials into your .env file.
+- When you send an email in development, check your Mailtrap Inbox to view the rendered HTML and verify the 2FA code.
