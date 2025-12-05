@@ -19,7 +19,7 @@
 This project is focused on developing a database alongside a web application that will help Kids-U manage donors, both individual and organizations, and volunteers along with related funding (via donations and grants) and events. There will be three types of users: Super Admin, administrators and volunteers.
 
 **Super Admin**
-- Ability to manage roles of users
+- Ability to manage users (role management, edit information, view all user info)
 - All Admin Abilities
 
 **Admin**
@@ -28,7 +28,7 @@ This project is focused on developing a database alongside a web application tha
 - Ability to edit any module
 
 **Volunteers**
-- Can view registration, mail, and check in check out pages within Volunteer module
+- Can view registration, check in check out, and join activities within Volunteer module
 - Can fill out the registration form
 
 ## Third Party Integration
