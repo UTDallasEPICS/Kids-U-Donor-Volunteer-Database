@@ -11,31 +11,13 @@ place holder list
 */
 
 const headCells = [
-  {
-    id: "type",
-    numeric: false,
-    label: "Donation Type",
-  },
-  {
-    id: "amount",
-    numeric: true,
-    label: "Donation Amount / Item(s) Value",
-  },
-  {
-    id: "item",
-    numeric: false,
-    label: "Item",
-  },
-  {
-    id: "paymentMethod",
-    numeric: false,
-    label: "Method",
-  },
-  {
-    id: "date",
-    numeric: false,
-    label: "Date",
-  },
+  { id: "donorType", numeric: false, label: "Donor Type" },
+  { id: "donor", numeric: false, label: "Donor" },
+  { id: "amount", numeric: true, label: "Amount" },
+  { id: "date", numeric: false, label: "Date" },
+  { id: "campaign", numeric: false, label: "Campaign" },
+  { id: "paymentMethod", numeric: false, label: "Method" },
+  { id: "type", numeric: false, label: "Type" },
 ];
 export const TableHeader = () => {
   return (
@@ -93,21 +75,24 @@ export default function DonationsList() {
             <TableHeader />
             <TableBody>
               {data.map((donation) => {
+                const donorName = donation?.donor?.person
+                  ? `${donation.donor.person.firstName} ${donation.donor.person.lastName}`
+                  : donation?.donor?.organization?.name || "—";
+                const amount = typeof donation.amount === "number" ? donation.amount : Number(donation.amount ?? 0);
+                const donorType = donation?.donor?.type || "";
                 return (
                   <TableRow hover key={donation.id}>
                     <TableCell sx={styles.tableCell}>
                       <Link className="text-blue-500" href={`/admin/donations/detail/${donation.id}`}>
-                        {donation.type}
+                        {donorType}
                       </Link>
                     </TableCell>
-                    <TableCell sx={styles.tableCell} align="right">
-                      ${donation.amount}
-                    </TableCell>
-                    <TableCell sx={styles.tableCell}>{donation.type !== "In-Kind" ? "" : donation.item}</TableCell>
-                    <TableCell sx={styles.tableCell}>
-                      {donation.type !== "In-Kind" ? donation.paymentMethod : ""}
-                    </TableCell>
+                    <TableCell sx={styles.tableCell}>{donorName}</TableCell>
+                    <TableCell sx={styles.tableCell} align="right">${amount.toFixed(2)}</TableCell>
                     <TableCell sx={styles.tableCell}>{new Date(donation.date).toLocaleDateString()}</TableCell>
+                    <TableCell sx={styles.tableCell}>{donation.campaign || ""}</TableCell>
+                    <TableCell sx={styles.tableCell}>{donation.type !== "In-Kind" ? (donation.paymentMethod || "") : ""}</TableCell>
+                    <TableCell sx={styles.tableCell}>{donation.type}</TableCell>
                   </TableRow>
                 );
               })}
