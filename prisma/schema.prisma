@@ -34,24 +34,24 @@ model Organization {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  role          Role
-  personId      String?   @unique
-  person        Person?   @relation(fields: [personId], references: [id])
-  email         String    @unique
-  avatarUrl     String?
-  password      String
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  verified        Boolean   @default(false)
-  verificationToken    String?   @unique
-  verificationExpiry   DateTime?
-  twoFactorEnabled     Boolean   @default(false)
-  twoFactorCode        String?
-  twoFactorExpiry      DateTime?
-  resetToken           String?   @unique
-  resetTokenExpiry     DateTime?
+  id                 String    @id @default(uuid())
+  role               Role
+  personId           String?   @unique
+  person             Person?   @relation(fields: [personId], references: [id])
+  email              String    @unique
+  avatarUrl          String?
+  password           String
+  emailVerified      DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  verified           Boolean   @default(false)
+  verificationToken  String?   @unique
+  verificationExpiry DateTime?
+  twoFactorEnabled   Boolean   @default(false)
+  twoFactorCode      String?
+  twoFactorExpiry    DateTime?
+  resetToken         String?   @unique
+  resetTokenExpiry   DateTime?
 }
 
 model Task {

@@ -21,7 +21,7 @@ function parseName(name: string, fallbackLastName: string | null) {
 
   const parts = trimmed.split(/\s+/);
   const firstName = parts[0];
-  const lastName = parts.length > 1 ? parts.slice(1).join(" ") : fallbackLastName ?? "User";
+  const lastName = parts.length > 1 ? parts.slice(1).join(" ") : (fallbackLastName ?? "User");
 
   return { firstName, lastName };
 }
@@ -122,10 +122,7 @@ export async function POST(request: NextRequest) {
       const emailAddress = (personUpdateData.emailAddress as string | undefined) ?? user.email;
 
       if (!firstName || !lastName || !emailAddress) {
-        return NextResponse.json(
-          { error: "Name and email are required to create a profile" },
-          { status: 400 }
-        );
+        return NextResponse.json({ error: "Name and email are required to create a profile" }, { status: 400 });
       }
 
       userUpdateData.person = {
