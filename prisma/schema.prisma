@@ -39,6 +39,7 @@ model User {
   personId      String?   @unique
   person        Person?   @relation(fields: [personId], references: [id])
   email         String    @unique
+  avatarUrl     String?
   password      String
   emailVerified DateTime?
   createdAt     DateTime  @default(now())

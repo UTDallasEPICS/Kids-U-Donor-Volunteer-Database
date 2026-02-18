@@ -8,7 +8,7 @@ export default function AccountSettings() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [avatar, setAvatar] = useState("/accountSetting/image.png");
+  const [avatar, setAvatar] = useState("");
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -38,15 +38,38 @@ export default function AccountSettings() {
     fetchUserData();
   }, []);
 
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setAvatar(reader.result as string);
-        setImageError(false); 
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const response = await fetch("/api/user/avatar", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.url) {
+        setAvatar(data.url as string);
+        setImageError(false);
+      } else {
+        setMessage({ type: "error", text: data.error || "Failed to upload photo" });
+      }
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      setMessage({ type: "error", text: "An error occurred. Please try again." });
+    } finally {
+      setLoading(false);
+      if (e.target) {
+        e.target.value = "";
+      }
     }
   };
 
@@ -72,7 +95,7 @@ export default function AccountSettings() {
       if (data.success) {
         setMessage({ type: "success", text: "Profile updated successfully!" });
       } else {
-        setMessage({ type: "error", text: data.message || "Failed to update profile" });
+        setMessage({ type: "error", text: data.error || "Failed to update profile" });
       }
     } catch (error) {
       console.error('Error updating profile:', error);
@@ -87,10 +110,10 @@ export default function AccountSettings() {
     setTwoFactorEnabled(newValue);
     
     try {
-      await fetch('/api/user/toggle-2fa', {
+      await fetch('/api/auth/toggle-2fa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: newValue })
+        body: JSON.stringify({ enable: newValue })
       });
     } catch (error) {
       console.error('Failed to toggle 2FA:', error);
@@ -128,7 +151,7 @@ export default function AccountSettings() {
         )}
 
         <div className="flex items-center gap-6 mb-6 pb-6 border-b border-gray-100">
-          {!imageError ? (
+          {avatar && !imageError ? (
             <div className="relative w-[100px] h-[100px] rounded-full border-2 border-[#2f5597] overflow-hidden flex-shrink-0">
               <Image
                 src={avatar}
@@ -156,7 +179,7 @@ export default function AccountSettings() {
                 onChange={handlePhotoChange}
               />
             </label>
-            <p className="text-xs text-gray-500 mt-2">JPG, PNG or GIF. Max 2MB.</p>
+            <p className="text-xs text-gray-500 mt-2">JPG, PNG, GIF or WebP. Max 2MB.</p>
           </div>
         </div>
 

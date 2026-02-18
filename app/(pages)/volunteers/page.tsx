@@ -7,6 +7,7 @@ import logo from '/app/logo.png';
 export default function VolunteerDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState<number>(0);
+  const [attendedCount, setAttendedCount] = useState<number>(0);
   const [nextEventDays, setNextEventDays] = useState<number | null>(null);
   const [userName, setUserName] = useState<string>("Volunteer");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
@@ -21,6 +22,7 @@ export default function VolunteerDashboard() {
     ]).then(([events, hours, userData, gallery]) => {
       setUpcomingEvents(events);
       setTotalHours(hours.total || 0);
+      setAttendedCount(hours.attendedCount || 0);
       
       if (userData.success) {
         setUserName(userData.user.firstName);
@@ -91,7 +93,7 @@ export default function VolunteerDashboard() {
                   </svg>
                 </div>
                 <div className="text-right">
-                  <p className="text-4xl font-bold text-[#2f4b7c] mb-1">{upcomingEvents.filter(e => e.attended).length}</p>
+                  <p className="text-4xl font-bold text-[#2f4b7c] mb-1">{attendedCount}</p>
                   <p className="text-xs text-gray-500">this year</p>
                 </div>
               </div>
@@ -248,6 +250,8 @@ export default function VolunteerDashboard() {
                       src={imgUrl}
                       alt={`Gallery image ${idx + 1}`}
                       fill
+                      unoptimized={imgUrl.startsWith('data:')}
+                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 200px"
                       className="object-cover group-hover:scale-110 transition-transform duration-300"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
