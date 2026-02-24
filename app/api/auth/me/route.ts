@@ -39,10 +39,13 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         role: true,
+        avatarUrl: true,
+        twoFactorEnabled: true,
         person: {
           select: {
             firstName: true,
             lastName: true,
+            phoneNumber: true,
           },
         },
       },
@@ -63,6 +66,9 @@ export async function GET(request: NextRequest) {
         role: user.role,
         firstName: user.person?.firstName || 'Admin',
         lastName: user.person?.lastName || 'User',
+        phone: user.person?.phoneNumber || '',
+        avatar: user.avatarUrl || null,
+        twoFactorEnabled: user.twoFactorEnabled || false,
       },
     });
   } catch (error) {

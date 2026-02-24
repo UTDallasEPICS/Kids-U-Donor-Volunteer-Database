@@ -10,8 +10,10 @@ export default function VolunteerTopNavigationBar() {
     name: 'Name',
     email: 'email',
     role: 'Volunteer',
-    initials: 'V'
+    initials: 'V',
+    avatar: ''
   });
+  const [avatarError, setAvatarError] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,8 +26,10 @@ export default function VolunteerTopNavigationBar() {
             name: `${data.user.firstName} ${data.user.lastName}`,
             email: data.user.email,
             role: 'Volunteer',
-            initials: `${data.user.firstName[0]}${data.user.lastName[0]}`
+            initials: `${data.user.firstName[0]}${data.user.lastName[0]}`,
+            avatar: data.user.avatar || ''
           });
+          setAvatarError(false);
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -68,6 +72,7 @@ export default function VolunteerTopNavigationBar() {
                 src={logo}
                 alt="Kids University Logo"
                 fill
+                sizes="(max-width: 768px) 120px, 144px"
                 className="object-contain"
                 priority
               />
@@ -88,9 +93,23 @@ export default function VolunteerTopNavigationBar() {
                 <p className="text-sm font-semibold text-gray-700">{user.name}</p>
                 <p className="text-xs text-gray-500">{user.role}</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4a6fa5] to-[#2f4b7c] flex items-center justify-center text-white font-semibold shadow-md">
-                {user.initials}
-              </div>
+              {user.avatar && !avatarError ? (
+                <div className="relative w-10 h-10 rounded-full overflow-hidden shadow-md">
+                  <Image
+                    src={user.avatar}
+                    alt="Profile avatar"
+                    fill
+                    sizes="40px"
+                    className="object-cover"
+                    onError={() => setAvatarError(true)}
+                    unoptimized={user.avatar.startsWith('data:')}
+                  />
+                </div>
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4a6fa5] to-[#2f4b7c] flex items-center justify-center text-white font-semibold shadow-md">
+                  {user.initials}
+                </div>
+              )}
               <svg
                 className={`w-4 h-4 text-gray-500 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
                 fill="none"
