@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import prisma from "@/app/utils/db";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const ALLOWED_TYPES: Record<string, string> = {
@@ -36,17 +34,53 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File too large (max 2MB)" }, { status: 413 });
     }
 
-    const extension = ALLOWED_TYPES[file.type];
-    const filename = `${userId}-${randomUUID()}.${extension}`;
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "avatars");
-
-    await mkdir(uploadsDir, { recursive: true });
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadsDir, filename), buffer);
 
-    return NextResponse.json({ success: true, url: `/uploads/avatars/${filename}` }, { status: 200 });
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        avatarData: buffer,
+        avatarMimeType: file.type,
+      },
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error("Avatar upload error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
+export async function GET(request: NextRequest) {
+  try {
+    const userPayload = request.headers.get("x-user-payload");
+    if (!userPayload) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { userId } = JSON.parse(userPayload);
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        avatarData: true,
+        avatarMimeType: true,
+      },
+    });
+
+    if (!user?.avatarData) {
+      return NextResponse.json({ error: "No avatar found" }, { status: 404 });
+    }
+
+    return new NextResponse(user.avatarData, {
+      status: 200,
+      headers: {
+        "Content-Type": user.avatarMimeType || "image/png",
+        "Cache-Control": "private, max-age=60",
+      },
+    });
+  } catch (error) {
+    console.error("Avatar fetch error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

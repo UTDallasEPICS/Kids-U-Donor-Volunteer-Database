@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         role: true,
-        avatarUrl: true,
+        avatarMimeType: true,
         twoFactorEnabled: true,
         person: {
           select: {
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         firstName: user.person?.firstName || "Admin",
         lastName: user.person?.lastName || "User",
         phone: user.person?.phoneNumber || "",
-        avatar: user.avatarUrl || null,
+        avatar: user.avatarMimeType ? "/api/user/avatar" : null,
         twoFactorEnabled: user.twoFactorEnabled || false,
       },
     });

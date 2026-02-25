@@ -2,18 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/utils/db";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_AVATAR_URL_LENGTH = 2048;
-
-const isAllowedAvatarUrl = (value: string) => {
-  if (value.startsWith("data:")) return false;
-  if (value.startsWith("/")) return true;
-  try {
-    const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-};
 
 function parseName(name: string, fallbackLastName: string | null) {
   const trimmed = name.trim();
@@ -36,7 +24,7 @@ export async function POST(request: NextRequest) {
     const { userId } = JSON.parse(userPayload);
     const body = await request.json();
 
-    const { name, email, phone, avatar } = body ?? {};
+    const { name, email, phone } = body ?? {};
 
     if (name !== undefined && typeof name !== "string") {
       return NextResponse.json({ error: "Invalid name" }, { status: 400 });
@@ -46,9 +34,6 @@ export async function POST(request: NextRequest) {
     }
     if (phone !== undefined && typeof phone !== "string") {
       return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
-    }
-    if (avatar !== undefined && typeof avatar !== "string") {
-      return NextResponse.json({ error: "Invalid avatar" }, { status: 400 });
     }
 
     const trimmedEmail = typeof email === "string" ? email.trim() : undefined;
@@ -87,19 +72,6 @@ export async function POST(request: NextRequest) {
     if (trimmedEmail) {
       userUpdateData.email = trimmedEmail;
       personUpdateData.emailAddress = trimmedEmail;
-    }
-
-    if (typeof avatar === "string") {
-      const trimmedAvatar = avatar.trim();
-      if (trimmedAvatar === "") {
-        userUpdateData.avatarUrl = null;
-      } else if (trimmedAvatar.length > MAX_AVATAR_URL_LENGTH) {
-        return NextResponse.json({ error: "Avatar URL is too long" }, { status: 400 });
-      } else if (!isAllowedAvatarUrl(trimmedAvatar)) {
-        return NextResponse.json({ error: "Invalid avatar URL" }, { status: 400 });
-      } else {
-        userUpdateData.avatarUrl = trimmedAvatar;
-      }
     }
 
     if (nameParts) {
@@ -145,7 +117,6 @@ export async function POST(request: NextRequest) {
       select: {
         id: true,
         email: true,
-        avatarUrl: true,
         person: {
           select: {
             firstName: true,
@@ -163,7 +134,6 @@ export async function POST(request: NextRequest) {
         user: {
           id: updatedUser.id,
           email: updatedUser.email,
-          avatar: updatedUser.avatarUrl || null,
           firstName: updatedUser.person?.firstName ?? null,
           lastName: updatedUser.person?.lastName ?? null,
           phone: updatedUser.person?.phoneNumber ?? "",

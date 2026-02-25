@@ -56,9 +56,10 @@ export default function AccountSettings() {
 
       const data = await response.json();
 
-      if (data.success && data.url) {
-        setAvatar(data.url as string);
+      if (data.success) {
+        setAvatar(`/api/user/avatar?t=${Date.now()}`);
         setImageError(false);
+        setMessage({ type: "success", text: "Photo updated successfully!" });
       } else {
         setMessage({ type: "error", text: data.error || "Failed to upload photo" });
       }
@@ -85,7 +86,6 @@ export default function AccountSettings() {
           name,
           email,
           phone,
-          avatar,
           twoFactorEnabled
         })
       });
@@ -160,7 +160,7 @@ export default function AccountSettings() {
                 sizes="100px"
                 className="object-cover"
                 onError={() => setImageError(true)}
-                unoptimized={avatar.startsWith('data:')}
+                unoptimized
               />
             </div>
           ) : (
