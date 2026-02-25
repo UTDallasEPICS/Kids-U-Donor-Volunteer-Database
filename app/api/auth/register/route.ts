@@ -1,19 +1,19 @@
 // app/api/auth/register/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import { sendVerificationEmail, generateToken } from '../../../utils/email';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { sendVerificationEmail, generateToken } from "../../../utils/email";
 
 const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    const { 
-      email, 
-      password, 
-      firstName, 
+    const {
+      email,
+      password,
+      firstName,
       lastName,
-      middleInitial,         
+      middleInitial,
       phoneNumber,
       addressLine,
       city,
@@ -24,22 +24,15 @@ export async function POST(request: NextRequest) {
       reliableTransport,
       speakSpanish,
       referenceName,
-      businessOrSchoolName,  
+      businessOrSchoolName,
     } = await request.json();
 
     if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
-        { error: 'Email, password, first name, and last name are required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Email, password, first name, and last name are required" }, { status: 400 });
     }
 
-
     if (password.length < 8) {
-      return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "Password must be at least 8 characters long" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
@@ -55,10 +48,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser || existingPerson || existingVolunteer) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -81,18 +71,18 @@ export async function POST(request: NextRequest) {
           middleInitial: middleInitial || null,
           lastName,
           emailAddress: email,
-          phoneNumber: phoneNumber || 'Not provided',        
-          addressLine: addressLine || 'Not provided',        
-          city: city || 'Not provided',                      
-          state: state || 'Not provided',                    
-          zipCode: zipCode || '00000',                       
+          phoneNumber: phoneNumber || "Not provided",
+          addressLine: addressLine || "Not provided",
+          city: city || "Not provided",
+          state: state || "Not provided",
+          zipCode: zipCode || "00000",
           usCitizen: usCitizen ?? null,
           driversLicense: driversLicense ?? null,
           reliableTransport: reliableTransport ?? null,
           speakSpanish: speakSpanish ?? null,
           referenceName: referenceName || null,
           businessOrSchoolName: businessOrSchoolName || null,
-          registration: true, 
+          registration: true,
         },
       });
 
@@ -100,7 +90,7 @@ export async function POST(request: NextRequest) {
         data: {
           email,
           password: hashedPassword,
-          role: 'VOLUNTEER',
+          role: "VOLUNTEER",
           verified: false,
           verificationToken,
           verificationExpiry,
@@ -111,30 +101,34 @@ export async function POST(request: NextRequest) {
       return { user, person, volunteer };
     });
 
-    await sendVerificationEmail(email, verificationToken, firstName);
-    console.log('Email sent successfully to:', email);
+    // Temporarily skip email sending for development
+    // TODO: Add Mailtrap credentials to .env file
+    try {
+      await sendVerificationEmail(email, verificationToken, firstName);
+      console.log("Email sent successfully to:", email);
+    } catch (emailError) {
+      console.warn("Email sending failed (development mode):", emailError);
+      // Continue anyway for development
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Registration successful. Please check your email to verify your account.',
+        message: "Registration successful. Please check your email to verify your account.",
         user: {
           id: result.user.id,
           email: result.user.email,
           verified: result.user.verified,
           firstName: result.person.firstName,
           lastName: result.person.lastName,
-          volunteerId: result.volunteer.id, 
+          volunteerId: result.volunteer.id,
         },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Registration error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Registration error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

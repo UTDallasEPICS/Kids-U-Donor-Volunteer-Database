@@ -54,12 +54,12 @@ model User {
   resetTokenExpiry     DateTime?
 }
 
-model Task {
-  id        Int      @id @default(autoincrement())
-  title     String
-  completed Boolean
-  createdAt DateTime @default(now())
-}
+// model Task {
+//   id        Int      @id @default(autoincrement())
+//   title     String
+//   completed Boolean
+//   createdAt DateTime @default(now())
+// }
 
 //Volunteer profile and Admin profile
 
@@ -238,13 +238,13 @@ model Volunteer {
   MailRecipient       MailRecipient[]
 }
 
-model volunteerAccount {
-  id          String @id @default(uuid())
-  username    String @unique
-  email       String @unique
-  password    String
-  volunteerId String @unique
-}
+// model volunteerAccount {
+//   id          String @id @default(uuid())
+//   username    String @unique
+//   email       String @unique
+//   password    String
+//   volunteerId String @unique
+// }
 
 model EventHour {
   id             String    @id @default(uuid())
