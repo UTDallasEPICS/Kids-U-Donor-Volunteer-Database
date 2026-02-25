@@ -7,7 +7,7 @@ async function main() {
 
   // First, check if there's an existing volunteer or create one
   let volunteer = await prisma.volunteer.findFirst();
-  
+
   if (!volunteer) {
     console.log("Creating a mock volunteer...");
     volunteer = await prisma.volunteer.create({
@@ -128,14 +128,14 @@ async function main() {
   console.log("\n=== Summary ===");
   console.log(`Events created/found: ${createdEvents.length}`);
   console.log(`New hours added: ${totalHoursAdded}`);
-  
+
   // Get total hours for the volunteer
   const totals = await prisma.volunteerAttendance.aggregate({
     where: { volunteerId: volunteer.id },
     _sum: { hoursWorked: true },
   });
   console.log(`Total volunteer hours in DB: ${totals._sum.hoursWorked || 0}`);
-  
+
   console.log("\nDone!");
 }
 
