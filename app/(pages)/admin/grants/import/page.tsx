@@ -27,7 +27,7 @@ export default function Import() {
       setStatusMessage('Error: Please select a file first.');
       return;
     }
-
+    
     setIsUploading(true);
     setStatusMessage('Uploading Excel file...');
 
@@ -37,7 +37,7 @@ export default function Import() {
       const formData = new FormData();
       formData.append('csv', new Blob([csv], { type: 'text/csv' }), `${selectedFile.name.replace(/\..+$/, '')}.csv`);
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/grants/import`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/api/admin/grants/import`;
       const response = await fetch(apiUrl, { method: 'POST', body: formData });
 
       //error handling
@@ -57,7 +57,7 @@ export default function Import() {
       await response.json();
       setStatusMessage(`'${selectedFile.name}' was successfully processed and imported!`);
       setSelectedFile(null); 
-
+      
     } catch (error: any) {
       setStatusMessage(`Error: ${error.message}`);
       console.error(error);
@@ -102,7 +102,7 @@ export default function Import() {
 
   // upload icon svg
   const UploadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" >
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="17 8 12 3 7 8" />
       <line x1="12" y1="3" x2="12" y2="15" />
