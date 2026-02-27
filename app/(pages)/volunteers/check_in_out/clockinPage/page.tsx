@@ -1,13 +1,14 @@
-"use client"; 
+"use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 interface volunteer {}
 
 const Breadcrumb = () => (
   <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
-    <span className="hover:text-blue-500 cursor-pointer transition-colors duration-200">
+    <Link href="/volunteers/check_in_out" className="hover:text-blue-500 cursor-pointer transition-colors duration-200">
       Home
-    </span>
+    </Link>
     <span className="text-gray-400">/</span>
     <span className="font-semibold text-gray-700">Checkin : Checkout</span>
   </div>
@@ -19,7 +20,8 @@ export default function Checkinout() {
   const [visible, setVisible] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [currentEvent, setCurrentEvent] = useState<any>(null);
-  const volunteerId = "8bf18571-0f32-4a6a-a71b-e267e650dcc2"; // Hardcoded volunteer ID add your own ID
+  const [volunteerId, setVolunteerId] = useState<string | null>(null);
+  const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
 
   // Manual entry state for Column 2
   const [manualCheckInDate, setManualCheckInDate] = useState<string>("");
@@ -45,10 +47,30 @@ export default function Checkinout() {
     };
   };
 
-  // Fetch current event on component mount
+  // Fetch current user's volunteer ID and current event on component mount
   useEffect(() => {
-    const fetchCurrentEvent = async () => {
+    const fetchUserAndEvent = async () => {
       try {
+        // Fetch user data to get volunteer ID
+        const userResponse = await fetch('/api/auth/me');
+        if (userResponse.ok) {
+          const userData = await userResponse.json();
+          if (userData.success && userData.user?.email) {
+            // Fetch volunteer by email
+            const volResponse = await fetch(`/api/volunteer/get/by-email?email=${encodeURIComponent(userData.user.email)}`);
+            if (volResponse.ok) {
+              const volData = await volResponse.json();
+              if (volData.volunteerId) {
+                setVolunteerId(volData.volunteerId);
+              } else {
+                showMessage("No volunteer profile found for your account.", true);
+              }
+            }
+          }
+        }
+        setIsLoadingUser(false);
+
+        // Fetch current event
         const response = await fetch('/api/events/get');
         if (response.ok) {
           const events = await response.json();
@@ -59,11 +81,12 @@ export default function Checkinout() {
           }
         }
       } catch (error) {
-        showMessage("Failed to fetch current event", true);
+        showMessage("Failed to fetch user or event data", true);
+        setIsLoadingUser(false);
       }
     };
 
-    fetchCurrentEvent();
+    fetchUserAndEvent();
   }, []);
 
   // Handle automatic Check-In
@@ -83,6 +106,11 @@ export default function Checkinout() {
 
     if (!currentEvent) {
       showMessage("No active event found. Please try again.", true);
+      return;
+    }
+
+    if (!volunteerId) {
+      showMessage("No volunteer profile found. Please contact support.", true);
       return;
     }
 
@@ -129,6 +157,11 @@ export default function Checkinout() {
 
     if (!currentEvent) {
       showMessage("No active event found. Please try again.", true);
+      return;
+    }
+
+    if (!volunteerId) {
+      showMessage("No volunteer profile found. Please contact support.", true);
       return;
     }
 
