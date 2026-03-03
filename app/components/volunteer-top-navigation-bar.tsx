@@ -74,7 +74,6 @@ export default function VolunteerTopNavigationBar() {
                 fill
                 sizes="(max-width: 768px) 120px, 144px"
                 className="object-contain"
-                sizes="144px"
                 priority
               />
             </div>
