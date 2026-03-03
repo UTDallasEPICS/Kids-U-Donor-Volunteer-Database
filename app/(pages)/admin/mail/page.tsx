@@ -118,6 +118,7 @@ export default function EmailPage() {
           to: recipientType === 'individual' ? recipient : null,
           subject: subject,
           body: body,
+          from: "", //look for the admin email varibale // 
         }),
       });
 
