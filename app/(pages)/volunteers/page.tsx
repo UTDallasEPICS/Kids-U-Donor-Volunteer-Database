@@ -118,8 +118,8 @@ export default function VolunteerDashboard() {
           <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
             <h3 className="text-sm font-bold text-gray-900 mb-4 uppercase tracking-wide">Quick Actions</h3>
             <div className="space-y-3">
-              <button 
-                onClick={() => window.location.href = '/volunteers/registration'}
+              <button
+                onClick={() => window.location.href = '/volunteers/Registration'}
                 className="w-full flex items-center gap-3 p-4 bg-gradient-to-r from-[#2f4b7c] to-[#4a6fa5] text-white rounded-xl hover:shadow-lg hover:scale-[1.02] transition-all"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -221,8 +221,8 @@ export default function VolunteerDashboard() {
                   <p className="text-sm text-gray-600 mb-6 max-w-md leading-relaxed">
                     Check back soon for exciting volunteer opportunities. Events are posted regularly and we&apos;d love to see you there!
                   </p>
-                  <button 
-                    onClick={() => window.location.href = '/volunteers/registration'}
+                  <button
+                    onClick={() => window.location.href = '/volunteers/Registration'}
                     className="px-8 py-3 bg-gradient-to-r from-[#2f4b7c] to-[#4a6fa5] text-white rounded-xl hover:shadow-lg hover:scale-105 transition-all font-semibold"
                   >
                     Browse All Events
