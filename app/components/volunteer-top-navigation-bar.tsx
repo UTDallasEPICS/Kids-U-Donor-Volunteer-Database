@@ -103,7 +103,7 @@ export default function VolunteerTopNavigationBar() {
                     sizes="40px"
                     className="object-cover"
                     onError={() => setAvatarError(true)}
-                    unoptimized={user.avatar.startsWith('data:')}
+                    unoptimized
                   />
                 </div>
               ) : (

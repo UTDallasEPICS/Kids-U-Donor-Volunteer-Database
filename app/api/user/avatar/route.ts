@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
-import { randomUUID } from "crypto";
+import prisma from "@/app/utils/db";
+import { writeFile, unlink, mkdir } from "fs/promises";
+import { join, extname } from "path";
 
 const MAX_BYTES = 2 * 1024 * 1024;
 const ALLOWED_TYPES: Record<string, string> = {
@@ -10,6 +10,7 @@ const ALLOWED_TYPES: Record<string, string> = {
   "image/gif": "gif",
   "image/webp": "webp",
 };
+const UPLOAD_DIR = join(process.cwd(), "public", "uploads", "avatars");
 
 export const runtime = "nodejs";
 
@@ -28,7 +29,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Avatar file is required" }, { status: 400 });
     }
 
-    if (!ALLOWED_TYPES[file.type]) {
+    const ext = ALLOWED_TYPES[file.type];
+    if (!ext) {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 415 });
     }
 
@@ -36,15 +38,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File too large (max 2MB)" }, { status: 413 });
     }
 
-    const extension = ALLOWED_TYPES[file.type];
-    const filename = `${userId}-${randomUUID()}.${extension}`;
-    const uploadsDir = path.join(process.cwd(), "public", "uploads", "avatars");
+    await mkdir(UPLOAD_DIR, { recursive: true });
 
-    await mkdir(uploadsDir, { recursive: true });
+    // Delete old file if extension differs (avoids orphaned files)
+    const existingUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { avatarPath: true },
+    });
+    if (existingUser?.avatarPath) {
+      const oldExt = extname(existingUser.avatarPath).slice(1);
+      if (oldExt !== ext) {
+        const oldFilePath = join(process.cwd(), "public", existingUser.avatarPath);
+        await unlink(oldFilePath).catch(() => {});
+      }
+    }
+
+    // Write file — named <userId>.<ext>, overwrites on same extension
+    const filename = `${userId}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(path.join(uploadsDir, filename), buffer);
+    await writeFile(join(UPLOAD_DIR, filename), buffer);
 
-    return NextResponse.json({ success: true, url: `/uploads/avatars/${filename}` }, { status: 200 });
+    const avatarPath = `/uploads/avatars/${filename}`;
+    await prisma.user.update({
+      where: { id: userId },
+      data: { avatarPath },
+    });
+
+    return NextResponse.json({ success: true, avatarPath }, { status: 200 });
   } catch (error) {
     console.error("Avatar upload error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

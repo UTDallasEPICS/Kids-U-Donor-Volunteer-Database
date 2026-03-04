@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
     const attendedEvents = await prisma.volunteerAttendance.findMany({
       where: {
         volunteerId: volunteer.id,
-        checkOutTime: { not: null },
         checkInTime: { gte: startOfYear, lt: startOfNextYear },
       },
       distinct: ["eventId"],
