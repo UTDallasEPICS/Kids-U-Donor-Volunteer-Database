@@ -236,6 +236,8 @@ model Volunteer {
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+
+  @@index([emailAddress])
 }
 
 // model volunteerAccount {

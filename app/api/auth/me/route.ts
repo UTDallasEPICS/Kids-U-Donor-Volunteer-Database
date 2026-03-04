@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/utils/db";
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 interface JWTPayload {
@@ -65,7 +64,5 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Get user error:", error);
     return NextResponse.json({ success: false, error: "Failed to fetch user data" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
   }
 }
