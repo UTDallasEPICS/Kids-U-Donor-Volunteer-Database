@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation'; 
 import Image from 'next/image';
-import logo from '/app/logo.png';
+import logo from '@/app/logo.png';
 
 export default function VolunteerTopNavigationBar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -74,6 +74,7 @@ export default function VolunteerTopNavigationBar() {
                 fill
                 sizes="(max-width: 768px) 120px, 144px"
                 className="object-contain"
+                sizes="144px"
                 priority
               />
             </div>
