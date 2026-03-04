@@ -36,6 +36,17 @@ export default function VolunteerLogsPage() {
   const [sortField, setSortField] = useState<"checkInTime" | "hoursWorked" | "volunteer">("checkInTime");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
+
+  const [editingLog, setEditingLog] = useState<VolunteerLog | null>(null);
+  const [editCheckIn, setEditCheckIn] = useState("");
+  const [editCheckOut, setEditCheckOut] = useState("");
+  const [editHours, setEditHours] = useState("");
+  const [editError, setEditError] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const [deletingLogId, setDeletingLogId] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
   useEffect(() => {
     const fetchLogs = async () => {
       setLoading(true);
@@ -142,6 +153,94 @@ export default function VolunteerLogsPage() {
     setStartDate("");
     setEndDate("");
     setSelectedVolunteer("");
+  };
+
+
+  const toDateTimeLocal = (dateStr: string) => {
+    const d = new Date(dateStr);
+    const pad = (n: number) => n.toString().padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+
+  const openEditModal = (log: VolunteerLog) => {
+    setEditingLog(log);
+    setEditCheckIn(toDateTimeLocal(log.checkInTime));
+    setEditCheckOut(toDateTimeLocal(log.checkOutTime));
+    setEditHours(log.hoursWorked.toString());
+    setEditError("");
+  };
+
+
+  const recalcHours = (checkIn: string, checkOut: string) => {
+    if (checkIn && checkOut) {
+      const diffMs = new Date(checkOut).getTime() - new Date(checkIn).getTime();
+      if (diffMs > 0) {
+        setEditHours((Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100).toString());
+      }
+    }
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingLog) return;
+    setEditError("");
+    setSaving(true);
+
+    try {
+      const res = await fetch(`/api/admin/volunteer/logs/${editingLog.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          checkInTime: new Date(editCheckIn).toISOString(),
+          checkOutTime: new Date(editCheckOut).toISOString(),
+          hoursWorked: parseFloat(editHours),
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setLogs(logs.map((l) => (l.id === editingLog.id ? data.log : l)));
+        const updatedLogs = logs.map((l) => (l.id === editingLog.id ? data.log : l));
+        const totalHours = updatedLogs.reduce((s, l) => s + l.hoursWorked, 0);
+        setSummary((prev) =>
+          prev
+            ? { ...prev, totalHours: Math.round(totalHours * 100) / 100 }
+            : prev
+        );
+        setEditingLog(null);
+      } else {
+        const err = await res.json();
+        setEditError(err.message || "Failed to save changes");
+      }
+    } catch (err) {
+      setEditError("Network error. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/admin/volunteer/logs/${id}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        const updatedLogs = logs.filter((l) => l.id !== id);
+        setLogs(updatedLogs);
+        const totalHours = updatedLogs.reduce((s, l) => s + l.hoursWorked, 0);
+        const uniqueVols = new Set(updatedLogs.map((l) => l.volunteer.id)).size;
+        setSummary({
+          totalHours: Math.round(totalHours * 100) / 100,
+          uniqueVolunteers: uniqueVols,
+          totalSessions: updatedLogs.length,
+        });
+        setDeletingLogId(null);
+      }
+    } catch (err) {
+      console.error("Error deleting log:", err);
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -313,6 +412,9 @@ export default function VolunteerLogsPage() {
                 <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   Status
                 </th>
+                <th className="text-left px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
@@ -363,6 +465,28 @@ export default function VolunteerLogsPage() {
                         {isComplete ? "Completed" : "In Progress"}
                       </span>
                     </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => openEditModal(log)}
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
+                        >
+                          <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                          </svg>
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => setDeletingLogId(log.id)}
+                          className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
+                        >
+                          <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                          Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -386,6 +510,131 @@ export default function VolunteerLogsPage() {
           </div>
         )}
       </div>
+
+      
+      {editingLog && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
+            
+            <div className="px-6 py-4 border-b border-gray-100">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-800">Edit Attendance Log</h2>
+                  <p className="text-sm text-gray-400 mt-0.5">
+                    {editingLog.volunteer.firstName} {editingLog.volunteer.lastName} — {editingLog.event.name}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setEditingLog(null)}
+                  className="text-gray-400 hover:text-gray-600 transition"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            
+            <div className="px-6 py-5 space-y-4">
+              {editError && (
+                <div className="bg-red-50 text-red-600 text-sm px-4 py-3 rounded-lg">
+                  {editError}
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Clock In Time</label>
+                <input
+                  type="datetime-local"
+                  value={editCheckIn}
+                  onChange={(e) => {
+                    setEditCheckIn(e.target.value);
+                    recalcHours(e.target.value, editCheckOut);
+                  }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">Clock Out Time</label>
+                <input
+                  type="datetime-local"
+                  value={editCheckOut}
+                  onChange={(e) => {
+                    setEditCheckOut(e.target.value);
+                    recalcHours(editCheckIn, e.target.value);
+                  }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-600 mb-1">
+                  Hours Worked
+                  <span className="text-gray-400 font-normal ml-1">(auto-calculated, or override manually)</span>
+                </label>
+                <input
+                  type="number"
+                  step="0.25"
+                  min="0"
+                  value={editHours}
+                  onChange={(e) => setEditHours(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+                />
+              </div>
+            </div>
+
+            
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setEditingLog(null)}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={saving}
+                className="px-5 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deletingLogId && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm">
+            <div className="px-6 py-5 text-center">
+              <div className="w-12 h-12 mx-auto mb-4 bg-red-50 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">Delete Attendance Log</h3>
+              <p className="text-sm text-gray-500">Are you sure? This action cannot be undone.</p>
+            </div>
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center gap-3">
+              <button
+                onClick={() => setDeletingLogId(null)}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deletingLogId)}
+                disabled={deleting}
+                className="px-5 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {deleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
