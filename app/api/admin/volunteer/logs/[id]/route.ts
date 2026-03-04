@@ -1,11 +1,7 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
     const body = await req.json();
@@ -16,18 +12,13 @@ export async function PATCH(
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { message: "Attendance log not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Attendance log not found" }, { status: 404 });
     }
-
 
     const updateData: any = {};
     if (checkInTime !== undefined) updateData.checkInTime = new Date(checkInTime);
     if (checkOutTime !== undefined) updateData.checkOutTime = new Date(checkOutTime);
     if (hoursWorked !== undefined) updateData.hoursWorked = parseFloat(hoursWorked);
-
 
     const finalCheckIn = updateData.checkInTime || existing.checkInTime;
     const finalCheckOut = updateData.checkOutTime || existing.checkOutTime;
@@ -36,12 +27,8 @@ export async function PATCH(
       updateData.hoursWorked = Math.round((diffMs / (1000 * 60 * 60)) * 100) / 100;
     }
 
-
     if (new Date(finalCheckOut) <= new Date(finalCheckIn)) {
-      return NextResponse.json(
-        { message: "Clock out time must be after clock in time" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "Clock out time must be after clock in time" }, { status: 400 });
     }
 
     const updated = await prisma.volunteerAttendance.update({
@@ -67,20 +54,13 @@ export async function PATCH(
 
     return NextResponse.json({ log: updated }, { status: 200 });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error updating volunteer log:", errorMessage);
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
 
@@ -89,25 +69,15 @@ export async function DELETE(
     });
 
     if (!existing) {
-      return NextResponse.json(
-        { message: "Attendance log not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "Attendance log not found" }, { status: 404 });
     }
 
     await prisma.volunteerAttendance.delete({ where: { id } });
 
-    return NextResponse.json(
-      { message: "Attendance log deleted successfully" },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Attendance log deleted successfully" }, { status: 200 });
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error deleting volunteer log:", errorMessage);
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }
