@@ -108,6 +108,20 @@ export default function EmailPage() {
         body
       });
 
+
+      //where to fetch for the email variable for the from field in the post request //
+
+      const userResponse = await fetch('/api/auth/me', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const userObject = await userResponse.json();
+      const email = userObject.user.email;
+
+
       const response = await fetch('/api/send-mail/post', {
         method: 'POST',
         headers: {
@@ -118,7 +132,7 @@ export default function EmailPage() {
           to: recipientType === 'individual' ? recipient : null,
           subject: subject,
           body: body,
-          from: "", //look for the admin email varibale // 
+          from: email,//look for the admin email varibale // 
         }),
       });
 

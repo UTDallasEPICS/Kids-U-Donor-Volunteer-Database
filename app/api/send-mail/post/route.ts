@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export async function POST(request: Request) {
   try {
     // Parse request body
-    const { recipientType, to, subject, body } = await request.json();
+    const { recipientType, to, subject, body, from } = await request.json();
 
     // Validate required fields
     if (!subject || !body) {
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
 
     // Send emails
     const mailOptions = {
-      from: "", //replace with the email variable  for admin //
+      from: from, //replace with the email variable  for admin //
       subject: subject,
       text: body,
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${body.replace(/\n/g, "<br>")}</div>`,
@@ -78,7 +78,7 @@ export async function POST(request: Request) {
       try {
         await transporter.sendMail({
           ...mailOptions,
-          to: recipients,
+          to: recipients, //chaged to reciptients in order to send an email to all volunteers and admins if selected//
         });
         emailCount++;
       } catch (error) {
@@ -86,10 +86,7 @@ export async function POST(request: Request) {
         // Continue sending to other recipients even if one fails
     }
 
-    console.log(recipients);
-
-
-    console.log("E");
+    
 
     return NextResponse.json(
       {
