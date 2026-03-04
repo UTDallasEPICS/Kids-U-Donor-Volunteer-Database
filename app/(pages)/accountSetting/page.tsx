@@ -57,7 +57,7 @@ export default function AccountSettings() {
       const data = await response.json();
 
       if (data.success) {
-        setAvatar(`/api/user/avatar?t=${Date.now()}`);
+        setAvatar(`${data.avatarPath}?t=${Date.now()}`);
         setImageError(false);
         setMessage({ type: "success", text: "Photo updated successfully!" });
       } else {
