@@ -160,9 +160,16 @@ export async function POST(req: NextRequest) {
 
         // Normalize type values
         let type = row["Donor Type"] || row["Type"] || row["type"] || "Individual";
-        if (type != "Individual" && type != "individual" && type != "Corporate" && type != "corporate" && type != "In-Kind" && type != "In-kind" && type != "in-kind" && type != "In Kind" && type != "In kind" && type != "in kind") {
+        const allowedTypes = new Set(["Individual", "individual", "Corporate", "corporate", "Corporate Sponsor", "Business", "In-Kind", "In-kind", "in-kind", "In Kind", "In kind", "in kind"]);
+        if (!allowedTypes.has(type)) {
           type = "Individual";
         }
+        
+        const isCorporateSponsorVal = type === "Corporate Sponsor" || parseBoolean(row["Corporate Sponsor"] || row["isCorporateSponsor"]);
+        const referralSource = row["Referral Source"] || row["referralSource"] || row["Referral"] || null;
+        const orgPhone = row["Business Phone"] || row["Organization Phone"] || null;
+        const orgWebsite = row["Website"] || row["Business Website"] || null;
+        const orgContactTitle = row["Point of Contact Title"] || row["Job Title"] || null;
 
         // Organization fields
         const orgName = row["Organization"] || row["Organization Name"] || row["Company Name (if applicable)"] || row["Company"] || null;
@@ -201,6 +208,7 @@ export async function POST(req: NextRequest) {
                 lastName: String(personLast),
                 emailAddress: email ? String(email) : `${personFirst}.${personLast}@temp.com`,
                 phoneNumber: phone ? String(phone) : undefined,
+                referralSource: referralSource ? String(referralSource) : undefined,
               },
             });
             summary.peopleCreated += 1;
@@ -217,7 +225,7 @@ export async function POST(req: NextRequest) {
             }
             let donor = await prisma.donor.findUnique({ where: { personId: person.id } }).catch(() => null);
             if (!donor) {
-              donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, personId: person.id } });
+              donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, isCorporateSponsor: isCorporateSponsorVal, personId: person.id } });
               summary.donorsCreated += 1;
             }
             donorId = donor.id;
@@ -233,7 +241,7 @@ export async function POST(req: NextRequest) {
 
           }
 
-        } else if (type == "Corporate" || type == "corporate" || type == "In-Kind" || type == "In-kind" || type == "in-kind" || type == "In Kind" || type == "In kind" || type == "in kind") {
+        } else if (allowedTypes.has(type) && type.toLowerCase() !== "individual") {
           let organization = null;
           if (orgName) {
             organization = await prisma.organization.findFirst({ where: { name: String(orgName) } }).catch(() => null);
@@ -242,7 +250,17 @@ export async function POST(req: NextRequest) {
             organization = await prisma.organization.findUnique({ where: { emailAddress: String(orgEmail) } }).catch(() => null);
           }
           if (!organization) {
-            organization = await prisma.organization.create({ data: { name: String(orgName), emailAddress: orgEmail ? String(orgEmail) : email } });
+            organization = await prisma.organization.create({ 
+              data: { 
+                name: String(orgName), 
+                emailAddress: orgEmail ? String(orgEmail) : email,
+                phoneNumber: orgPhone ? String(orgPhone) : phone ? String(phone) : undefined,
+                website: orgWebsite ? String(orgWebsite) : undefined,
+                pointOfContactName: personFirst || personLast ? `${personFirst || ''} ${personLast || ''}`.trim() : undefined,
+                pointOfContactTitle: orgContactTitle ? String(orgContactTitle) : undefined,
+                referralSource: referralSource ? String(referralSource) : undefined,
+              } 
+            });
             summary.organizationsCreated += 1;
           }
           if (mailingAddress) {
@@ -269,6 +287,7 @@ export async function POST(req: NextRequest) {
                   lastName: personLast ? String(personLast) : (personFirst ? String(personFirst) : ""),
                   emailAddress: email ? String(email) : `${(personFirst ?? "").toString().replace(/\s+/g, '')}.${(personLast ?? "").toString().replace(/\s+/g, '')}@temp.com`,
                   phoneNumber: phone ? String(phone) : undefined,
+                  referralSource: referralSource ? String(referralSource) : undefined,
                 },
               }).catch(() => null);
               if (contactPerson) summary.peopleCreated += 1;
@@ -287,7 +306,7 @@ export async function POST(req: NextRequest) {
 
           let donor = await prisma.donor.findUnique({ where: { organizationId: organization.id } }).catch(() => null);
           if (!donor) {
-            donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, organizationId: organization.id, personId: contactPerson ? contactPerson.id : undefined } }).catch(() => null);
+            donor = await prisma.donor.create({ data: { type: type, communicationPreference: preferredContact ?? "", status: "Active", notes: "", isRetained: false, isCorporateSponsor: isCorporateSponsorVal, organizationId: organization.id, personId: contactPerson ? contactPerson.id : undefined } }).catch(() => null);
             if (donor) summary.donorsCreated += 1;
           } else {
             // DOES NOT WORK

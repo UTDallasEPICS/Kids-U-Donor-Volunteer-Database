@@ -8,19 +8,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId } = JSON.parse(userPayload);
-
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { email: true },
-    });
-
-    if (!user) {
-      return NextResponse.json({ total: 0, attendedCount: 0 }, { status: 200 });
-    }
+    const { email } = JSON.parse(userPayload);
 
     const volunteer = await prisma.volunteer.findFirst({
-      where: { emailAddress: user.email },
+      where: { emailAddress: email },
       select: { id: true },
     });
 

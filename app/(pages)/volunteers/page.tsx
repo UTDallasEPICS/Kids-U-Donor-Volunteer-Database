@@ -9,7 +9,6 @@ export default function VolunteerDashboard() {
   const [totalHours, setTotalHours] = useState<number>(0);
   const [attendedCount, setAttendedCount] = useState<number>(0);
   const [nextEventDays, setNextEventDays] = useState<number | null>(null);
-  const [userName, setUserName] = useState<string>("Volunteer");
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
 
@@ -17,17 +16,12 @@ export default function VolunteerDashboard() {
     Promise.all([
       fetch('/api/volunteer/events/upcoming').then(res => res.json()),
       fetch('/api/volunteer/hours').then(res => res.json()),
-      fetch('/api/auth/me').then(res => res.json()),
       fetch('/api/gallery/images').then(res => res.json()).catch(() => ({ images: [] })),
-    ]).then(([events, hours, userData, gallery]) => {
+    ]).then(([events, hours, gallery]) => {
       setUpcomingEvents(events);
       setTotalHours(hours.total || 0);
       setAttendedCount(hours.attendedCount || 0);
-      
-      if (userData.success) {
-        setUserName(userData.user.firstName);
-      }
-      
+
       if (events.length > 0) {
         const nextEvent = new Date(events[0].date);
         const today = new Date();
@@ -47,7 +41,7 @@ export default function VolunteerDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-6">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-[#2f4b7c] mb-1">Welcome back, {userName}</h1>
+          <h1 className="text-3xl font-bold text-[#2f4b7c] mb-1">Welcome back, Volunteer</h1>
           <p className="text-gray-600 text-sm">Track your volunteer journey and upcoming opportunities</p>
         </div>
         <Image
