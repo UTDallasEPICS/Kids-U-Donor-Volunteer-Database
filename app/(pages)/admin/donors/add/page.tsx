@@ -11,6 +11,7 @@ import {
   donorStatuses,
   donorTypes,
   statesChoices,
+  referralSources,
 } from "@/app/components/form-components/form-input-props";
 import { AddDonorFooter } from "@/app/components/donations/add/add-donor-footer";
 import { FormInputCheckbox } from "@/app/components/form-components/form-input-checkbox";
@@ -30,9 +31,10 @@ export default function AddDonor() {
         status: "",
         notes: "",
         isRetained: false,
+        isCorporateSponsor: false,
       },
-      person: { firstName: "", lastName: "", emailAddress: "", phoneNumber: "" },
-      organization: { name: "", emailAddress: "" },
+      person: { firstName: "", lastName: "", emailAddress: "", phoneNumber: "", referralSource: "" },
+      organization: { name: "", emailAddress: "", phoneNumber: "", website: "", pointOfContactName: "", pointOfContactTitle: "", referralSource: "" },
       address: { addressLine1: "", addressLine2: "", city: "", state: "", zipCode: "", type: "" },
     },
   });
@@ -82,6 +84,13 @@ export default function AddDonor() {
           label={"Retention"}
           required
         />
+        <FormInputCheckbox
+          control={control}
+          setValue={setValue}
+          name={"donor.isCorporateSponsor"}
+          label={"Corporate Sponsor"}
+          required
+        />
 
         <Box sx={{ gridColumn: "span 3" }}>
           <FormInputTextfield
@@ -122,7 +131,38 @@ export default function AddDonor() {
                     required
                     sx={styles.textField}
                   />
-                  <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                  <FormInputTextfield
+                    name={"organization.phoneNumber"}
+                    control={control}
+                    label={"Phone Number"}
+                    maxLength={12}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"organization.website"}
+                    control={control}
+                    label={"Website"}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"organization.pointOfContactName"}
+                    control={control}
+                    label={"Point of Contact Name"}
+                    sx={styles.textField}
+                  />
+                  <FormInputTextfield
+                    name={"organization.pointOfContactTitle"}
+                    control={control}
+                    label={"Point of Contact Title"}
+                    sx={styles.textField}
+                  />
+                  <FormInputDropdown
+                    name={"organization.referralSource"}
+                    control={control}
+                    label={"Referral Source"}
+                    menuItems={referralSources}
+                    sx={styles.textField}
+                  />
                 </>
               ) : (
                 <>
@@ -154,7 +194,13 @@ export default function AddDonor() {
                     maxLength={12}
                     sx={styles.textField}
                   />
-                  <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
+                  <FormInputDropdown
+                    name={"person.referralSource"}
+                    control={control}
+                    label={"Referral Source"}
+                    menuItems={referralSources}
+                    sx={styles.textField}
+                  />
                   <TextField sx={{ ...styles.textField, visibility: "hidden" }} label="styling" />
                 </>
               )}

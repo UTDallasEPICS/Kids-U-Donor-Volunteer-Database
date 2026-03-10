@@ -18,6 +18,7 @@ model Person {
   lastName       String
   emailAddress   String          @unique
   phoneNumber    String?         @unique
+  referralSource String?
   address        Address?
   donor          Donor?
   representative Representative?
@@ -25,12 +26,17 @@ model Person {
 }
 
 model Organization {
-  id           String   @id @default(uuid())
-  name         String
-  emailAddress String?  @unique
-  address      Address?
-  grantor      Grantor?
-  donor        Donor?
+  id                  String   @id @default(uuid())
+  name                String
+  emailAddress        String?  @unique
+  phoneNumber         String?
+  website             String?
+  pointOfContactName  String?
+  pointOfContactTitle String?
+  referralSource      String?
+  address             Address?
+  grantor             Grantor?
+  donor               Donor?
 }
 
 model User {
@@ -156,6 +162,7 @@ model Donor {
   status                  String
   notes                   String
   isRetained              Boolean
+  isCorporateSponsor      Boolean       @default(false)
   donation                Donation[]
   personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
