@@ -11,9 +11,7 @@ function escapeCsv(value: string): string {
 function fmtDate(d?: Date | null): string {
   if (!d) return "";
   try {
-    return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(
-      new Date(d)
-    );
+    return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(new Date(d));
   } catch {
     return "";
   }
@@ -122,9 +120,6 @@ export async function GET() {
     });
   } catch (err) {
     console.error("Volunteer export error:", err);
-    return NextResponse.json(
-      { error: "Failed to export volunteers" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to export volunteers" }, { status: 500 });
   }
 }

@@ -22,13 +22,17 @@ export default function EventRegPage() {
       }
 
       try {
-        const response = await fetch(`/api/admin/events/${eventID}/get`);
+        const response = await fetch(`/api/events/get`);
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || "Failed to fetch event");
         }
-        const data = await response.json();
-        setEvent(data);
+        const events = await response.json();
+        const eventData = events.find((e: Event) => e.id === eventID);
+        if (!eventData) {
+          throw new Error("Event not found");
+        }
+        setEvent(eventData);
       } catch (error) {
         console.error("Error fetching event:", error);
         setError(error instanceof Error ? error.message : "Failed to fetch event");
