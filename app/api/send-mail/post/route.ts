@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       },
     });
 
-    console.log("A");
+    
 
     let recipients: string[] = [];
     let emailCount = 0;
@@ -55,13 +55,13 @@ export async function POST(request: Request) {
       recipients = users.map((user) => user.email);
     }
 
-    console.log("B");
+    
 
     if (recipients.length === 0) {
       return NextResponse.json({ error: "No recipients found" }, { status: 404 });
     }
 
-    console.log("C");
+    
 
     // Send emails
     const mailOptions = {
@@ -71,7 +71,7 @@ export async function POST(request: Request) {
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${body.replace(/\n/g, "<br>")}</div>`,
     };
 
-    console.log("D");
+    
 
     // Send to all recipients
     
