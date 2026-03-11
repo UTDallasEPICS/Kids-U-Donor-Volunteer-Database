@@ -83,7 +83,14 @@ export async function POST(request: NextRequest) {
           referenceName: referenceName || null,
           businessOrSchoolName: businessOrSchoolName || null,
           registration: true,
+          personId: person.id,
         },
+      });
+
+      // if the schema also stores a volunteerId on Person, keep both sides in sync
+      await prisma.person.update({
+        where: { id: person.id },
+        data: { volunteer: { connect: { id: volunteer.id } } },
       });
 
       const user = await prisma.user.create({
