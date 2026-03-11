@@ -72,7 +72,7 @@ export const AdminRegTable = () => {
     <div className="flex justify-between items-center mb-5">
       <h1 className="text-2xl font-bold text-gray-800">Events</h1>
       <div className="px-4 py-2 ml-2">
-        <Link href="/Volunteers/Registration/New_event">
+        <Link href="/Volunteers/registration/New_event">
           <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
             Add A New Event
           </button>
@@ -89,7 +89,7 @@ export const AdminRegTable = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Events and Registrations</h2>
         <Link
-          href="/volunteers/Registration/add-event"
+          href="/volunteers/registration/add-event"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Add New Event
