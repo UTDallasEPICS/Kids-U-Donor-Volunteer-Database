@@ -23,6 +23,8 @@ model Person {
   donor          Donor?
   representative Representative?
   user           User?
+  // inverse side of volunteer->person, no foreign key stored here
+  volunteer      Volunteer?
 }
 
 model Organization {
@@ -243,8 +245,9 @@ model Volunteer {
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+  Person              Person?               @relation(fields: [personId], references: [id])
+  personId            String?               @unique
 
-  @@index([emailAddress])
 }
 
 // model volunteerAccount {

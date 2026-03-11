@@ -8,10 +8,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { email } = JSON.parse(userPayload);
+    const url = new URL(request.url);
+    const volunteerId = url.searchParams.get("volunteerId");
 
-    const volunteer = await prisma.volunteer.findFirst({
-      where: { emailAddress: email },
+    if (!volunteerId) {
+      return NextResponse.json({ error: "volunteerId is required" }, { status: 400 });
+    }
+
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { id: volunteerId },
       select: { id: true },
     });
 

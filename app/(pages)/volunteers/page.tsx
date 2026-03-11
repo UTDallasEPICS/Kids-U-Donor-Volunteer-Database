@@ -13,27 +13,41 @@ export default function VolunteerDashboard() {
 
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/volunteer/events/upcoming').then(res => res.json()),
-      fetch('/api/volunteer/hours').then(res => res.json()),
-      fetch('/api/gallery/images').then(res => res.json()).catch(() => ({ images: [] })),
-    ]).then(([events, hours, gallery]) => {
-      setUpcomingEvents(events);
-      setTotalHours(hours.total || 0);
-      setAttendedCount(hours.attendedCount || 0);
+    const fetchData = async () => {
+      try {
+        // Get the volunteer ID directly from /api/auth/me
+        const meRes = await fetch('/api/auth/me');
+        const meData = await meRes.json();
+        const volunteerId = meData?.user?.volunteerId;
+        if (!volunteerId) return;
 
-      if (events.length > 0) {
-        const nextEvent = new Date(events[0].date);
-        const today = new Date();
-        const diffTime = nextEvent.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        setNextEventDays(diffDays);
-      }
+        const [events, hours, gallery] = await Promise.all([
+          fetch(`/api/volunteer/events/upcoming?volunteerId=${volunteerId}`).then(res => res.json()),
+          fetch(`/api/volunteer/hours?volunteerId=${volunteerId}`).then(res => res.json()),
+          fetch('/api/gallery/images').then(res => res.json()).catch(() => ({ images: [] })),
+        ]);
 
-      if (gallery.images) {
-        setGalleryImages(gallery.images);
+        setUpcomingEvents(events);
+        setTotalHours(hours.total || 0);
+        setAttendedCount(hours.attendedCount || 0);
+
+        if (events.length > 0) {
+          const nextEvent = new Date(events[0].date);
+          const today = new Date();
+          const diffTime = nextEvent.getTime() - today.getTime();
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          setNextEventDays(diffDays);
+        }
+
+        if (gallery.images) {
+          setGalleryImages(gallery.images);
+        }
+      } catch (err) {
+        console.error('Failed to fetch dashboard data:', err);
       }
-    }).catch(err => console.error('Failed to fetch dashboard data:', err));
+    };
+
+    fetchData();
   }, []);
 
 

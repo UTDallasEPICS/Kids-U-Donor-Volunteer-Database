@@ -22,16 +22,29 @@ export default function BasicTable() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch(`/api/volunteer/events/registered`)
-      .then((res) => res.json())
-      .then((data) => {
+    const fetchEvents = async () => {
+      try {
+        // Get the volunteer ID directly from /api/auth/me
+        const meRes = await fetch('/api/auth/me');
+        const meData = await meRes.json();
+        const volunteerId = meData?.user?.volunteerId;
+        if (!volunteerId) {
+          setError("No volunteer profile found");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`/api/volunteer/events/registered?volunteerId=${volunteerId}`);
+        const data = await res.json();
         setItems(data);
         setLoading(false);
-      })
-      .catch(() => {
+      } catch {
         setError("Failed to load events");
         setLoading(false);
-      });
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   if (loading) {

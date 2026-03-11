@@ -53,21 +53,14 @@ export default function Checkinout() {
   useEffect(() => {
     const fetchUserAndEvent = async () => {
       try {
-        // Fetch user data to get volunteer ID
+        // Get volunteer ID directly from /api/auth/me
         const userResponse = await fetch('/api/auth/me');
         if (userResponse.ok) {
           const userData = await userResponse.json();
-          if (userData.success && userData.user?.email) {
-            // Fetch volunteer by email
-            const volResponse = await fetch(`/api/volunteer/get/by-email?email=${encodeURIComponent(userData.user.email)}`);
-            if (volResponse.ok) {
-              const volData = await volResponse.json();
-              if (volData.volunteerId) {
-                setVolunteerId(volData.volunteerId);
-              } else {
-                showMessage("No volunteer profile found for your account.", true);
-              }
-            }
+          if (userData.success && userData.user?.volunteerId) {
+            setVolunteerId(userData.user.volunteerId);
+          } else {
+            showMessage("No volunteer profile found for your account.", true);
           }
         }
         setIsLoadingUser(false);
