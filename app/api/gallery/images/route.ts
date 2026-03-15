@@ -73,5 +73,8 @@ export async function GET(request: NextRequest) {
     return buildEventSvg(name, date, location, index);
   });
 
-  return NextResponse.json({ images }, { status: 200 });
+  return NextResponse.json({ images }, {
+    status: 200,
+    headers: { "Cache-Control": "public, max-age=300, stale-while-revalidate=600" },
+  });
 }

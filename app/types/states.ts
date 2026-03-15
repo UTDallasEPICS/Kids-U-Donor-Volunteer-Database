@@ -6,11 +6,17 @@ export type DonorState = {
   status: string;
   notes: string;
   isRetained: boolean;
+  isCorporateSponsor: boolean;
 };
 
 export type OrganizationState = {
   name: string;
   emailAddress: string;
+  phoneNumber?: string | null;
+  website?: string | null;
+  pointOfContactName?: string | null;
+  pointOfContactTitle?: string | null;
+  referralSource?: string | null;
 };
 
 export type PersonState = {
@@ -18,6 +24,7 @@ export type PersonState = {
   lastName: string;
   emailAddress: string;
   phoneNumber?: string | null;
+  referralSource?: string | null;
 };
 
 export type AddressState = {

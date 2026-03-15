@@ -37,3 +37,10 @@ next-env.d.ts
 
 # Postgres database
 postgres-data
+
+CLAUDE.md
+
+/.claude
+
+/public/uploads/
+!/public/uploads/avatars/.gitkeep

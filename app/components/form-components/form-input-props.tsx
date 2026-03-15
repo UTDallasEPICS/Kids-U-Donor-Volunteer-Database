@@ -59,12 +59,12 @@ export const donorTypes: MenuItem[] = [
     value: "Individual",
   },
   {
-    label: "Corporate",
-    value: "Corporate",
+    label: "Corporate Sponsor",
+    value: "Corporate Sponsor",
   },
   {
-    label: "Foundation",
-    value: "Foundation",
+    label: "Business",
+    value: "Business",
   },
 ];
 
@@ -281,6 +281,25 @@ export const donationSources: MenuItem[] = [
   {
     label: "Referral",
     value: "Referral",
+  },
+  {
+    label: "Other",
+    value: "Other",
+  },
+];
+
+export const referralSources: MenuItem[] = [
+  {
+    label: "Family",
+    value: "Family",
+  },
+  {
+    label: "Friend",
+    value: "Friend",
+  },
+  {
+    label: "Organization",
+    value: "Organization",
   },
   {
     label: "Other",

@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/app/utils/db";
 
-const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
 interface JWTPayload {
@@ -40,6 +39,11 @@ export async function GET(request: NextRequest) {
             firstName: true,
             lastName: true,
             phoneNumber: true,
+            volunteer: {
+              select: {
+                id: true,
+              },
+            },
           },
         },
       },
@@ -60,6 +64,7 @@ export async function GET(request: NextRequest) {
         phone: user.person?.phoneNumber || "",
         avatar: user.avatarPath ?? null,
         twoFactorEnabled: user.twoFactorEnabled || false,
+        volunteerId: user.person?.volunteer?.id || null,
       },
     });
   } catch (error) {

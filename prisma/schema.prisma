@@ -18,19 +18,27 @@ model Person {
   lastName       String
   emailAddress   String          @unique
   phoneNumber    String?         @unique
+  referralSource String?
   address        Address?
   donor          Donor?
   representative Representative?
   user           User?
+  // inverse side of volunteer->person, no foreign key stored here
+  volunteer      Volunteer?
 }
 
 model Organization {
-  id           String   @id @default(uuid())
-  name         String
-  emailAddress String?  @unique
-  address      Address?
-  grantor      Grantor?
-  donor        Donor?
+  id                  String   @id @default(uuid())
+  name                String
+  emailAddress        String?  @unique
+  phoneNumber         String?
+  website             String?
+  pointOfContactName  String?
+  pointOfContactTitle String?
+  referralSource      String?
+  address             Address?
+  grantor             Grantor?
+  donor               Donor?
 }
 
 model User {
@@ -156,6 +164,7 @@ model Donor {
   status                  String
   notes                   String
   isRetained              Boolean
+  isCorporateSponsor      Boolean       @default(false)
   donation                Donation[]
   personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
@@ -236,6 +245,8 @@ model Volunteer {
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+  Person              Person?               @relation(fields: [personId], references: [id])
+  personId            String?               @unique
 }
 
 // model volunteerAccount {
