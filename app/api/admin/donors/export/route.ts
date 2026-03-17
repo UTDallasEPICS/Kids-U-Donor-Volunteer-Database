@@ -11,9 +11,7 @@ function escapeCsv(value: string): string {
 function fmtDate(d?: Date | null): string {
   if (!d) return "";
   try {
-    return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(
-      new Date(d)
-    );
+    return new Intl.DateTimeFormat("en-US", { timeZone: "UTC" }).format(new Date(d));
   } catch {
     return "";
   }
@@ -63,10 +61,7 @@ export async function GET() {
       const addr = person?.address ?? org?.address;
 
       const totalDonations = d.donation.length;
-      const totalAmount = d.donation.reduce(
-        (sum, don) => sum + (don.amount ?? 0),
-        0
-      );
+      const totalAmount = d.donation.reduce((sum, don) => sum + (don.amount ?? 0), 0);
 
       const row = [
         d.id,
@@ -102,9 +97,6 @@ export async function GET() {
     });
   } catch (err) {
     console.error("Donor export error:", err);
-    return NextResponse.json(
-      { error: "Failed to export donors" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to export donors" }, { status: 500 });
   }
 }
