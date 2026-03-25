@@ -131,7 +131,7 @@ export default function AddEvent() {
       }
 
       const data = await response.json();
-      router.push("/volunteers/Registration?success=true");
+      router.push("/volunteers/registration?success=true");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create event. Please try again.");
       console.error("Event creation error:", err);
@@ -147,7 +147,7 @@ export default function AddEvent() {
           Home
         </Link>
         <span className="text-gray-400">/</span>
-        <Link href="/volunteers/Registration" className="hover:text-blue-500">
+        <Link href="/volunteers/registration" className="hover:text-blue-500">
           Registration
         </Link>
         <span className="text-gray-400">/</span>

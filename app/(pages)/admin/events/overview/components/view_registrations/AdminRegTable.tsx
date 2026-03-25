@@ -89,7 +89,7 @@ export const AdminRegTable = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Events and Registrations</h2>
         <Link
-          href="/volunteers/Registration/add-event"
+          href="/volunteers/registration/add-event"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Add New Event
