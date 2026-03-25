@@ -1,25 +1,31 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient();
 
 export async function POST(request: Request) {
   try {
-    const { recipientType, to, subject, body } = await request.json();
+    // Parse request body
+    const { recipientType, to, subject, body, from } = await request.json();
 
     // Validate required fields
     if (!subject || !body) {
       return NextResponse.json({ error: "Missing required fields: subject and body are required" }, { status: 400 });
     }
 
-    // Create transporter with Gmail
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
+    // Create transporter with SMTP configuration
+    let transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: parseInt(process.env.SMTP_PORT || "587"),
+      secure: process.env.SMTP_SECURE === "true",
       auth: {
-        user: process.env.GMAIL_USER, // Test email
-        pass: process.env.GMAIL_PASS, // App password
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
       },
     });
+
+    
 
     let recipients: string[] = [];
     let emailCount = 0;
@@ -49,31 +55,38 @@ export async function POST(request: Request) {
       recipients = users.map((user) => user.email);
     }
 
+    
+
     if (recipients.length === 0) {
       return NextResponse.json({ error: "No recipients found" }, { status: 404 });
     }
 
+    
+
     // Send emails
     const mailOptions = {
-      from: process.env.GMAIL_USER,
+      from: from, //replace with the email variable  for admin //
       subject: subject,
       text: body,
       html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${body.replace(/\n/g, "<br>")}</div>`,
     };
 
+    
+
     // Send to all recipients
-    for (const recipientEmail of recipients) {
+    
       try {
         await transporter.sendMail({
           ...mailOptions,
-          to: recipientEmail,
+          to: recipients, //chaged to reciptients in order to send an email to all volunteers and admins if selected//
         });
         emailCount++;
       } catch (error) {
-        console.error(`Failed to send email to ${recipientEmail}:`, error);
+        console.error(`Failed to send email:`, error);
         // Continue sending to other recipients even if one fails
-      }
     }
+
+    
 
     return NextResponse.json(
       {

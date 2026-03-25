@@ -70,5 +70,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Get user error:", error);
     return NextResponse.json({ success: false, error: "Failed to fetch user data" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }

@@ -7,8 +7,7 @@ import { Event } from "@/app/types/event";
 export default function EventRegPage() {
   const searchParams = useSearchParams();
   const eventID = searchParams.get('eventID');
-  const VOLUNTEER_ID = "72ac21c4-2f07-4e64-a2a3-bb643308dec4"; 
-
+  const [volunteerId, setVolunteerId] = useState<string>("");
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,9 +21,18 @@ export default function EventRegPage() {
       }
 
       try {
-        const response = await fetch(`/api/admin/events/${eventID}/get`);
+        const authResponse = await fetch('/api/auth/me');
+        if (!authResponse.ok) {
+          const errorData = await authResponse.text();
+          throw new Error(errorData.error || "Failed to fetch user data");
+        }
+        const userData = await authResponse.json();
+        const id = userData.user.volunteerId;
+        setVolunteerId(id);
+
+        const response = await fetch(`/api/events/${eventID}/get`);
         if (!response.ok) {
-          const errorData = await response.json();
+          const errorData = await response.text();
           throw new Error(errorData.error || "Failed to fetch event");
         }
         const data = await response.json();
@@ -84,7 +92,7 @@ export default function EventRegPage() {
           <h2 className="text-xl font-semibold mb-4">Registration Form</h2>
           <RegistrationQuestions 
             eventId={eventID}
-            volunteerId={VOLUNTEER_ID}
+            volunteerId={volunteerId}
           />
         </div>
       </div>

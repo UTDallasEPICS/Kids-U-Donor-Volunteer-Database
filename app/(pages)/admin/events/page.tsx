@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { VolRegTable } from "../../volunteers/Registration/components/view_events/VolRegTable";
+import { VolRegTable } from "../../volunteers/registration/components/view_events/VolRegTable";
 import Loading from "@/app/loading";
 
 interface DatabaseEvent {

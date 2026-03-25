@@ -27,9 +27,11 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
       eSignature: formData.get("eSignature") || "",
       volunteerId: volunteerId,
     };
+    console.log(data);
 
     try {
-      const response = await fetch("/api/event-registration/post", {
+// Use the data as needed, e.g., setUser(data);
+      const registrationResponse = await fetch("/api/event-registration/post", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -37,10 +39,8 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
         body: JSON.stringify(data),
       });
 
-      if (!response.ok) {
+      if (!registrationResponse.ok) {
         throw new Error("Failed to register for event");
-        console.error("Error:", response.statusText);
-        console.error(data);
       }
 
       // Registration successful

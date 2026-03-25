@@ -5,6 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
+    console.log("Received event registration data:", body);
     const registration = await prisma.eventRegistration.create({
       data: {
         eventGroup: body.eventGroup,
