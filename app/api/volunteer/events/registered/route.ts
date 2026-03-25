@@ -7,17 +7,16 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
 
-  let email: string;
-  try {
-    const parsed = JSON.parse(userPayload);
-    email = parsed.email;
-  } catch {
-    return NextResponse.json({ error: "Invalid user payload" }, { status: 400 });
+  const url = new URL(req.url);
+  const volunteerId = url.searchParams.get("volunteerId");
+
+  if (!volunteerId) {
+    return NextResponse.json({ error: "volunteerId is required" }, { status: 400 });
   }
 
   try {
-    const volunteer = await prisma.volunteer.findFirst({
-      where: { emailAddress: email },
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { id: volunteerId },
       select: { id: true },
     });
 
