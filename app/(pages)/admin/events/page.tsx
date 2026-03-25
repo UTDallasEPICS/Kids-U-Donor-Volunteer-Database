@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { VolRegTable } from "../../volunteers/registration/components/view_events/VolRegTable";
+import { VolRegTable } from "../../volunteers/Registration/components/view_events/VolRegTable";
 import Loading from "@/app/loading";
 
 interface DatabaseEvent {
@@ -41,7 +41,7 @@ export default function EventsPage() {
           throw new Error("Failed to fetch events");
         }
         const data: DatabaseEvent[] = await response.json();
-        
+
         // Transform the data to match the expected format
         const formattedEvents: TableEvent[] = data.map((event, index) => {
           const scheduleDate = new Date(event.schedule);
@@ -54,7 +54,7 @@ export default function EventsPage() {
             LocationID: event.locationId ? parseInt(event.locationId) : 0,
           };
         });
-        
+
         setEvents(formattedEvents);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");

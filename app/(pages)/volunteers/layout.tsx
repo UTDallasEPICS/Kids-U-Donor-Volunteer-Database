@@ -1,6 +1,6 @@
 import React from "react";
 import MainSidebar from "@/app/components/main-sidebar";
-import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar"; 
+import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar";
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -10,14 +10,12 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
         <MainSidebar
           items={[
             { name: "Dashboard", reference: "/volunteers" },
-            { name: "Register For Event", reference: "/volunteers/registration" },
+            { name: "Register For Event", reference: "/volunteers/Registration" },
             { name: "Check-In / Out", reference: "/volunteers/check_in_out" },
             { name: "Apply", reference: "/volunteers/apply" },
           ]}
         />
-          <main className="ml-64 mt-16 min-h-screen flex-1">
-          {children}
-        </main>
+        <main className="ml-64 mt-16 min-h-screen flex-1">{children}</main>
       </div>
     </div>
   );

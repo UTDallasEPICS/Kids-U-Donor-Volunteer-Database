@@ -42,10 +42,8 @@ export const VolRegTable = () => {
       });
   }, []);
 
-
   const handleViewEvent = (id: string) => {
-    router.push(`/volunteers/registration/event_registration?eventID=${id}`);
- 
+    router.push(`/volunteers/Registration/event_registration?eventID=${id}`);
   };
 
   const Breadcrumb = () => (
@@ -74,40 +72,49 @@ export const VolRegTable = () => {
         <Table sx={{ minWidth: 650 }} aria-label="events table">
           <TableHead>
             <TableRow>
-              <TableCell sx={{ fontWeight: '600' }}>Event Name</TableCell>
-              <TableCell sx={{ fontWeight: '600' }} align="right">Date</TableCell>
-              <TableCell sx={{ fontWeight: '600' }} align="right">Time</TableCell>
-              <TableCell sx={{ fontWeight: '600' }} align="right">Location</TableCell>
-              <TableCell sx={{ fontWeight: '600' }} align="right">Description</TableCell>
-              <TableCell sx={{ fontWeight: '600' }} align="right">Action</TableCell>
+              <TableCell sx={{ fontWeight: "600" }}>Event Name</TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">
+                Date
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">
+                Time
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">
+                Location
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">
+                Description
+              </TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">
+                Action
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {events.map((event) => (
-              <TableRow
-                key={event.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
+              <TableRow key={event.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell component="th" scope="row">
                   {event.name}
                 </TableCell>
                 <TableCell align="right">
-                  {new Date(event.schedule).toLocaleString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
+                  {new Date(event.schedule).toLocaleString("en-US", {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
                   })}
                 </TableCell>
                 <TableCell align="right">
-                  {new Date(event.schedule).toLocaleString('en-US', {
-                    hour: 'numeric',
-                    minute: '2-digit',
-                    hour12: true
+                  {new Date(event.schedule).toLocaleString("en-US", {
+                    hour: "numeric",
+                    minute: "2-digit",
+                    hour12: true,
                   })}
                 </TableCell>
                 <TableCell align="right">
-                  {event.location ? `${event.location.name} - ${event.location.city}, ${event.location.state}` : 'No location set'}
+                  {event.location
+                    ? `${event.location.name} - ${event.location.city}, ${event.location.state}`
+                    : "No location set"}
                 </TableCell>
                 <TableCell align="right">{event.description}</TableCell>
                 <TableCell align="right">

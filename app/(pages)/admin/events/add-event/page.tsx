@@ -21,14 +21,14 @@ export default function AddEvent() {
   const [error, setError] = useState("");
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
-  
+
   // Event Form State
   const [eventData, setEventData] = useState({
     name: "",
     date: "",
     time: "",
     description: "",
-    locationId: ""
+    locationId: "",
   });
 
   // Location Form State
@@ -40,21 +40,21 @@ export default function AddEvent() {
     zipCode: "",
     phoneNumber: "",
     emailAddress: "",
-    hours: ""
+    hours: "",
   });
 
   useEffect(() => {
     // Fetch locations when component mounts
     const fetchLocations = async () => {
       try {
-        const response = await fetch('/api/locations/get');
+        const response = await fetch("/api/locations/get");
         if (!response.ok) {
-          throw new Error('Failed to fetch locations');
+          throw new Error("Failed to fetch locations");
         }
         const data = await response.json();
         setLocations(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error fetching locations');
+        setError(err instanceof Error ? err.message : "Error fetching locations");
       }
     };
 
@@ -63,17 +63,17 @@ export default function AddEvent() {
 
   const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setEventData(prev => ({
+    setEventData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setLocationData(prev => ({
+    setLocationData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -94,10 +94,10 @@ export default function AddEvent() {
       }
 
       const data = await response.json();
-      setLocations(prev => [...prev, data]);
-      setEventData(prev => ({
+      setLocations((prev) => [...prev, data]);
+      setEventData((prev) => ({
         ...prev,
-        locationId: data.id
+        locationId: data.id,
       }));
       setShowLocationForm(false);
     } catch (err) {
@@ -121,7 +121,7 @@ export default function AddEvent() {
           name: eventData.name,
           description: eventData.description,
           schedule: new Date(eventData.date + "T" + eventData.time).toISOString(),
-          locationId: eventData.locationId
+          locationId: eventData.locationId,
         }),
       });
 
@@ -131,7 +131,7 @@ export default function AddEvent() {
       }
 
       const data = await response.json();
-      router.push("/volunteers/registration?success=true");
+      router.push("/volunteers/Registration?success=true");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create event. Please try again.");
       console.error("Event creation error:", err);
@@ -143,9 +143,13 @@ export default function AddEvent() {
   return (
     <div className="p-6">
       <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
-        <Link href="/" className="hover:text-blue-500 cursor-pointer">Home</Link>
+        <Link href="/" className="hover:text-blue-500 cursor-pointer">
+          Home
+        </Link>
         <span className="text-gray-400">/</span>
-        <Link href="/volunteers/registration" className="hover:text-blue-500">Registration</Link>
+        <Link href="/volunteers/Registration" className="hover:text-blue-500">
+          Registration
+        </Link>
         <span className="text-gray-400">/</span>
         <span className="text-gray-700">Add Event</span>
       </div>
@@ -156,7 +160,9 @@ export default function AddEvent() {
         <form onSubmit={handleEventSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">Event Name</label>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Event Name
+              </label>
               <input
                 type="text"
                 id="name"
@@ -170,7 +176,9 @@ export default function AddEvent() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date</label>
+                <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+                  Date
+                </label>
                 <input
                   type="date"
                   id="date"
@@ -182,7 +190,9 @@ export default function AddEvent() {
                 />
               </div>
               <div>
-                <label htmlFor="time" className="block text-sm font-medium text-gray-700">Time</label>
+                <label htmlFor="time" className="block text-sm font-medium text-gray-700">
+                  Time
+                </label>
                 <input
                   type="time"
                   id="time"
@@ -196,7 +206,9 @@ export default function AddEvent() {
             </div>
 
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                Description
+              </label>
               <textarea
                 id="description"
                 name="description"
@@ -209,7 +221,9 @@ export default function AddEvent() {
             </div>
 
             <div>
-              <label htmlFor="locationId" className="block text-sm font-medium text-gray-700">Location</label>
+              <label htmlFor="locationId" className="block text-sm font-medium text-gray-700">
+                Location
+              </label>
               <div className="mt-1 flex items-center gap-4">
                 <select
                   id="locationId"
@@ -220,7 +234,7 @@ export default function AddEvent() {
                   className="block w-full rounded-md border border-gray-300 shadow-sm p-2 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 >
                   <option value="">Select a location</option>
-                  {locations.map(location => (
+                  {locations.map((location) => (
                     <option key={location.id} value={location.id}>
                       {location.name} - {location.address}, {location.city}
                     </option>
@@ -246,11 +260,7 @@ export default function AddEvent() {
           </button>
         </form>
 
-        {error && (
-          <div className="text-red-600 text-sm mt-2">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-red-600 text-sm mt-2">{error}</div>}
 
         {showLocationForm && (
           <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
@@ -258,7 +268,9 @@ export default function AddEvent() {
               <h2 className="text-xl font-semibold mb-4">Add New Location</h2>
               <form onSubmit={handleLocationSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="locName" className="block text-sm font-medium text-gray-700">Location Name</label>
+                  <label htmlFor="locName" className="block text-sm font-medium text-gray-700">
+                    Location Name
+                  </label>
                   <input
                     type="text"
                     id="locName"
@@ -271,7 +283,9 @@ export default function AddEvent() {
                 </div>
 
                 <div>
-                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">Address</label>
+                  <label htmlFor="address" className="block text-sm font-medium text-gray-700">
+                    Address
+                  </label>
                   <input
                     type="text"
                     id="address"
@@ -285,7 +299,9 @@ export default function AddEvent() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                    <label htmlFor="city" className="block text-sm font-medium text-gray-700">
+                      City
+                    </label>
                     <input
                       type="text"
                       id="city"
@@ -297,7 +313,9 @@ export default function AddEvent() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">State</label>
+                    <label htmlFor="state" className="block text-sm font-medium text-gray-700">
+                      State
+                    </label>
                     <select
                       id="state"
                       name="state"
@@ -314,7 +332,9 @@ export default function AddEvent() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">ZIP Code</label>
+                    <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
+                      ZIP Code
+                    </label>
                     <input
                       type="text"
                       id="zipCode"
@@ -327,7 +347,9 @@ export default function AddEvent() {
                     />
                   </div>
                   <div>
-                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                    <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700">
+                      Phone Number
+                    </label>
                     <input
                       type="tel"
                       id="phoneNumber"
@@ -343,7 +365,9 @@ export default function AddEvent() {
                 </div>
 
                 <div>
-                  <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700">Email Address</label>
+                  <label htmlFor="emailAddress" className="block text-sm font-medium text-gray-700">
+                    Email Address
+                  </label>
                   <input
                     type="email"
                     id="emailAddress"
@@ -356,7 +380,9 @@ export default function AddEvent() {
                 </div>
 
                 <div>
-                  <label htmlFor="hours" className="block text-sm font-medium text-gray-700">Operating Hours</label>
+                  <label htmlFor="hours" className="block text-sm font-medium text-gray-700">
+                    Operating Hours
+                  </label>
                   <input
                     type="text"
                     id="hours"
