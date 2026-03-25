@@ -6,7 +6,7 @@ import { Event } from "@/app/types/event";
 
 export default function EventRegPage() {
   const searchParams = useSearchParams();
-  const eventID = searchParams.get('eventID');
+  const eventID = searchParams.get('eventID') ?? "";
   const [volunteerId, setVolunteerId] = useState<string>("");
   const [event, setEvent] = useState<Event | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -23,8 +23,7 @@ export default function EventRegPage() {
       try {
         const authResponse = await fetch('/api/auth/me');
         if (!authResponse.ok) {
-          const errorData = await authResponse.text();
-          throw new Error(errorData.error || "Failed to fetch user data");
+          throw new Error("Failed to fetch user data");
         }
         const userData = await authResponse.json();
         const id = userData.user.volunteerId;
@@ -32,11 +31,13 @@ export default function EventRegPage() {
 
         const response = await fetch(`/api/events/${eventID}/get`);
         if (!response.ok) {
-          const errorData = await response.text();
-          throw new Error(errorData.error || "Failed to fetch event");
+          throw new Error("Failed to fetch event");
         }
-        const data = await response.json();
-        setEvent(data);
+        const eventData = await response.json();
+        if (!eventData) {
+          throw new Error("Event not found");
+        }
+        setEvent(eventData);
       } catch (error) {
         console.error("Error fetching event:", error);
         setError(error instanceof Error ? error.message : "Failed to fetch event");

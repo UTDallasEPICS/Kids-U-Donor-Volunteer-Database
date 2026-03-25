@@ -2,18 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import {
-  FiCalendar,
-  FiMapPin,
-  FiUsers,
-  FiEdit2,
-  FiTrash2,
-  FiPlus,
-  FiSettings,
-  FiMail,
-  FiPhone,
-  FiX,
-} from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiUsers, FiEdit2, FiTrash2, FiPlus, FiSettings, FiMail, FiPhone, FiX } from "react-icons/fi";
 
 interface Location {
   id: string;
@@ -155,7 +144,9 @@ export default function EventsPage() {
         locationId: formData.locationId || null,
       };
 
-      const url = editingEvent ? `/api/admin/events/${editingEvent.id}/patch` : "/api/admin/events/post";
+      const url = editingEvent
+        ? `/api/admin/events/${editingEvent.id}/patch`
+        : "/api/admin/events/post";
 
       const response = await fetch(url, {
         method: editingEvent ? "PATCH" : "POST",
@@ -178,7 +169,11 @@ export default function EventsPage() {
   };
 
   const handleDelete = async (eventId: string) => {
-    if (!confirm("Are you sure you want to delete this event? This will also remove all registrations.")) {
+    if (
+      !confirm(
+        "Are you sure you want to delete this event? This will also remove all registrations."
+      )
+    ) {
       return;
     }
 
@@ -226,6 +221,7 @@ export default function EventsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      
       <div className="mb-6">
         <div className="flex justify-between items-center">
           <div>
@@ -248,6 +244,7 @@ export default function EventsPage() {
         </div>
       )}
 
+      
       {loading ? (
         <div className="flex items-center justify-center py-20">
           <div className="text-center">
@@ -273,7 +270,11 @@ export default function EventsPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event) => (
-            <div key={event.id} className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+            <div
+              key={event.id}
+              className="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden"
+            >
+              
               <div className="bg-[#4C7AB8] p-5 text-white">
                 <h3 className="text-lg font-bold mb-2">{event.name}</h3>
                 <p className="text-blue-100 text-sm line-clamp-2">{event.description}</p>
@@ -287,7 +288,9 @@ export default function EventsPage() {
                     <p className="font-medium text-gray-900">
                       {format(new Date(event.schedule), "EEEE, MMMM d, yyyy")}
                     </p>
-                    <p className="text-gray-600">{format(new Date(event.schedule), "h:mm a")}</p>
+                    <p className="text-gray-600">
+                      {format(new Date(event.schedule), "h:mm a")}
+                    </p>
                   </div>
                 </div>
 
@@ -306,17 +309,23 @@ export default function EventsPage() {
                 <div className="flex items-center gap-3 text-sm">
                   <FiUsers className="text-gray-400 flex-shrink-0" size={18} />
                   <p className="text-gray-700">
-                    <span className="font-semibold text-blue-500">{event.eventRegistrations.length}</span> volunteer
-                    {event.eventRegistrations.length !== 1 ? "s" : ""} registered
+                    <span className="font-semibold text-blue-500">
+                      {event.eventRegistrations.length}
+                    </span>{" "}
+                    volunteer{event.eventRegistrations.length !== 1 ? "s" : ""} registered
                   </p>
                 </div>
 
+                
                 {event.eventRegistrations.length > 0 && (
                   <div className="mt-2">
                     <p className="text-xs text-gray-500 mb-2">Recent volunteers:</p>
                     <div className="flex flex-wrap gap-2">
                       {event.eventRegistrations.slice(0, 3).map((reg) => (
-                        <div key={reg.id} className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full">
+                        <div
+                          key={reg.id}
+                          className="px-3 py-1 bg-blue-50 text-blue-700 text-xs rounded-full"
+                        >
                           {reg.volunteer.firstName} {reg.volunteer.lastName}
                         </div>
                       ))}
@@ -330,6 +339,7 @@ export default function EventsPage() {
                 )}
               </div>
 
+              
               <div className="px-5 py-4 bg-gray-50 border-t border-gray-200 flex gap-2">
                 <button
                   onClick={() => {
@@ -365,7 +375,9 @@ export default function EventsPage() {
             <div className="bg-[#4C7AB8] px-6 py-5 text-white">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="text-xl font-bold">{editingEvent ? "Edit Event" : "Create New Event"}</h2>
+                  <h2 className="text-xl font-bold">
+                    {editingEvent ? "Edit Event" : "Create New Event"}
+                  </h2>
                   <p className="text-blue-100 text-sm mt-1">
                     {editingEvent ? "Update event details" : "Fill in the details to create a new event"}
                   </p>
@@ -469,6 +481,7 @@ export default function EventsPage() {
                 </div>
               </div>
 
+        
               <div className="flex gap-3 pt-4">
                 <button
                   type="button"
@@ -490,14 +503,17 @@ export default function EventsPage() {
         </div>
       )}
 
+    
       {showLocationModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-3xl max-w-lg w-full">
+      
             <div className="bg-[#4C7AB8] px-6 py-5 text-white rounded-t-3xl">
               <h2 className="text-xl font-bold">Add New Location</h2>
               <p className="text-blue-100 text-sm mt-1">Create a location for your events</p>
             </div>
 
+        
             <form onSubmit={handleLocationSubmit} className="p-6 space-y-5 max-h-[70vh] overflow-y-auto">
               <div>
                 <label htmlFor="locName" className="block text-sm font-semibold text-gray-700 mb-2">
@@ -583,7 +599,9 @@ export default function EventsPage() {
                     type="tel"
                     id="phoneNumber"
                     value={locationData.phoneNumber}
-                    onChange={(e) => setLocationData({ ...locationData, phoneNumber: e.target.value })}
+                    onChange={(e) =>
+                      setLocationData({ ...locationData, phoneNumber: e.target.value })
+                    }
                     required
                     placeholder="(555) 555-5555"
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
@@ -599,7 +617,9 @@ export default function EventsPage() {
                   type="email"
                   id="emailAddress"
                   value={locationData.emailAddress}
-                  onChange={(e) => setLocationData({ ...locationData, emailAddress: e.target.value })}
+                  onChange={(e) =>
+                    setLocationData({ ...locationData, emailAddress: e.target.value })
+                  }
                   required
                   placeholder="email@example.com"
                   className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all outline-none"
@@ -755,9 +775,7 @@ export default function EventsPage() {
             <div className="p-6">
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
-                    Contact Information
-                  </h3>
+                  <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Contact Information</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
