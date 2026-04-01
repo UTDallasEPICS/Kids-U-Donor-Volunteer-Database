@@ -47,7 +47,7 @@ export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, er
 
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api${apiUrl}/${id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -73,7 +73,7 @@ export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, er
     if (remove) {
       try {
         setIsButtonDisabled(true);
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}${apiUrl}/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api${apiUrl}/${id}`, {
           method: "DELETE",
         });
 

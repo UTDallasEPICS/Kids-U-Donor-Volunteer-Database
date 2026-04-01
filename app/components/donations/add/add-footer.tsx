@@ -39,7 +39,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
     try {
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/anonymous`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donations/anonymous`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
     try {
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donations/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -94,7 +94,7 @@ export const AddFooter = ({ donorMode, email, handleSubmit, isDirty, errors }: F
         },
       });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/existing`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donations/existing`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
