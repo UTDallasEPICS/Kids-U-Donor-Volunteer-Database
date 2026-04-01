@@ -7,44 +7,18 @@ const BackgroundCheckForm = () => {
         // Personal Information
         fullName: '',
         dateOfBirth: '',
-        ssn: '',
-        email: '',
-        phoneNumber: '',
+        //ssn: '',
         currentAddress: '',
         city: '',
         state: '',
         zipCode: '',
+        county: '',
+
+        // Race/Gender
+        race: '',
+        gender: '',
         
-        // Identification
-        driversLicenseNumber: '',
-        driversLicenseState: '',
-        driversLicenseExpiration: '',
-        
-        // Employment History
-        currentEmployer: '',
-        currentPosition: '',
-        yearsAtCurrentJob: '',
-        previousEmployer: '',
-        previousPosition: '',
-        
-        // Background Information
-        hasCriminalHistory: '',
-        criminalHistoryDetails: '',
-        hasBeenDeniedJob: '',
-        denialDetails: '',
-        hasBeenTerminated: '',
-        terminationDetails: '',
-        
-        // References
-        referenceName1: '',
-        referencePhone1: '',
-        referenceCompany1: '',
-        referenceName2: '',
-        referencePhone2: '',
-        referenceCompany2: '',
-        
-        // Additional Information
-        additionalInfo: '',
+        // Certification
         agreeToBackgroundCheck: false,
         electronicSignature: '',
         signatureDate: new Date().toISOString().split('T')[0],
@@ -53,9 +27,9 @@ const BackgroundCheckForm = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        const target = e.target as HTMLInputElement;
-        const { name, value, type, checked } = target;
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const target = e.target as HTMLInputElement | HTMLSelectElement;
+        const { name, value, type, checked } = target as HTMLInputElement;
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
@@ -81,34 +55,14 @@ const BackgroundCheckForm = () => {
                 setFormData({
                     fullName: '',
                     dateOfBirth: '',
-                    ssn: '',
-                    email: '',
-                    phoneNumber: '',
+                    //ssn: '',
                     currentAddress: '',
                     city: '',
                     state: '',
                     zipCode: '',
-                    driversLicenseNumber: '',
-                    driversLicenseState: '',
-                    driversLicenseExpiration: '',
-                    currentEmployer: '',
-                    currentPosition: '',
-                    yearsAtCurrentJob: '',
-                    previousEmployer: '',
-                    previousPosition: '',
-                    hasCriminalHistory: '',
-                    criminalHistoryDetails: '',
-                    hasBeenDeniedJob: '',
-                    denialDetails: '',
-                    hasBeenTerminated: '',
-                    terminationDetails: '',
-                    referenceName1: '',
-                    referencePhone1: '',
-                    referenceCompany1: '',
-                    referenceName2: '',
-                    referencePhone2: '',
-                    referenceCompany2: '',
-                    additionalInfo: '',
+                    county: '',
+                    race: '',
+                    gender: '',
                     agreeToBackgroundCheck: false,
                     electronicSignature: '',
                     signatureDate: new Date().toISOString().split('T')[0],
@@ -164,7 +118,7 @@ const BackgroundCheckForm = () => {
                             />
                         </div>
 
-                        <div>
+                        {/* <div>
                             <label className="block mb-2 font-medium">Social Security Number</label>
                             <input
                                 type="text"
@@ -174,26 +128,14 @@ const BackgroundCheckForm = () => {
                                 placeholder="XXX-XX-XXXX"
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
-                        </div>
+                        </div> */}
 
                         <div>
-                            <label className="block mb-2 font-medium">Email</label>
+                            <label className="block mb-2 font-medium">County</label>
                             <input
-                                type="email"
-                                name="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="block mb-2 font-medium">Phone Number</label>
-                            <input
-                                type="tel"
-                                name="phoneNumber"
-                                value={formData.phoneNumber}
+                                type="text"
+                                name="county"
+                                value={formData.county}
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
@@ -245,332 +187,50 @@ const BackgroundCheckForm = () => {
                     </div>
                 </section>
 
-                {/* Identification Section */}
+                {/* Race/Gender Section */}
                 <section>
-                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Identification</h2>
+                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Race/Gender</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                            <label className="block mb-2 font-medium">Driver's License Number</label>
-                            <input
-                                type="text"
-                                name="driversLicenseNumber"
-                                value={formData.driversLicenseNumber}
+                            <label className="block mb-2 font-medium">Race</label>
+                            <select
+                                name="race"
+                                value={formData.race}
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                                required
+                            >
+                                <option value="">-- Select Race --</option>
+                                <option value="White">White</option>
+                                <option value="Black or African American">Black or African American</option>
+                                <option value="Asian">Asian</option>
+                                <option value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</option>
+                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                <option value="Hispanic or Latino">Hispanic or Latino</option>
+                                <option value="Two or More Races">Two or More Races</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer Not to Say">Prefer Not to Say</option>
+                            </select>
                         </div>
 
                         <div>
-                            <label className="block mb-2 font-medium">State</label>
-                            <input
-                                type="text"
-                                name="driversLicenseState"
-                                value={formData.driversLicenseState}
+                            <label className="block mb-2 font-medium">Gender</label>
+                            <select
+                                name="gender"
+                                value={formData.gender}
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
+                                required
+                            >
+                                <option value="">-- Select Gender --</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Non-binary">Non-binary</option>
+                                <option value="Other">Other</option>
+                                <option value="Prefer Not to Say">Prefer Not to Say</option>
+                            </select>
                         </div>
-
-                        <div>
-                            <label className="block mb-2 font-medium">Expiration Date</label>
-                            <input
-                                type="date"
-                                name="driversLicenseExpiration"
-                                value={formData.driversLicenseExpiration}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
-                </section>
-
-                {/* Employment History Section */}
-                <section>
-                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Employment History</h2>
-
-                    <div className="mb-6 pb-6 border-b">
-                        <h3 className="font-medium mb-3">Current Employment</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block mb-2 font-medium">Employer</label>
-                                <input
-                                    type="text"
-                                    name="currentEmployer"
-                                    value={formData.currentEmployer}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Position</label>
-                                <input
-                                    type="text"
-                                    name="currentPosition"
-                                    value={formData.currentPosition}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Years at Job</label>
-                                <input
-                                    type="text"
-                                    name="yearsAtCurrentJob"
-                                    value={formData.yearsAtCurrentJob}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 className="font-medium mb-3">Previous Employment</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2 font-medium">Employer</label>
-                                <input
-                                    type="text"
-                                    name="previousEmployer"
-                                    value={formData.previousEmployer}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Position</label>
-                                <input
-                                    type="text"
-                                    name="previousPosition"
-                                    value={formData.previousPosition}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Background Information Section */}
-                <section>
-                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Background Information</h2>
-
-                    <div className="space-y-6">
-                        <div>
-                            <label className="block mb-2 font-medium">Have you ever been convicted of a crime?</label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasCriminalHistory"
-                                        value="yes"
-                                        checked={formData.hasCriminalHistory === 'yes'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    Yes
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasCriminalHistory"
-                                        value="no"
-                                        checked={formData.hasCriminalHistory === 'no'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    No
-                                </label>
-                            </div>
-                            {formData.hasCriminalHistory === 'yes' && (
-                                <textarea
-                                    name="criminalHistoryDetails"
-                                    value={formData.criminalHistoryDetails}
-                                    onChange={handleChange}
-                                    placeholder="Please explain in detail..."
-                                    className="w-full p-2 border rounded mt-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    rows={4}
-                                />
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block mb-2 font-medium">Have you ever been denied employment due to background check?</label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasBeenDeniedJob"
-                                        value="yes"
-                                        checked={formData.hasBeenDeniedJob === 'yes'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    Yes
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasBeenDeniedJob"
-                                        value="no"
-                                        checked={formData.hasBeenDeniedJob === 'no'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    No
-                                </label>
-                            </div>
-                            {formData.hasBeenDeniedJob === 'yes' && (
-                                <textarea
-                                    name="denialDetails"
-                                    value={formData.denialDetails}
-                                    onChange={handleChange}
-                                    placeholder="Please explain in detail..."
-                                    className="w-full p-2 border rounded mt-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    rows={4}
-                                />
-                            )}
-                        </div>
-
-                        <div>
-                            <label className="block mb-2 font-medium">Have you ever been terminated from employment?</label>
-                            <div className="flex gap-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasBeenTerminated"
-                                        value="yes"
-                                        checked={formData.hasBeenTerminated === 'yes'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    Yes
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="hasBeenTerminated"
-                                        value="no"
-                                        checked={formData.hasBeenTerminated === 'no'}
-                                        onChange={handleChange}
-                                        className="mr-2"
-                                    />
-                                    No
-                                </label>
-                            </div>
-                            {formData.hasBeenTerminated === 'yes' && (
-                                <textarea
-                                    name="terminationDetails"
-                                    value={formData.terminationDetails}
-                                    onChange={handleChange}
-                                    placeholder="Please explain in detail..."
-                                    className="w-full p-2 border rounded mt-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    rows={4}
-                                />
-                            )}
-                        </div>
-                    </div>
-                </section>
-
-                {/* References Section */}
-                <section>
-                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Professional References</h2>
-
-                    <div className="mb-6 pb-6 border-b">
-                        <h3 className="font-medium mb-3">Reference 1</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block mb-2 font-medium">Name</label>
-                                <input
-                                    type="text"
-                                    name="referenceName1"
-                                    value={formData.referenceName1}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    name="referencePhone1"
-                                    value={formData.referencePhone1}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Company/Organization</label>
-                                <input
-                                    type="text"
-                                    name="referenceCompany1"
-                                    value={formData.referenceCompany1}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 className="font-medium mb-3">Reference 2</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block mb-2 font-medium">Name</label>
-                                <input
-                                    type="text"
-                                    name="referenceName2"
-                                    value={formData.referenceName2}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Phone Number</label>
-                                <input
-                                    type="tel"
-                                    name="referencePhone2"
-                                    value={formData.referencePhone2}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block mb-2 font-medium">Company/Organization</label>
-                                <input
-                                    type="text"
-                                    name="referenceCompany2"
-                                    value={formData.referenceCompany2}
-                                    onChange={handleChange}
-                                    className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Additional Information Section */}
-                <section>
-                    <h2 className="text-xl font-semibold border-b pb-2 mb-4">Additional Information</h2>
-
-                    <div>
-                        <label className="block mb-2 font-medium">Additional Comments or Information</label>
-                        <textarea
-                            name="additionalInfo"
-                            value={formData.additionalInfo}
-                            onChange={handleChange}
-                            placeholder="Please provide any additional information you feel is relevant..."
-                            className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            rows={5}
-                        />
                     </div>
                 </section>
 
