@@ -27,7 +27,6 @@ model Person {
   // inverse side of volunteer->person, no foreign key stored here
   volunteer      Volunteer?
   superAdmin     SuperAdmin?
-  
 }
 
 model Organization {
@@ -241,7 +240,7 @@ model Volunteer {
   // Volunteer Events & Hours
   volunteerEvents  Event[]
   eventHoursLogged EventHour[]
-  isDeleted         Boolean @default(false)
+  isDeleted        Boolean     @default(false)
 
   // Relations
   application         VolunteerApplication? @relation(fields: [applicationId], references: [id])
@@ -402,16 +401,14 @@ model Admin {
   locationId String
   location   Location @relation(fields: [locationId], references: [id])
   mails      Mail[]
-  isDeleted         Boolean @default(false)
+  isDeleted  Boolean  @default(false)
 }
 
-model SuperAdmin{
-  id        String   @id @default(uuid())
-  Person              Person?               @relation(fields: [personId], references: [id])
-  personId            String?               @unique
+model SuperAdmin {
+  id       String  @id @default(uuid())
+  Person   Person? @relation(fields: [personId], references: [id])
+  personId String? @unique
 }
-  
-
 
 model Mail {
   id                String          @id @default(uuid())
