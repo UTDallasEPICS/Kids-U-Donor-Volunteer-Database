@@ -48,6 +48,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Volunteer Logs", reference: "/admin/volunteer/logs" },
               { name: "View Registrations", reference: "/admin/events/overview" },
               { name: "View Applications", reference: "/admin/volunteer/application" },
+              { name: "Background Checks", reference: "/admin/volunteer/background-check" },
             ]
           },
           { 
