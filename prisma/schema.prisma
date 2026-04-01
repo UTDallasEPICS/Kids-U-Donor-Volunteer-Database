@@ -332,8 +332,7 @@ model VolunteerApplication {
 
   accepted Boolean @default(false)
 
-  volunteer     Volunteer[]
-  volunteerInfo VolunteerInfo?
+  volunteer Volunteer[]
 }
 
 model VolunteerBackgroundCheck {
@@ -345,65 +344,18 @@ model VolunteerBackgroundCheck {
   dateOfBirth DateTime
   email       String
   phoneNumber String
+  county      String
   addressLine String
   city        String
   state       String
   zipCode     String
-
-  // Employment History - Current
-  currentEmployer   String?
-  currentPosition   String?
-  yearsAtCurrentJob String?
-
-  // Employment History - Previous
-  previousEmployer String?
-  previousPosition String?
-
-  // Background Questions
-  everConvicted        Boolean
-  everDeniedEmployment Boolean
-  everTerminated       Boolean
-
-  // Professional References
-  ref1Name    String
-  ref1Phone   String
-  ref1Company String
-  ref2Name    String
-  ref2Phone   String
-  ref2Company String
-
-  // Additional Info
-  additionalComments String?
+  race        String
+  gender      String
 
   // Certification
   agreedToBackgroundCheck Boolean
   eSignature              String
   signatureDate           DateTime
-
-  volunteerInfo VolunteerInfo?
-}
-
-model VolunteerInfo {
-  id                String   @id @default(uuid())
-  createdAt         DateTime @default(now())
-  backgroundChecked Boolean  @default(false)
-
-  // Personal Info
-  fullName    String
-  email       String
-  phoneNumber String
-  addressLine String
-  city        String
-  state       String
-  zipCode     String
-
-  // Optional link to VolunteerApplication
-  applicationId String?               @unique
-  application   VolunteerApplication? @relation(fields: [applicationId], references: [id])
-
-  // Optional link to VolunteerBackgroundCheck
-  backgroundCheckId String?                   @unique
-  backgroundCheck   VolunteerBackgroundCheck? @relation(fields: [backgroundCheckId], references: [id])
 }
 
 model Event {
