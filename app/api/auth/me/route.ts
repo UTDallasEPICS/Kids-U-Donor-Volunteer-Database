@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
         phone: user.person?.phoneNumber || "",
         avatar: user.avatarPath ?? null,
         twoFactorEnabled: user.twoFactorEnabled || false,
-        volunteerId: user.person?.volunteer?.id || null,
+        volunteerId: user.person?.volunteer?.id ?? null,
       },
     });
   } catch (error) {

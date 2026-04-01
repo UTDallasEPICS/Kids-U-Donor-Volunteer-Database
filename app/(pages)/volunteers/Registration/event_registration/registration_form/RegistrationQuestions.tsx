@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -30,7 +29,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
     console.log(data);
 
     try {
-// Use the data as needed, e.g., setUser(data);
+      // Use the data as needed, e.g., setUser(data);
       const registrationResponse = await fetch("/api/event-registration/post", {
         method: "POST",
         headers: {
@@ -64,28 +63,14 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
         <div className="grid grid-cols-1 sm:grid-cols-2">
           <div className="sm:col-span-1">
             <div className="flex flex-col mb-2">
-              <label className="mb-1 text-gray-700">
-                I will be volunteering at this event.
-              </label>
+              <label className="mb-1 text-gray-700">I will be volunteering at this event.</label>
               <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="volunteeringYes"
-                  name="volunteering"
-                  value="yes"
-                  className="mr-2"
-                />
+                <input type="radio" id="volunteeringYes" name="volunteering" value="yes" className="mr-2" />
                 <label htmlFor="volunteeringYes" className="mr-4">
                   Yes
                 </label>
 
-                <input
-                  type="radio"
-                  id="volunteeringNo"
-                  name="volunteering"
-                  value="no"
-                  className="mr-2"
-                />
+                <input type="radio" id="volunteeringNo" name="volunteering" value="no" className="mr-2" />
                 <label htmlFor="volunteeringNo">No</label>
               </div>
             </div>
@@ -95,24 +80,12 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
                 I will be volunteering at this event for the full event time.
               </label>
               <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="volunteeringFullYes"
-                  name="volunteeringFull"
-                  value="yes"
-                  className="mr-2"
-                />
+                <input type="radio" id="volunteeringFullYes" name="volunteeringFull" value="yes" className="mr-2" />
                 <label htmlFor="volunteeringFullYes" className="mr-4">
                   Yes
                 </label>
 
-                <input
-                  type="radio"
-                  id="volunteeringFullNo"
-                  name="volunteeringFull"
-                  value="no"
-                  className="mr-2"
-                />
+                <input type="radio" id="volunteeringFullNo" name="volunteeringFull" value="no" className="mr-2" />
                 <label htmlFor="volunteeringFullNo">No</label>
               </div>
             </div>
@@ -199,28 +172,14 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
             </div>
 
             <div className="flex flex-col mb-2">
-              <label className="mb-1 text-gray-700">
-                Do you speak Spanish?
-              </label>
+              <label className="mb-1 text-gray-700">Do you speak Spanish?</label>
               <div className="flex items-center">
-                <input
-                  type="radio"
-                  id="speakSpanishYes"
-                  name="speakSpanish"
-                  value="yes"
-                  className="mr-2"
-                />
+                <input type="radio" id="speakSpanishYes" name="speakSpanish" value="yes" className="mr-2" />
                 <label htmlFor="speakSpanishYes" className="mr-4">
                   Yes
                 </label>
 
-                <input
-                  type="radio"
-                  id="speakSpanishNo"
-                  name="speakSpanish"
-                  value="no"
-                  className="mr-2"
-                />
+                <input type="radio" id="speakSpanishNo" name="speakSpanish" value="no" className="mr-2" />
                 <label htmlFor="speakSpanishNo">No</label>
               </div>
             </div>
@@ -237,18 +196,9 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
               >
                 <optgroup label="None">
                   <option value="US Citizen"> US Citizen</option>
-                  <option value="Naturalized Citizen">
-                    {" "}
-                    Naturalized Citizen
-                  </option>
-                  <option value="Immigrant Non-Citizen">
-                    {" "}
-                    Immigrant Non-Citizen
-                  </option>
-                  <option value="Non-Immigrant Visa Holder">
-                    {" "}
-                    Non-Immigrant Visa Holder
-                  </option>
+                  <option value="Naturalized Citizen"> Naturalized Citizen</option>
+                  <option value="Immigrant Non-Citizen"> Immigrant Non-Citizen</option>
+                  <option value="Non-Immigrant Visa Holder"> Non-Immigrant Visa Holder</option>
                   <option value="Other"> Other</option>
                 </optgroup>
               </select>
@@ -436,10 +386,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
           <div className="sm:col-span-1">
             <h1 className="font-bold text-lg">Emergency Contact Information</h1>
             <div className="flex flex-col mb-2">
-              <label
-                htmlFor="emergencyFirstName"
-                className="mb-1 text-gray-700"
-              >
+              <label htmlFor="emergencyFirstName" className="mb-1 text-gray-700">
                 First Name:
               </label>
               <input
@@ -461,10 +408,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
               />
             </div>
             <div className="flex flex-col mb-2">
-              <label
-                htmlFor="emergencyPreferredName"
-                className="mb-1 text-gray-700"
-              >
+              <label htmlFor="emergencyPreferredName" className="mb-1 text-gray-700">
                 Preferred Name:
               </label>
               <input
@@ -488,10 +432,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
               />
             </div>
             <div className="flex flex-col mb-2">
-              <label
-                htmlFor="emergencyPhoneNumber"
-                className="mb-1 text-gray-700"
-              >
+              <label htmlFor="emergencyPhoneNumber" className="mb-1 text-gray-700">
                 Phone Number:
               </label>
               <input

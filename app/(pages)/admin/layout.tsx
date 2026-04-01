@@ -57,7 +57,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             submenuItems: [
               { name: "Add Orientation", reference: "/admin/orientations/add_orientation" },
               { name: "View Orientations", reference: "/admin/orientations/view_orientations" },
-              { name: "Add Event", reference: "/admin/events/add-event" },
+              { name: "Events", reference: "/admin/events" },
             ]
           },
           { 

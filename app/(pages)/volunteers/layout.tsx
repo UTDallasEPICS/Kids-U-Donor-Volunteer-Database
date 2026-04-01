@@ -1,6 +1,6 @@
 import React from "react";
 import MainSidebar from "@/app/components/main-sidebar";
-import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar"; 
+import TopNavigationBar from "@/app/components/volunteer-top-navigation-bar";
 
 export default function VolunteerLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -23,9 +23,7 @@ export default function VolunteerLayout({ children }: { children: React.ReactNod
             },
           ]}
         />
-          <main className="ml-64 mt-16 min-h-screen flex-1">
-          {children}
-        </main>
+        <main className="ml-64 mt-16 min-h-screen flex-1">{children}</main>
       </div>
     </div>
   );
