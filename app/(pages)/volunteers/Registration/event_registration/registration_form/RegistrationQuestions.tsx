@@ -145,10 +145,11 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
             </div>
           </div>
         </div>
+        {/*
         <div className="w-full border-t border-[#1F2839] my-4"></div>
         <div className="grid grid-cols-1 sm:grid-cols-2">
           <div className="sm:col-span-1">
-            <h1 className="font-bold text-lg">Personal Information</h1>
+            {<h1 className="font-bold text-lg">Personal Information</h1> }
             <div className="flex flex-col mb-2">
               <label htmlFor="ssn" className="mb-1 text-gray-700">
                 SSN:
@@ -502,6 +503,7 @@ const RegistrationQuestions: React.FC<RegistrationQuestionsProps> = ({ eventId, 
             </div>
           </div>
         </div>
+        */}
         <div>
           <input
             type="submit"
