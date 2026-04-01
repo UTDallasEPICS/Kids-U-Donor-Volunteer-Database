@@ -16,7 +16,7 @@ const BackgroundCheckForm = () => {
 
         // Race/Gender
         race: '',
-        gender: '',
+        sex: '',
         
         // Certification
         agreeToBackgroundCheck: false,
@@ -62,7 +62,7 @@ const BackgroundCheckForm = () => {
                     zipCode: '',
                     county: '',
                     race: '',
-                    gender: '',
+                    sex: '',
                     agreeToBackgroundCheck: false,
                     electronicSignature: '',
                     signatureDate: new Date().toISOString().split('T')[0],
@@ -131,17 +131,6 @@ const BackgroundCheckForm = () => {
                         </div> */}
 
                         <div>
-                            <label className="block mb-2 font-medium">County</label>
-                            <input
-                                type="text"
-                                name="county"
-                                value={formData.county}
-                                onChange={handleChange}
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-
-                        <div>
                             <label className="block mb-2 font-medium">Current Address</label>
                             <input
                                 type="text"
@@ -184,6 +173,17 @@ const BackgroundCheckForm = () => {
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                         </div>
+
+                        <div>
+                            <label className="block mb-2 font-medium">County</label>
+                            <input
+                                type="text"
+                                name="county"
+                                value={formData.county}
+                                onChange={handleChange}
+                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
                     </div>
                 </section>
 
@@ -202,23 +202,20 @@ const BackgroundCheckForm = () => {
                                 required
                             >
                                 <option value="">-- Select Race --</option>
-                                <option value="White">White</option>
-                                <option value="Black or African American">Black or African American</option>
+                                <option value="African American">African American</option>
+                                <option value="American Indian">American Indian</option>
                                 <option value="Asian">Asian</option>
-                                <option value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</option>
-                                <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                                <option value="Anglo">Anglo</option>
                                 <option value="Hispanic or Latino">Hispanic or Latino</option>
-                                <option value="Two or More Races">Two or More Races</option>
                                 <option value="Other">Other</option>
-                                <option value="Prefer Not to Say">Prefer Not to Say</option>
                             </select>
                         </div>
 
                         <div>
-                            <label className="block mb-2 font-medium">Gender</label>
+                            <label className="block mb-2 font-medium">Sex</label>
                             <select
-                                name="gender"
-                                value={formData.gender}
+                                name="sex"
+                                value={formData.sex}
                                 onChange={handleChange}
                                 className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 required
@@ -226,9 +223,6 @@ const BackgroundCheckForm = () => {
                                 <option value="">-- Select Gender --</option>
                                 <option value="Male">Male</option>
                                 <option value="Female">Female</option>
-                                <option value="Non-binary">Non-binary</option>
-                                <option value="Other">Other</option>
-                                <option value="Prefer Not to Say">Prefer Not to Say</option>
                             </select>
                         </div>
                     </div>
