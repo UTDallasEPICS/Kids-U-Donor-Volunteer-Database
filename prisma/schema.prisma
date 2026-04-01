@@ -51,6 +51,7 @@ model User {
   person             Person?   @relation(fields: [personId], references: [id])
   email              String    @unique
   avatarPath         String?
+  deletedAt          DateTime?
   password           String
   emailVerified      DateTime?
   createdAt          DateTime  @default(now())

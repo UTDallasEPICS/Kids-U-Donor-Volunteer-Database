@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         role: true,
+        deletedAt: true,
         avatarPath: true,
         twoFactorEnabled: true,
         person: {
@@ -51,6 +52,10 @@ export async function GET(request: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
+    }
+
+    if (user.deletedAt) {
+      return NextResponse.json({ success: false, error: "Account is deactivated" }, { status: 403 });
     }
 
     return NextResponse.json({

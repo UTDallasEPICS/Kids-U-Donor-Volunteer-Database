@@ -46,9 +46,9 @@ const publicPaths = [
   '/verification/forgot-password',
   '/verification/reset-password'
 ];
-const adminPaths = ['/admin', '/api/admin', '/api/grantors', '/api/super-admin'];  //delete supper-admin after creating the first super admin account, 
+const adminPaths = ['/admin', '/api/admin', '/api/grantors'];
 
-const superAdminPaths = ['/api/super-admin'];
+const superAdminPaths = ['/super-admin', '/api/super-admin'];
 
 const volunteerPaths = ['/volunteers', '/api/volunteer', '/api/event-registration', '/api/events', '/api/locations', '/api/orientations'];
 
@@ -94,21 +94,19 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-// Super admin only routes 
- 
-  // if(superAdminPaths.some((path) => pathname.startsWith(path))) {
-
-  //   if (userRole !== 'SUPER_ADMIN') {
-  //     if (isApiRoute) {
-  //       return NextResponse.json(
-  //         { error: 'Forbidden. You do not have admin privileges.' },
-  //         { status: 403 }
-  //       );
-  //     }
-  //     const dashboardUrl = new URL('/volunteers', request.url);
-  //     return NextResponse.redirect(dashboardUrl);
-  //   }
-  // }
+  // Super admin only routes
+  if (superAdminPaths.some((path) => pathname.startsWith(path))) {
+    if (userRole !== 'SUPER_ADMIN') {
+      if (isApiRoute) {
+        return NextResponse.json(
+          { error: 'Forbidden. You do not have super admin privileges.' },
+          { status: 403 }
+        );
+      }
+      const dashboardUrl = new URL('/volunteers', request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
+  }
 
 
   //volunteer or admin users
