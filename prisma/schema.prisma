@@ -342,8 +342,6 @@ model VolunteerBackgroundCheck {
   // Personal Info
   fullName    String
   dateOfBirth DateTime
-  email       String
-  phoneNumber String
   county      String
   addressLine String
   city        String
@@ -355,7 +353,7 @@ model VolunteerBackgroundCheck {
   // Certification
   agreedToBackgroundCheck Boolean
   eSignature              String
-  signatureDate           DateTime
+  signatureDate           String
 }
 
 model Event {
