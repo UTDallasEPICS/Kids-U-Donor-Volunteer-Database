@@ -62,7 +62,7 @@ export default function GrantorsPage() {
   const fetchGrantsData = async () => {
     try {
 
-      const response = await fetch(`/api/admin/grantors?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/admin/grantors/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
 
       const result = await response.json();
       setGrantorsData(result.data);
@@ -131,15 +131,15 @@ export default function GrantorsPage() {
   }
 
   return (
-    <Box>
-      <Box>
+    <Box sx = {styles.box}>
+      {/*<Box>
         <Breadcrumbs style={styles.breadcrumb}>
           <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
           <Typography>Grants</Typography>
           <Typography>Grantor List</Typography>
         </Breadcrumbs>
-      </Box>
-      <Box>
+      </Box>*/}
+      {/*<Box>
         <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
           <Grid>
             <FormControl variant="outlined" sx={{ width: 150 }}>
@@ -187,12 +187,12 @@ export default function GrantorsPage() {
             </FormControl>
           </Grid>
         </Grid>
-      </Box>
+      </Box>*/}
       <Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small">
+        <TableContainer>
+          <Table stickyHeader sx={styles.table} size="small">
             <TableHead>
-              <TableRow>
+              <TableRow hover>
                 {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
                 {selectedColumns.includes("type") && <TableCell style={styles.tableCellHeader}>Type</TableCell>}
                 {selectedColumns.includes("addressLine1") && <TableCell style={styles.tableCellHeader}>Address Line 1</TableCell>}
@@ -206,20 +206,10 @@ export default function GrantorsPage() {
             </TableHead>
             <TableBody>
               {grantorsData?.map((grantor) => (
-                <TableRow key={grantor.id}>
+                <TableRow hover key={grantor.id}>
                   {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/admin/grants/grantor/detail/${grantor.id}`}>{grantor.organization.name}</Link></TableCell>}
                   {selectedColumns.includes("type") && <TableCell style={styles.tableCell}>{grantor.type}</TableCell>}
                   {selectedColumns.includes("addressLine1") && (
-  <TableCell style={styles.tableCell}>
-    {grantor.organization.address?.addressLine1 || "N/A"}
-  </TableCell>
-)}
-{selectedColumns.includes("addressLine2") && (
-  <TableCell style={styles.tableCell}>
-    {grantor.organization.address?.addressLine2 || "N/A"}
-  </TableCell>
-)}
-{selectedColumns.includes("addressLine1") && (
   <TableCell style={styles.tableCell}>
     {grantor.organization.address?.addressLine1 || "N/A"}
   </TableCell>
@@ -258,7 +248,7 @@ export default function GrantorsPage() {
                 </TableRow>
               )) ?? null}
             </TableBody>
-            <TableFooter>
+            {/*<TableFooter>
               <TableRow>
                 <TableCell colSpan={12} style={{ padding: 0 }}>
                   <TablePagination
@@ -273,7 +263,7 @@ export default function GrantorsPage() {
                   />
                 </TableCell>
               </TableRow>
-            </TableFooter>
+            </TableFooter>*/}
           </Table>
         </TableContainer>
       </Box>
@@ -282,16 +272,22 @@ export default function GrantorsPage() {
 }
 
 const styles = {
+ box: {
+    marginLeft: "1em",
+    marginRight: "1em",
+    marginTop: "5em",
+  },
   table: {
-    minWidth: 650,
+    minWidth: 750,
+    borderLeft: "1px solid #ccc",
+    borderRight: "1px solid #ccc",
+    borderTop: "1px solid #ccc",
   },
   tableCellHeader: {
     fontWeight: "bold",
-    border: "1px solid #aaa",
-    backgroundColor: "#ccc",
   },
   tableCell: {
-    border: "1px solid #ccc",
+    borderTop: "1px solid #ccc",
   },
   center: {
     display: "flex",
@@ -301,14 +297,14 @@ const styles = {
     marginLeft: "auto",
     marginRight: "auto",
   },
-  pagination: {
+  /*pagination: {
     display: "flex",
     justifyContent: "left",
     width: "100%",
     backgroundColor: "#ccc",
-  },
-  breadcrumb: {
+  },*/
+  /*breadcrumb: {
     marginLeft: "5px",
     marginTop: "8px"
-  }
+  }*/
 };

@@ -42,7 +42,7 @@ export const AddDonorFooter = ({ handleSubmit, isDirty, errors }: FooterProps) =
       setIsButtonDisabled(true);
       const requestBody = JSON.stringify({ data });
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donors/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donors/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -41,7 +41,7 @@ export default function Import() {
       // backend import route expects 'csv' field
       formData.append('csv', new File([blob], csvFileName, { type: 'text/csv' }));
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/donations/import`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/api/admin/donations/import`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
