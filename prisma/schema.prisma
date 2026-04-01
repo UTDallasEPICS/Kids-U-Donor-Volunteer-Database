@@ -247,7 +247,6 @@ model Volunteer {
   MailRecipient       MailRecipient[]
   Person              Person?               @relation(fields: [personId], references: [id])
   personId            String?               @unique
-
 }
 
 // model volunteerAccount {
