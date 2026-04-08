@@ -247,6 +247,7 @@ model Volunteer {
   MailRecipient       MailRecipient[]
   Person              Person?               @relation(fields: [personId], references: [id])
   personId            String?               @unique
+  backgroundCheck     VolunteerBackgroundCheck?
 }
 
 // model volunteerAccount {
@@ -354,6 +355,11 @@ model VolunteerBackgroundCheck {
   agreedToBackgroundCheck Boolean
   eSignature              String
   signatureDate           String
+
+  approved Boolean @default(false)
+
+  volunteerId String?   @unique
+  volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
 }
 
 model Event {
