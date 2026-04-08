@@ -32,6 +32,7 @@ interface Event {
     city: string;
     state: string;
   };
+  backgroundCheckRequired: boolean;
   eventRegistrations: EventRegistration[];
 }
 
@@ -89,7 +90,7 @@ export const AdminRegTable = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold">Events and Registrations</h2>
         <Link
-          href="/volunteers/registration/add-event"
+          href="/admin/events"
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
         >
           Add New Event
@@ -104,6 +105,7 @@ export const AdminRegTable = () => {
             <th className="px-6 py-3 border-b text-left">Time</th>
             <th className="px-6 py-3 border-b text-left">Location</th>
             <th className="px-6 py-3 border-b text-left">Registrations</th>
+            <th className="px-6 py-3 border-b text-left">Background Check Required</th>
           </tr>
         </thead>
         <tbody>
@@ -116,7 +118,15 @@ export const AdminRegTable = () => {
                 <td className="px-6 py-4 border-b">
                   {event.location ? `${event.location.name}, ${event.location.city}` : "No location set"}
                 </td>
-                <td className="px-6 py-4 border-b">{event.eventRegistrations.length} volunteers</td>
+                <td className="px-6 py-4 border-b">
+                  {format(new Date(event.schedule), 'h:mm a')}
+                </td>
+                <td className="px-6 py-4 border-b">
+                  {event.location ? `${event.location.name}, ${event.location.city}` : 'No location set'}
+                </td>
+                <td className="px-6 py-4 border-b">
+                  {event.eventRegistrations.length} volunteers
+                </td>
               </tr>
               {expandedEventId === event.id && (
                 <tr>
