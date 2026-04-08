@@ -125,21 +125,21 @@ export default function GrantsPage() {
   useEffect(() => {
     fetchGrantsData();
   }, [page, rowsPerPage, searchValue, searchCriteria]);
-
+  
   if (loading) {
     return <CircularProgress style={styles.center} />
   }
 
   return (
-    <Box>
-      <Box>
+    <Box sx={styles.box}>
+      {/*<Box>
         <Breadcrumbs style={styles.breadcrumb}>
           <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
           <Typography>Grants</Typography>
           <Typography>Grant List</Typography>
         </Breadcrumbs>
-      </Box>
-      <Box>
+      </Box>*/}
+      {/*<Box>
         <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
           <Grid>
             <FormControl variant="outlined" sx={{ width: 150 }}>
@@ -187,12 +187,12 @@ export default function GrantsPage() {
             </FormControl>
           </Grid>
         </Grid>
-      </Box>
+      </Box>*/}
       <Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small">
+        <TableContainer>
+          <Table stickyHeader sx={styles.table} aria-labelledby="tableTitle" size="small">
             <TableHead>
-              <TableRow>
+              <TableRow hover>
                 {selectedColumns.includes("grantor") && <TableCell style={styles.tableCellHeader}>Grantor</TableCell>}
                 {selectedColumns.includes("representative") && <TableCell style={styles.tableCellHeader}>Representative</TableCell>}
                 {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
@@ -209,7 +209,7 @@ export default function GrantsPage() {
             </TableHead>
             <TableBody>
               {grantsData?.map((grant) => (
-                <TableRow key={grant.id}>
+                <TableRow hover key={grant.id}>
 {selectedColumns.includes("grantor") && grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
   <TableCell style={styles.tableCell}>
     <Link href={`/admin/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}>
@@ -223,7 +223,7 @@ export default function GrantsPage() {
     {grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}
   </TableCell>
 ) : null}
-                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/grants/detail/${grant.id}`}>{grant.name}</Link></TableCell>}
+                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link className="text-blue-500" href={`/admin/grants/detail/${grant.id}`}>{grant.name}</Link></TableCell>}
                   {selectedColumns.includes("status") && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
                   {selectedColumns.includes("purpose") && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
                   {selectedColumns.includes("startDate") && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
@@ -236,7 +236,7 @@ export default function GrantsPage() {
                 </TableRow>
               )) ?? null}
             </TableBody>
-            <TableFooter>
+            {/*<TableFooter>
               <TableRow>
                 <TableCell colSpan={12} style={{ padding: 0 }}>
                   <TablePagination
@@ -251,7 +251,7 @@ export default function GrantsPage() {
                   />
                 </TableCell>
               </TableRow>
-            </TableFooter>
+            </TableFooter>*/}
           </Table>
         </TableContainer>
       </Box>
@@ -260,16 +260,23 @@ export default function GrantsPage() {
 }
 
 const styles = {
+  box: {
+    marginLeft: "1em",
+    marginRight: "1em",
+    marginTop: "5em",
+  },
   table: {
-    minWidth: 650,
+    minWidth: 750,
+    borderLeft: "1px solid #ccc",
+    borderRight: "1px solid #ccc",
+    borderTop: "1px solid #ccc",
   },
   tableCellHeader: {
     fontWeight: "bold",
-    border: "1px solid #aaa",
-    backgroundColor: "#ccc",
+    whiteSpace: "nowrap",
   },
   tableCell: {
-    border: "1px solid #ccc",
+    borderTop: "1px solid #ccc",
   },
   center: {
     display: "flex",
@@ -279,14 +286,14 @@ const styles = {
     marginLeft: "auto",
     marginRight: "auto",
   },
-  pagination: {
+  /*pagination: {
     display: "flex",
     justifyContent: "left",
     width: "100%",
-    backgroundColor: "#ccc",
-  },
-  breadcrumb: {
+    backgroundColor: "#cccccc",
+  },*/
+  /*breadcrumb: {
     marginLeft: "5px",
     marginTop: "8px"
-  }
+  }*/
 };

@@ -174,7 +174,7 @@ export default function Import() {
         {/* Database Fields Reference Section */}
           <div className="pt-4 border-t">
             <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel Columns</h2>
-            <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg">
+            <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg border " style={{ borderColor: 'rgb(16, 83, 172)'}}>
                 <p className="mb-3">Ensure the first row of your Excel file contains columns matching these fields.</p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
                     {dbFields.map(field => <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">{field}</p>)}

@@ -38,7 +38,9 @@ export default function LoginPage(): JSX.Element {
       }
 
       if (data.success) {
-        if (data.user.role === "ADMIN") {
+        if (data.user.role === "SUPER_ADMIN") {
+          router.push("/super-admin");
+        } else if (data.user.role === "ADMIN") {
           router.push("/admin");
         } else {
           router.push("/volunteers");

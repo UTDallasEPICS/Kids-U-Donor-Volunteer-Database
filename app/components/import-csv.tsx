@@ -56,7 +56,7 @@ export const Import = () => {
       const formData = new FormData();
       formData.append("csv", file);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/csv`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/csv`, {
         method: "POST",
         body: formData,
       });

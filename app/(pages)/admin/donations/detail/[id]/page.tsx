@@ -63,7 +63,7 @@ export default function DonationDetail() {
 
   const fetchDonation = async () => {
     try {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/donations/${id}`, {
+      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donations/${id}`, {
         method: "GET",
       });
 

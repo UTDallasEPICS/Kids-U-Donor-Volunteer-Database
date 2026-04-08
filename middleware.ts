@@ -1,11 +1,11 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { jwtVerify } from 'jose'; 
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
 interface UserJwtPayload {
   userId: string;
   email: string;
-  role: 'ADMIN' | 'VOLUNTEER'; 
+  role: "ADMIN" | "VOLUNTEER" | "SUPER_ADMIN";
   iat: number;
   exp: number;
 }
@@ -13,14 +13,12 @@ interface UserJwtPayload {
 const JWT_SECRET = process.env.JWT_SECRET;
 
 if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined');
+  throw new Error("JWT_SECRET environment variable is not defined");
 }
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
-async function verifyToken(
-  token: string | undefined
-): Promise<UserJwtPayload | null> {
+async function verifyToken(token: string | undefined): Promise<UserJwtPayload | null> {
   if (!token) {
     return null;
   }
@@ -33,46 +31,52 @@ async function verifyToken(
 }
 
 const publicPaths = [
-  '/',
-  '/signup', 
-  '/forgot-password',
-  '/api/auth/login',
-  '/api/auth/register',
-  '/api/auth/forgot-password',
-  '/api/auth/reset-password',
-  '/api/auth/emailverify',
-  '/verification/verify-email',
-  '/verification/verify-2fa',
-  '/verification/forgot-password',
-  '/verification/reset-password'
+  "/",
+  "/signup",
+  "/forgot-password",
+  "/api/auth/login",
+  "/api/auth/register",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/auth/emailverify",
+  "/verification/verify-email",
+  "/verification/verify-2fa",
+  "/verification/forgot-password",
+  "/verification/reset-password",
 ];
-const adminPaths = ['/admin', '/api/admin', '/api/grantors'];
+const adminPaths = ["/admin", "/api/admin", "/api/grantors"];
 
-const volunteerPaths = ['/volunteers', '/api/volunteer', '/api/event-registration', '/api/events', '/api/locations', '/api/orientations'];
+const superAdminPaths = ["/super-admin", "/api/super-admin"];
+
+const volunteerPaths = [
+  "/volunteers",
+  "/api/volunteer",
+  "/api/event-registration",
+  "/api/events",
+  "/api/locations",
+  "/api/orientations",
+];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  if (publicPaths.some((path) => pathname === path || pathname.startsWith(path + '/'))) {
+  if (publicPaths.some((path) => pathname === path || pathname.startsWith(path + "/"))) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('token')?.value;
+  const token = request.cookies.get("token")?.value;
   const user = await verifyToken(token);
 
-  const loginUrl = new URL('/login', request.url);
-  const isApiRoute = pathname.startsWith('/api');
-  
+  const loginUrl = new URL("/login", request.url);
+  const isApiRoute = pathname.startsWith("/api");
+
   // unauthenticated users
   if (!user) {
     if (isApiRoute) {
-      return NextResponse.json(
-        { error: 'Unauthorized. Please login.' },
-        { status: 401 }
-      );
-    }    
-    const loginUrl = new URL('/', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.json({ error: "Unauthorized. Please login." }, { status: 401 });
+    }
+    const loginUrl = new URL("/", request.url);
+    loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
@@ -80,34 +84,38 @@ export async function middleware(request: NextRequest) {
   const userRole = user.role;
 
   if (adminPaths.some((path) => pathname.startsWith(path))) {
-    if (userRole !== 'ADMIN') {
+    if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
       if (isApiRoute) {
-        return NextResponse.json(
-          { error: 'Forbidden. You do not have admin privileges.' },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Forbidden. You do not have admin privileges." }, { status: 403 });
       }
-      const dashboardUrl = new URL('/volunteers', request.url);
+      const dashboardUrl = new URL("/volunteers", request.url);
+      return NextResponse.redirect(dashboardUrl);
+    }
+  }
+
+  // Super admin only routes
+  if (superAdminPaths.some((path) => pathname.startsWith(path))) {
+    if (userRole !== "SUPER_ADMIN") {
+      if (isApiRoute) {
+        return NextResponse.json({ error: "Forbidden. You do not have super admin privileges." }, { status: 403 });
+      }
+      const dashboardUrl = new URL("/volunteers", request.url);
       return NextResponse.redirect(dashboardUrl);
     }
   }
 
   //volunteer or admin users
   if (volunteerPaths.some((path) => pathname.startsWith(path))) {
-    if (userRole !== 'VOLUNTEER' && userRole !== 'ADMIN') {
+    if (userRole !== "VOLUNTEER" && userRole !== "ADMIN") {
       if (isApiRoute) {
-        return NextResponse.json(
-          { error: 'Forbidden. You do not have access.' },
-          { status: 403 }
-        );
+        return NextResponse.json({ error: "Forbidden. You do not have access." }, { status: 403 });
       }
       return NextResponse.redirect(loginUrl);
     }
   }
 
-
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set('x-user-payload', JSON.stringify(user));
+  requestHeaders.set("x-user-payload", JSON.stringify(user));
 
   return NextResponse.next({
     request: {
@@ -117,10 +125,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    '/api/:path*',
-    '/admin/:path*', 
-    '/volunteers/:path*',
-    '/((?!_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ["/api/:path*", "/admin/:path*", "/volunteers/:path*", "/((?!_next/static|_next/image|favicon.ico).*)"],
 };
