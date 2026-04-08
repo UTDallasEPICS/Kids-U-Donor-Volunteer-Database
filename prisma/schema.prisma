@@ -378,6 +378,7 @@ model Event {
   Volunteer            Volunteer?            @relation(fields: [volunteerId], references: [id])
   volunteerId          String?
   EventHour            EventHour[]
+  bgCheckRequired      Boolean               @default(false)
 }
 
 model EventRegistration {
@@ -409,13 +410,14 @@ model Location {
 }
 
 model Orientation {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  schedule    DateTime
-  capacity    Int
-  locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String
+  schedule        DateTime
+  capacity        Int
+  locationId      String
+  location        Location @relation(fields: [locationId], references: [id])
+  bgCheckRequired Boolean  @default(false)
 }
 
 model Admin {

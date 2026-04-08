@@ -6,6 +6,31 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
 
     console.log("Received event registration data:", body);
+
+    // Check if this event requires a background check
+    const event = await prisma.event.findUnique({
+      where: { id: body.eventId },
+      select: { bgCheckRequired: true },
+    });
+
+    if (!event) {
+      return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    }
+
+    if (event.bgCheckRequired) {
+      const bgCheck = await prisma.volunteerBackgroundCheck.findFirst({
+        where: { volunteerId: body.volunteerId, approved: true },
+        select: { id: true },
+      });
+
+      if (!bgCheck) {
+        return NextResponse.json(
+          { error: "You need to be background checked to register for this event." },
+          { status: 403 }
+        );
+      }
+    }
+
     const registration = await prisma.eventRegistration.create({
       data: {
         eventGroup: body.eventGroup,

@@ -29,6 +29,7 @@ export default function AddEvent() {
     time: "",
     description: "",
     locationId: "",
+    bgCheckRequired: false,
   });
 
   // Location Form State
@@ -62,10 +63,10 @@ export default function AddEvent() {
   }, []);
 
   const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
     setEventData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -122,6 +123,7 @@ export default function AddEvent() {
           description: eventData.description,
           schedule: new Date(eventData.date + "T" + eventData.time).toISOString(),
           locationId: eventData.locationId,
+          bgCheckRequired: eventData.bgCheckRequired,
         }),
       });
 
@@ -249,6 +251,20 @@ export default function AddEvent() {
                 </button>
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="bgCheckRequired"
+              name="bgCheckRequired"
+              checked={eventData.bgCheckRequired}
+              onChange={handleEventChange}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="bgCheckRequired" className="text-sm font-medium text-gray-700">
+              Requires Background Check
+            </label>
           </div>
 
           <button

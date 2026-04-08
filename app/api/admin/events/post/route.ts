@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
       description: body.description,
       schedule: body.schedule,
       locationId: body.locationId || null,
+      bgCheckRequired: body.bgCheckRequired ?? false,
     };
 
     const event = await prisma.event.create({

@@ -8,7 +8,8 @@ export default function AddOrientation() {
     description: '',
     schedule: '',
     capacity: '',
-    locationId: ''
+    locationId: '',
+    bgCheckRequired: false,
   })
 
   useEffect(() => {
@@ -18,7 +19,8 @@ export default function AddOrientation() {
   }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value, type } = e.target;
+    setForm({ ...form, [name]: type === 'checkbox' ? (e.target as HTMLInputElement).checked : value })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +34,7 @@ export default function AddOrientation() {
 
     if (res.ok) {
       alert('Orientation created!')
-      setForm({ name: '', description: '', schedule: '', capacity: '', locationId: '' })
+      setForm({ name: '', description: '', schedule: '', capacity: '', locationId: '', bgCheckRequired: false })
     } else {
       alert('Failed to create orientation')
     }
@@ -52,6 +54,16 @@ export default function AddOrientation() {
             <option key={loc.id} value={loc.id}>{loc.name}</option>
           ))}
         </select>
+        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+          <input
+            type="checkbox"
+            name="bgCheckRequired"
+            checked={form.bgCheckRequired}
+            onChange={handleChange}
+            className="h-4 w-4 rounded border-gray-300"
+          />
+          Requires Background Check
+        </label>
         <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Create</button>
       </form>
     </div>
