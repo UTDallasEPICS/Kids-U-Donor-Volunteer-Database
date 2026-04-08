@@ -39,6 +39,7 @@ next-env.d.ts
 postgres-data
 
 CLAUDE.md
+AGENTS.md
 
 /.claude
 

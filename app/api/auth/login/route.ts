@@ -35,6 +35,7 @@ export async function POST(request: NextRequest) {
         email: true,
         password: true,
         role: true,
+        deletedAt: true,
         verified: true, 
         twoFactorEnabled: true, 
         twoFactorCode: true, 
@@ -52,6 +53,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Invalid email or password' },
         { status: 401 }
+      );
+    }
+
+    if (user.deletedAt) {
+      return NextResponse.json(
+        { error: 'Account is deactivated. Please contact a super admin.' },
+        { status: 403 }
       );
     }
 

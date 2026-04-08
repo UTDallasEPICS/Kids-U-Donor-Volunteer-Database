@@ -48,14 +48,14 @@ export const AdminRegTable = () => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch('/api/events/get');
+      const response = await fetch("/api/events/get");
       if (!response.ok) {
-        throw new Error('Failed to fetch events');
+        throw new Error("Failed to fetch events");
       }
       const data = await response.json();
       setEvents(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error fetching events');
+      setError(err instanceof Error ? err.message : "Error fetching events");
     } finally {
       setLoading(false);
     }
@@ -111,13 +111,12 @@ export const AdminRegTable = () => {
         <tbody>
           {events.map((event) => (
             <React.Fragment key={event.id}>
-              <tr 
-                onClick={() => handleRowClick(event.id)}
-                className="hover:bg-gray-50 cursor-pointer"
-              >
+              <tr onClick={() => handleRowClick(event.id)} className="hover:bg-gray-50 cursor-pointer">
                 <td className="px-6 py-4 border-b">{event.name}</td>
+                <td className="px-6 py-4 border-b">{format(new Date(event.schedule), "MMM dd, yyyy")}</td>
+                <td className="px-6 py-4 border-b">{format(new Date(event.schedule), "h:mm a")}</td>
                 <td className="px-6 py-4 border-b">
-                  {format(new Date(event.schedule), 'MMM dd, yyyy')}
+                  {event.location ? `${event.location.name}, ${event.location.city}` : "No location set"}
                 </td>
                 <td className="px-6 py-4 border-b">
                   {format(new Date(event.schedule), 'h:mm a')}
@@ -127,9 +126,6 @@ export const AdminRegTable = () => {
                 </td>
                 <td className="px-6 py-4 border-b">
                   {event.eventRegistrations.length} volunteers
-                </td>
-                <td className="px-6 py-4 border-b">
-                  {event.backgroundCheckRequired ? 'Yes' : 'No'}
                 </td>
               </tr>
               {expandedEventId === event.id && (
@@ -155,11 +151,9 @@ export const AdminRegTable = () => {
                                   {registration.volunteer.firstName} {registration.volunteer.lastName}
                                 </td>
                                 <td className="px-4 py-2">{registration.volunteer.emailAddress}</td>
-                                <td className="px-4 py-2">{registration.volunteer.phoneNumber || 'N/A'}</td>
+                                <td className="px-4 py-2">{registration.volunteer.phoneNumber || "N/A"}</td>
                                 <td className="px-4 py-2">{registration.eventGroup}</td>
-                                <td className="px-4 py-2">
-                                  {format(new Date(registration.date), 'MMM dd, yyyy')}
-                                </td>
+                                <td className="px-4 py-2">{format(new Date(registration.date), "MMM dd, yyyy")}</td>
                               </tr>
                             ))}
                           </tbody>
