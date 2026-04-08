@@ -6,10 +6,11 @@ import PrintToolbar from './PrintToolbar';
 export default async function PrintBackgroundCheckPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
   const record = await prisma.volunteerBackgroundCheck.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!record) notFound();
