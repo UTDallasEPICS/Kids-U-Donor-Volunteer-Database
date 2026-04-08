@@ -36,6 +36,7 @@ interface Event {
   schedule: string;
   location: Location | null;
   eventRegistrations: EventRegistration[];
+  backgroundCheckRequired: boolean;
 }
 
 export default function EventsPage() {
@@ -57,6 +58,7 @@ export default function EventsPage() {
     date: "",
     time: "",
     locationId: "",
+    backgroundCheckRequired: false,
   });
 
   const [locationData, setLocationData] = useState({
@@ -110,6 +112,7 @@ export default function EventsPage() {
         date: format(scheduleDate, "yyyy-MM-dd"),
         time: format(scheduleDate, "HH:mm"),
         locationId: event.location?.id || "",
+        backgroundCheckRequired: event.backgroundCheckRequired,
       });
     } else {
       setEditingEvent(null);
@@ -119,6 +122,7 @@ export default function EventsPage() {
         date: "",
         time: "",
         locationId: "",
+        backgroundCheckRequired: false,
       });
     }
     setShowModal(true);
@@ -142,6 +146,7 @@ export default function EventsPage() {
         description: formData.description,
         schedule,
         locationId: formData.locationId || null,
+        backgroundCheckRequired: formData.backgroundCheckRequired,
       };
 
       const url = editingEvent
@@ -480,7 +485,22 @@ export default function EventsPage() {
                   </button>
                 </div>
               </div>
-
+              
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={formData.backgroundCheckRequired}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      backgroundCheckRequired: e.target.checked,
+                    })
+                  }
+                />
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Requires Background Check
+                </label>
+              </div>
         
               <div className="flex gap-3 pt-4">
                 <button

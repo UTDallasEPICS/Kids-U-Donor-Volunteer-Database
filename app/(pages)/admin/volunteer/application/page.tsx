@@ -39,11 +39,14 @@ export default function ApplicationsPage() {
       const res = await fetch(`/api/admin/volunteer/application/${id}/patch`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: {accepted: true } }), // match your backend
+        body: JSON.stringify({ data: {accepted: true } }), 
       });
 
       if (res.ok) {
         setApplications(apps =>
+          apps.map(app => (app.id === id ? { ...app, status: "APPROVED", softdelete: false } : app))
+        );
+        setPathapplications(apps =>
           apps.map(app => (app.id === id ? { ...app, status: "APPROVED", softdelete: false } : app))
         );
       } else {
@@ -61,11 +64,12 @@ export default function ApplicationsPage() {
       const res = await fetch(`/api/admin/volunteer/application/${id}/delete`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { status: "REJECTED", softdelete: true } }), // match your backend
+        body: JSON.stringify({ data: { status: "REJECTED", softdelete: true } }), 
       });
 
       if (res.ok) {
         setApplications(apps => apps.filter(app => app.id !== id));
+        setPathapplications(apps => apps.filter(app => app.id !== id));
       } else {
         console.error('Failed to reject the application');
       }
@@ -88,7 +92,7 @@ export default function ApplicationsPage() {
           </tr>
         </thead>
         <tbody>
-          {applications.map(app => (
+          {applications.filter(app => app.status === VolunteerAppStatus.PENDING).map(app => (
             <tr key={app.id} className="border-t">
               <td className="p-2">{app.legalName}</td>
               <td className="p-2">{app.email}</td>
@@ -123,7 +127,7 @@ export default function ApplicationsPage() {
       <div className="flex flex-col min-h-screen p-6">
       <div className="flex flex-1 items-center justify-center">
       <div className="w-full">
-      <h1 className="flex text-2xl font-bold mb-4">Pending Volunteer Applications</h1>
+      <h1 className="flex text-2xl font-bold mb-4">Past Volunteer Applications</h1>
       <table className="w-full table-auto border border-gray-300">
         <thead>
           <tr className="bg-gray-100 text-left">
@@ -134,7 +138,7 @@ export default function ApplicationsPage() {
           </tr>
         </thead>
         <tbody>
-          {Pathapplications.map(app => (
+          {Pathapplications.filter(app => app.status !== VolunteerAppStatus.PENDING).map(app => (
             <tr key={app.id} className="border-t">
               <td className="p-2">{app.legalName}</td>
               <td className="p-2">{app.email}</td>
