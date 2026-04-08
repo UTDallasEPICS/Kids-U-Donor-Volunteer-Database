@@ -3,9 +3,10 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export default async function ApplicationDetailPage({ params }: { params: { id: string } }) {
+export default async function ApplicationDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const application = await prisma.volunteerApplication.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   if (!application) {
@@ -173,7 +174,7 @@ export default async function ApplicationDetailPage({ params }: { params: { id: 
         {/* Application Status */}
         <div>
           <span className="font-medium text-gray-700">Application Status:</span>
-          <span className="text-gray-900">{application.accepted ? 'Accepted' : 'Pending'}</span>
+          <span className="text-gray-900">{application.status }</span>
         </div>
       </div>
     </div>

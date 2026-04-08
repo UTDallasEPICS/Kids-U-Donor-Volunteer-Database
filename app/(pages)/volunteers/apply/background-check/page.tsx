@@ -1,31 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const defaultFormData = {
+    fullName: '',
+    dateOfBirth: '',
+    currentAddress: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    county: '',
+    race: '',
+    sex: '',
+    agreeToBackgroundCheck: false,
+    electronicSignature: '',
+    signatureDate: new Date().toISOString().split('T')[0],
+};
 
 const BackgroundCheckForm = () => {
-    const [formData, setFormData] = useState({
-        // Personal Information
-        fullName: '',
-        dateOfBirth: '',
-        //ssn: '',
-        currentAddress: '',
-        city: '',
-        state: '',
-        zipCode: '',
-        county: '',
-
-        // Race/Gender
-        race: '',
-        sex: '',
-        
-        // Certification
-        agreeToBackgroundCheck: false,
-        electronicSignature: '',
-        signatureDate: new Date().toISOString().split('T')[0],
-    });
-
+    const [formData, setFormData] = useState(defaultFormData);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitMessage, setSubmitMessage] = useState('');
+    const [alreadySubmitted, setAlreadySubmitted] = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [statusLoading, setStatusLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/background-check/get')
+            .then(res => res.json())
+            .then(data => {
+                if (data.submitted) setAlreadySubmitted(true);
+            })
+            .catch(() => {/* non-blocking */})
+            .finally(() => setStatusLoading(false));
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const target = e.target as HTMLInputElement | HTMLSelectElement;
@@ -42,7 +50,6 @@ const BackgroundCheckForm = () => {
         setSubmitMessage('');
 
         try {
-            // Update this API endpoint as needed
             const response = await fetch('/api/background-check/post', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -50,23 +57,9 @@ const BackgroundCheckForm = () => {
             });
 
             if (response.ok) {
-                setSubmitMessage('Background check form submitted successfully!');
-                // Reset form or redirect
-                setFormData({
-                    fullName: '',
-                    dateOfBirth: '',
-                    //ssn: '',
-                    currentAddress: '',
-                    city: '',
-                    state: '',
-                    zipCode: '',
-                    county: '',
-                    race: '',
-                    sex: '',
-                    agreeToBackgroundCheck: false,
-                    electronicSignature: '',
-                    signatureDate: new Date().toISOString().split('T')[0],
-                });
+                setAlreadySubmitted(true);
+                setShowForm(false);
+                setFormData(defaultFormData);
             } else {
                 throw new Error('Submission failed');
             }
@@ -78,6 +71,37 @@ const BackgroundCheckForm = () => {
         }
     };
 
+    if (statusLoading) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl text-center text-gray-500">
+                Loading...
+            </div>
+        );
+    }
+
+    if (alreadySubmitted && !showForm) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <header className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-800">Background Check Form</h1>
+                </header>
+                <div className="bg-white rounded-lg shadow-md p-8 text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-full text-sm">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+                        Sent
+                    </div>
+                    <p className="text-gray-600">Your background check form has been submitted and is pending review.</p>
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="mt-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-6 rounded"
+                    >
+                        Submit a New Form
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
             <header className="mb-8 text-center">
@@ -88,7 +112,7 @@ const BackgroundCheckForm = () => {
             </header>
 
             <form className="bg-white rounded-lg shadow-md p-6 space-y-8" onSubmit={handleSubmit}>
-                
+
                 {/* Personal Information Section */}
                 <section>
                     <h2 className="text-xl font-semibold border-b pb-2 mb-4">Personal Information</h2>
@@ -117,18 +141,6 @@ const BackgroundCheckForm = () => {
                                 required
                             />
                         </div>
-
-                        {/* <div>
-                            <label className="block mb-2 font-medium">Social Security Number</label>
-                            <input
-                                type="text"
-                                name="ssn"
-                                value={formData.ssn}
-                                onChange={handleChange}
-                                placeholder="XXX-XX-XXXX"
-                                className="w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div> */}
 
                         <div>
                             <label className="block mb-2 font-medium">Current Address</label>
@@ -274,7 +286,7 @@ const BackgroundCheckForm = () => {
                 </section>
 
                 {/* Submit Button */}
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-3">
                     <button
                         type="submit"
                         disabled={isSubmitting}
@@ -282,11 +294,19 @@ const BackgroundCheckForm = () => {
                     >
                         {isSubmitting ? 'Submitting...' : 'Submit Background Check Form'}
                     </button>
+                    {alreadySubmitted && (
+                        <button
+                            type="button"
+                            onClick={() => { setShowForm(false); setSubmitMessage(''); }}
+                            className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 px-4 rounded"
+                        >
+                            Cancel
+                        </button>
+                    )}
                 </div>
 
-                {/* Message Display */}
                 {submitMessage && (
-                    <div className={`p-4 rounded ${submitMessage.includes('successfully') ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                    <div className="p-4 rounded bg-red-100 text-red-700">
                         {submitMessage}
                     </div>
                 )}

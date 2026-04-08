@@ -229,13 +229,14 @@ model Volunteer {
   preferredEvents     String[]
 
   // Compliance & Requirements
-  volunteerApplicationCompleted Boolean @default(false)
-  backgroundCheckCompleted      Boolean @default(false)
-  codeOfEthicsFormSigned        Boolean @default(false)
-  abuseNeglectReportFormSigned  Boolean @default(false)
-  personnelPoliciesFormSigned   Boolean @default(false)
-  orientationCompleted          Boolean @default(false)
-  trainingModulesCompleted      Boolean @default(false)
+  volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
+  volunteerApplicationCompleted Boolean            @default(false)
+  backgroundCheckCompleted      Boolean            @default(false)
+  codeOfEthicsFormSigned        Boolean            @default(false)
+  abuseNeglectReportFormSigned  Boolean            @default(false)
+  personnelPoliciesFormSigned   Boolean            @default(false)
+  orientationCompleted          Boolean            @default(false)
+  trainingModulesCompleted      Boolean            @default(false)
 
   // Volunteer Events & Hours
   volunteerEvents  Event[]
@@ -243,15 +244,15 @@ model Volunteer {
   isDeleted        Boolean     @default(false)
 
   // Relations
-  application         VolunteerApplication? @relation(fields: [applicationId], references: [id])
+  application         VolunteerApplication?     @relation(fields: [applicationId], references: [id])
   applicationId       String?
   EmergencyContact    EmergencyContact?
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
-  Person              Person?               @relation(fields: [personId], references: [id])
-  personId            String?               @unique
-
+  Person              Person?                   @relation(fields: [personId], references: [id])
+  personId            String?                   @unique
+  backgroundCheck     VolunteerBackgroundCheck?
 }
 
 // model volunteerAccount {
@@ -334,10 +335,36 @@ model VolunteerApplication {
 
   agreedToTerms Boolean
   eSignature    String
-
-  accepted Boolean @default(false)
+  softdelete    Boolean            @default(false)
+  status        VolunteerAppStatus @default(PENDING)
 
   volunteer Volunteer[]
+}
+
+model VolunteerBackgroundCheck {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+
+  // Personal Info
+  fullName    String
+  dateOfBirth DateTime
+  county      String
+  addressLine String
+  city        String
+  state       String
+  zipCode     String
+  race        String
+  gender      String
+
+  // Certification
+  agreedToBackgroundCheck Boolean
+  eSignature              String
+  signatureDate           String
+
+  approved Boolean @default(false)
+
+  volunteerId String?    @unique
+  volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
 }
 
 model Event {
@@ -352,7 +379,7 @@ model Event {
   Volunteer            Volunteer?            @relation(fields: [volunteerId], references: [id])
   volunteerId          String?
   EventHour            EventHour[]
-  backgroundCheckRequired Boolean @default(false)
+  bgCheckRequired      Boolean               @default(false)
 }
 
 model EventRegistration {
@@ -384,13 +411,14 @@ model Location {
 }
 
 model Orientation {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  schedule    DateTime
-  capacity    Int
-  locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String
+  schedule        DateTime
+  capacity        Int
+  locationId      String
+  location        Location @relation(fields: [locationId], references: [id])
+  bgCheckRequired Boolean  @default(false)
 }
 
 model Admin {
@@ -444,4 +472,10 @@ enum DeliveryStatus {
   PENDING
   SENT
   FAILED
+}
+
+enum VolunteerAppStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

@@ -10,15 +10,10 @@ export async function POST(req: NextRequest) {
       description: body.description,
       schedule: body.schedule,
       locationId: body.locationId || null,
-      backgroundCheckRequired: body.backgroundCheckRequired || false,
+      bgCheckRequired: body.bgCheckRequired ?? false,
     };
 
-    const event = await prisma.event.create({
-      data: eventData,
-      include: {
-        location: true,
-      },
-    });
+    const event = await prisma.event.create({ data: eventData, include: { location: true } });
 
     return NextResponse.json(event, { status: 201 });
   } catch (error: unknown) {
