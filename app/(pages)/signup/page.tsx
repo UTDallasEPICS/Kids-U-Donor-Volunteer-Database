@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import logo from "../../logo.png";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+
 export default function SignUpPage(): JSX.Element {
   const router = useRouter();
   const [formData, setFormData] = useState({
@@ -38,8 +41,16 @@ export default function SignUpPage(): JSX.Element {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError("Password must be at least 8 characters long");
+    const normalizedEmail = formData.email.trim().toLowerCase();
+
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      setError("Please enter a valid email address");
+      setLoading(false);
+      return;
+    }
+
+    if (!PASSWORD_REGEX.test(formData.password)) {
+      setError("Password must be 8+ characters and include uppercase, lowercase, number, and special character");
       setLoading(false);
       return;
     }
@@ -51,7 +62,7 @@ export default function SignUpPage(): JSX.Element {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: formData.email,
+          email: normalizedEmail,
           password: formData.password,
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -253,7 +264,7 @@ export default function SignUpPage(): JSX.Element {
               <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Must be at least 8 characters
+              Must be 8+ characters with uppercase, lowercase, number, and special character
             </p>
           </div>
 

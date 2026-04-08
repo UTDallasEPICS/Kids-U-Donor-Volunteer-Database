@@ -5,11 +5,13 @@ import bcrypt from "bcryptjs";
 import { sendVerificationEmail, generateToken } from "../../../utils/email";
 
 const prisma = new PrismaClient();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
 
 export async function POST(request: NextRequest) {
   try {
     const {
-      email,
+      email: rawEmail,
       password,
       firstName,
       lastName,
@@ -27,12 +29,24 @@ export async function POST(request: NextRequest) {
       businessOrSchoolName,
     } = await request.json();
 
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+
     if (!email || !password || !firstName || !lastName) {
       return NextResponse.json({ error: "Email, password, first name, and last name are required" }, { status: 400 });
     }
 
-    if (password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters long" }, { status: 400 });
+    if (!EMAIL_REGEX.test(email)) {
+      return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      return NextResponse.json(
+        {
+          error:
+            "Password must be at least 8 characters and include uppercase, lowercase, number, and special character",
+        },
+        { status: 400 }
+      );
     }
 
     const existingUser = await prisma.user.findUnique({
