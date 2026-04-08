@@ -16,12 +16,10 @@ export async function GET() {
         phoneNumber: true,
         educationLevel: true,
         status: true,
+        softdelete: true,
       },
       orderBy: {
         createdAt: "desc",
-      },
-    where: {
-    status: "PENDING",
   }
 
     }); 
