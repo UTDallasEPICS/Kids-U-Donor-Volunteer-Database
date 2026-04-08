@@ -229,6 +229,7 @@ model Volunteer {
   preferredEvents     String[]
 
   // Compliance & Requirements
+  volunteerApplicationStatus VolunteerAppStatus @default(PENDING)
   volunteerApplicationCompleted Boolean @default(false)
   backgroundCheckCompleted      Boolean @default(false)
   codeOfEthicsFormSigned        Boolean @default(false)
@@ -334,8 +335,9 @@ model VolunteerApplication {
 
   agreedToTerms Boolean
   eSignature    String
-
-  accepted Boolean @default(false)
+  softdelete Boolean @default(false)
+  status VolunteerAppStatus @default(PENDING)
+  
 
   volunteer Volunteer[]
 }
@@ -471,4 +473,10 @@ enum DeliveryStatus {
   PENDING
   SENT
   FAILED
+}
+
+enum VolunteerAppStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

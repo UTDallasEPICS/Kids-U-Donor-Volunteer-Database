@@ -174,7 +174,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
         {/* Application Status */}
         <div>
           <span className="font-medium text-gray-700">Application Status:</span>
-          <span className="text-gray-900">{application.accepted ? 'Accepted' : 'Pending'}</span>
+          <span className="text-gray-900">{application.status }</span>
         </div>
       </div>
     </div>

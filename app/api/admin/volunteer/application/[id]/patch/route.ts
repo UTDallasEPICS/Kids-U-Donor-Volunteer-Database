@@ -21,7 +21,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     const updatedVolunteerApplication = await prisma.volunteerApplication.update({
       where: { id },
-      data: { accepted },
+      data: { status: "APPROVED" },
     });
 
     console.log("Volunteer Application updated successfully:", updatedVolunteerApplication);
