@@ -347,6 +347,7 @@ model Event {
   Volunteer            Volunteer?            @relation(fields: [volunteerId], references: [id])
   volunteerId          String?
   EventHour            EventHour[]
+  backgroundCheckRequired Boolean @default(false)
 }
 
 model EventRegistration {

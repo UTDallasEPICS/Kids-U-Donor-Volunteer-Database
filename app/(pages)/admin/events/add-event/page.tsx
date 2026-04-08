@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { CheckBoxItem } from "@/app/components/form-components/form-input-props";
 
 interface Location {
   id: string;
@@ -28,7 +29,8 @@ export default function AddEvent() {
     date: "",
     time: "",
     description: "",
-    locationId: ""
+    locationId: "",
+    backgroundCheckRequired: false
   });
 
   // Location Form State
@@ -61,13 +63,18 @@ export default function AddEvent() {
     fetchLocations();
   }, []);
 
-  const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setEventData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+  const handleEventChange = (
+  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+) => {
+  const { name, value, type } = e.target;
+
+  setEventData(prev => ({
+    ...prev,
+    [name]: type === "checkbox"
+      ? (e.target as HTMLInputElement).checked
+      : value
+  }));
+};
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -121,7 +128,8 @@ export default function AddEvent() {
           name: eventData.name,
           description: eventData.description,
           schedule: new Date(eventData.date + "T" + eventData.time).toISOString(),
-          locationId: eventData.locationId
+          locationId: eventData.locationId,
+          backgroundCheckRequired: eventData.backgroundCheckRequired
         }),
       });
 
@@ -234,6 +242,18 @@ export default function AddEvent() {
                   + New Location
                 </button>
               </div>
+            </div>
+            <div>
+              <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="backgroundCheckRequired"
+                checked={eventData.backgroundCheckRequired}
+                onChange={handleEventChange}
+                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm font-medium text-gray-700">Background check required for this event</span>
+              </label>
             </div>
           </div>
 
