@@ -108,14 +108,19 @@ export async function POST(request: NextRequest) {
       return { user, person, volunteer };
     });
 
-    // Temporarily skip email sending for development
-    // TODO: Add Mailtrap credentials to .env file
+    // Send verification email
     try {
       await sendVerificationEmail(email, verificationToken, firstName);
       console.log("Email sent successfully to:", email);
     } catch (emailError) {
-      console.warn("Email sending failed (development mode):", emailError);
-      // Continue anyway for development
+      console.error("Email sending failed:", emailError);
+      // Log full error details for debugging
+      if (emailError instanceof Error) {
+        console.error("Error message:", emailError.message);
+        console.error("Error stack:", emailError.stack);
+      }
+      // Still return success to avoid disrupting the signup flow
+      // but user should be warned
     }
 
     return NextResponse.json(

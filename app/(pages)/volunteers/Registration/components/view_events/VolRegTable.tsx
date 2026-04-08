@@ -14,6 +14,7 @@ interface Event {
   name: string;
   schedule: string;
   description: string;
+  bgCheckRequired: boolean;
   location: {
     name: string;
     address: string;
@@ -28,6 +29,7 @@ export const VolRegTable = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [bgCheckApproved, setBgCheckApproved] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetch("/api/events/get")
@@ -40,6 +42,17 @@ export const VolRegTable = () => {
         setError(err.message);
         setLoading(false);
       });
+
+    fetch("/api/background-check/get")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.submitted && data.record?.approved) {
+          setBgCheckApproved(true);
+        } else {
+          setBgCheckApproved(false);
+        }
+      })
+      .catch(() => setBgCheckApproved(false));
   }, []);
 
   const handleViewEvent = (id: string) => {
@@ -57,6 +70,23 @@ export const VolRegTable = () => {
   const Header = () => (
     <div className="flex justify-between items-center mb-5">
       <h1 className="text-2xl font-bold text-gray-800">Available Events</h1>
+      <div className="flex items-center gap-2 text-sm font-medium">
+        {bgCheckApproved === true ? (
+          <span className="inline-flex items-center gap-1.5 bg-green-100 text-green-700 px-3 py-1 rounded-full">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+            BG Checked
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-500 px-3 py-1 rounded-full">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 102 0V7zm-1 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+            </svg>
+            Not BG Checked
+          </span>
+        )}
+      </div>
     </div>
   );
 
@@ -73,28 +103,28 @@ export const VolRegTable = () => {
           <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: "600" }}>Event Name</TableCell>
-              <TableCell sx={{ fontWeight: "600" }} align="right">
-                Date
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600" }} align="right">
-                Time
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600" }} align="right">
-                Location
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600" }} align="right">
-                Description
-              </TableCell>
-              <TableCell sx={{ fontWeight: "600" }} align="right">
-                Action
-              </TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">Date</TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">Time</TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">Location</TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">Description</TableCell>
+              <TableCell sx={{ fontWeight: "600" }} align="right">Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {events.map((event) => (
               <TableRow key={event.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                 <TableCell component="th" scope="row">
-                  {event.name}
+                  <div className="flex items-center gap-2">
+                    {event.name}
+                    {event.bgCheckRequired && (
+                      <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        BG Check Required
+                      </span>
+                    )}
+                  </div>
                 </TableCell>
                 <TableCell align="right">
                   {new Date(event.schedule).toLocaleString("en-US", {

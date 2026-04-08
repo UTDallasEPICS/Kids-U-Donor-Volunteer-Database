@@ -55,6 +55,7 @@ const volunteerPaths = [
   "/api/events",
   "/api/locations",
   "/api/orientations",
+  "/api/background-check",
 ];
 
 export async function middleware(request: NextRequest) {

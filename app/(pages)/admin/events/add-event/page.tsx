@@ -30,7 +30,7 @@ export default function AddEvent() {
     time: "",
     description: "",
     locationId: "",
-    backgroundCheckRequired: false
+    bgCheckRequired: false,
   });
 
   // Location Form State
@@ -63,18 +63,13 @@ export default function AddEvent() {
     fetchLocations();
   }, []);
 
-  const handleEventChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-) => {
-  const { name, value, type } = e.target;
-
-  setEventData(prev => ({
-    ...prev,
-    [name]: type === "checkbox"
-      ? (e.target as HTMLInputElement).checked
-      : value
-  }));
-};
+  const handleEventChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value, type } = e.target;
+    setEventData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? (e.target as HTMLInputElement).checked : value,
+    }));
+  };
 
   const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -129,7 +124,7 @@ export default function AddEvent() {
           description: eventData.description,
           schedule: new Date(eventData.date + "T" + eventData.time).toISOString(),
           locationId: eventData.locationId,
-          backgroundCheckRequired: eventData.backgroundCheckRequired
+          bgCheckRequired: eventData.bgCheckRequired,
         }),
       });
 
@@ -269,6 +264,20 @@ export default function AddEvent() {
               <span className="ml-2 text-sm font-medium text-gray-700">Background check required for this event</span>
               </label>
             </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="bgCheckRequired"
+              name="bgCheckRequired"
+              checked={eventData.bgCheckRequired}
+              onChange={handleEventChange}
+              className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+            />
+            <label htmlFor="bgCheckRequired" className="text-sm font-medium text-gray-700">
+              Requires Background Check
+            </label>
           </div>
 
           <button
