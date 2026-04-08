@@ -1,0 +1,135 @@
+import { PrismaClient, VolunteerAppStatus } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+async function main() {
+  const existing = await prisma.volunteerApplication.findMany({
+    select: { id: true },
+    take: 1,
+  });
+
+  if (existing.length > 0) {
+    console.log("Volunteer application mock data already exists, skipping seed.");
+    return;
+  }
+
+  const mockApplications = [
+    {
+      legalName: "Amina Johnson",
+      maidenName: "Moore",
+      ssn: "111-22-3333",
+      preferredName: "Amina",
+      currentAddress: "123 Main St, Houston, TX 77002",
+      phoneNumber: "713-555-0123",
+      email: "amina.johnson@example.com",
+      usCitizen: true,
+      driversLicense: false,
+      ownCar: true,
+      speakSpanish: true,
+      otherLanguages: "Portuguese",
+      heardAbout: "Community event",
+      emergencyContactName: "Sofia Johnson",
+      emergencyContactPhone: "713-555-0987",
+      professionalRefName: "Carlos Vega",
+      professionalRefPhone: "713-555-0456",
+      personalRefName: "Mia Carter",
+      personalRefPhone: "713-555-0789",
+      educationLevel: "High School",
+      highSchoolName: "Houston High School",
+      collegeName: null,
+      degreeObtained: null,
+      additionalInfo1: "Available most weekends.",
+      additionalInfo2: null,
+      arrestedOrConvicted: false,
+      convictionExplanation: null,
+      agreedToTerms: true,
+      eSignature: "Amina Johnson",
+      softdelete: false,
+      status: VolunteerAppStatus.PENDING,
+      dateSubmitted: new Date("2026-03-01T10:00:00Z"),
+    },
+    {
+      legalName: "Diego Ramirez",
+      maidenName: null,
+      ssn: "222-33-4444",
+      preferredName: "Diego",
+      currentAddress: "456 Elm St, Houston, TX 77003",
+      phoneNumber: "832-555-0189",
+      email: "diego.ramirez@example.com",
+      usCitizen: false,
+      driversLicense: true,
+      ownCar: false,
+      speakSpanish: true,
+      otherLanguages: "French",
+      heardAbout: "Online search",
+      emergencyContactName: "Lucia Ramirez",
+      emergencyContactPhone: "832-555-0567",
+      professionalRefName: "Nadia Chen",
+      professionalRefPhone: "832-555-0321",
+      personalRefName: "Omar Diaz",
+      personalRefPhone: "832-555-0444",
+      educationLevel: "College",
+      highSchoolName: "Riverdale High School",
+      collegeName: "Houston Community College",
+      degreeObtained: "Associate Degree",
+      additionalInfo1: "Has experience with event logistics.",
+      additionalInfo2: null,
+      arrestedOrConvicted: false,
+      convictionExplanation: null,
+      agreedToTerms: true,
+      eSignature: "Diego Ramirez",
+      softdelete: false,
+      status: VolunteerAppStatus.PENDING,
+      dateSubmitted: new Date("2026-03-02T14:30:00Z"),
+    },
+    {
+      legalName: "Evelyn Brooks",
+      maidenName: null,
+      ssn: "333-44-5555",
+      preferredName: "Eve",
+      currentAddress: "789 Pine St, Houston, TX 77004",
+      phoneNumber: "281-555-0247",
+      email: "evelyn.brooks@example.com",
+      usCitizen: true,
+      driversLicense: true,
+      ownCar: true,
+      speakSpanish: false,
+      otherLanguages: "",
+      heardAbout: "Friend referral",
+      emergencyContactName: "Martha Brooks",
+      emergencyContactPhone: "281-555-0678",
+      professionalRefName: "Rita Lopez",
+      professionalRefPhone: "281-555-0912",
+      personalRefName: "Tina Brooks",
+      personalRefPhone: "281-555-0315",
+      educationLevel: "Bachelor's Degree",
+      highSchoolName: "Springfield High School",
+      collegeName: "University of Houston",
+      degreeObtained: "B.A. in Communications",
+      additionalInfo1: "Available for evening shifts.",
+      additionalInfo2: null,
+      arrestedOrConvicted: false,
+      convictionExplanation: null,
+      agreedToTerms: true,
+      eSignature: "Evelyn Brooks",
+      softdelete: false,
+      status: VolunteerAppStatus.APPROVED,
+      dateSubmitted: new Date("2026-03-03T09:15:00Z"),
+    },
+  ];
+
+  const result = await prisma.volunteerApplication.createMany({
+    data: mockApplications,
+  });
+
+  console.log(`Seeded ${result.count} volunteer application records.`);
+}
+
+main()
+  .catch((error) => {
+    console.error("Error seeding volunteer applications:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

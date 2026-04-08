@@ -252,6 +252,18 @@ export default function AddEvent() {
                 </button>
               </div>
             </div>
+            <div>
+              <label className="flex items-center">
+              <input
+                type="checkbox"
+                name="backgroundCheckRequired"
+                checked={eventData.backgroundCheckRequired}
+                onChange={handleEventChange}
+                className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              />
+              <span className="ml-2 text-sm font-medium text-gray-700">Background check required for this event</span>
+              </label>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">
