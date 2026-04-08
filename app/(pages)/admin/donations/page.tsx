@@ -66,12 +66,12 @@ export default function DonationsList() {
   }, []);
 
   return (
-    <Box>
+    <Box sx = {styles.box}>
       {isLoading ? (
         <Loading />
       ) : (
         <TableContainer>
-          <Table stickyHeader sx={styles.table} aria-labelledby="tableTitle">
+          <Table stickyHeader sx={styles.table} aria-labelledby="tableTitle" size="small">
             <TableHeader />
             <TableBody>
               {data.map((donation) => {
@@ -88,7 +88,7 @@ export default function DonationsList() {
                       </Link>
                     </TableCell>
                     <TableCell sx={styles.tableCell}>{donorName}</TableCell>
-                    <TableCell sx={styles.tableCell} align="right">${amount.toFixed(2)}</TableCell>
+                    <TableCell sx={styles.tableCell}>${amount.toFixed(2)}</TableCell>
                     <TableCell sx={styles.tableCell}>{new Date(donation.date).toLocaleDateString()}</TableCell>
                     <TableCell sx={styles.tableCell}>{donation.campaign || ""}</TableCell>
                     <TableCell sx={styles.tableCell}>{donation.type !== "In-Kind" ? (donation.paymentMethod || "") : ""}</TableCell>
@@ -105,8 +105,16 @@ export default function DonationsList() {
 }
 
 const styles = {
+  box: {
+    marginLeft: "1em",
+    marginRight: "1em",
+    marginTop: "5em",
+  },
   table: {
     minWidth: 750,
+    borderLeft: "1px solid #ccc",
+    borderRight: "1px solid #ccc",
+    borderTop: "1px solid #ccc",
   },
   tableCellHeader: {
     fontWeight: "bold",

@@ -32,6 +32,7 @@ export async function GET(request: NextRequest) {
         id: true,
         email: true,
         role: true,
+        deletedAt: true,
         avatarPath: true,
         twoFactorEnabled: true,
         person: {
@@ -53,6 +54,10 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
     }
 
+    if (user.deletedAt) {
+      return NextResponse.json({ success: false, error: "Account is deactivated" }, { status: 403 });
+    }
+
     return NextResponse.json({
       success: true,
       user: {
@@ -64,7 +69,7 @@ export async function GET(request: NextRequest) {
         phone: user.person?.phoneNumber || "",
         avatar: user.avatarPath ?? null,
         twoFactorEnabled: user.twoFactorEnabled || false,
-        volunteerId: user.person?.volunteer?.id || null,
+        volunteerId: user.person?.volunteer?.id ?? null,
       },
     });
   } catch (error) {

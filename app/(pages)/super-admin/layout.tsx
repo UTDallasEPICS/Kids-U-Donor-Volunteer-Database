@@ -11,7 +11,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <MainSidebar
         items={[
-          { name: "Dashboard", reference: "/admin" },
+          { name: "Dashboard", reference: "/super-admin" },
            { name: "Promotion", reference: "/super-admin/promote" },
           { 
             name: "Donations", 
