@@ -1,14 +1,13 @@
-const { PrismaClient } = require("@prisma/client");
+import { Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
-async function main() {
+export async function seedMockVolunteerData(prisma: PrismaClient) {
   console.log("Adding mock data to database...\n");
 
-  // First, check if there's an existing volunteer or create one
   let volunteer = await prisma.volunteer.findFirst();
 
-  if (!volunteer) {
+  if (volunteer) {
+    console.log(`Using existing volunteer: ${volunteer.firstName} ${volunteer.lastName} (ID: ${volunteer.id})\n`);
+  } else {
     console.log("Creating a mock volunteer...");
     volunteer = await prisma.volunteer.create({
       data: {
@@ -29,13 +28,10 @@ async function main() {
       },
     });
     console.log(`Created volunteer: ${volunteer.firstName} ${volunteer.lastName} (ID: ${volunteer.id})\n`);
-  } else {
-    console.log(`Using existing volunteer: ${volunteer.firstName} ${volunteer.lastName} (ID: ${volunteer.id})\n`);
   }
 
-  // Create mock events
   console.log("Creating mock events...");
-  const eventsData = [
+  const eventsData: Prisma.EventCreateInput[] = [
     {
       name: "Weekend Tutoring Session",
       schedule: new Date("2026-03-01T10:00:00"),
@@ -79,57 +75,60 @@ async function main() {
     }
   }
 
-  // Create volunteer attendance records with hours
   console.log("\nCreating volunteer attendance records with hours...");
-  const attendanceData = [
+  const attendanceData: Prisma.VolunteerAttendanceCreateInput[] = [
     {
       hoursWorked: 4.5,
       checkInTime: new Date("2026-01-25T09:00:00"),
       checkOutTime: new Date("2026-01-25T13:30:00"),
-      volunteerId: volunteer.id,
-      eventId: createdEvents[4].id, // STEM Learning Camp
+      volunteer: { connect: { id: volunteer.id } },
+      event: { connect: { id: createdEvents[4].id } },
     },
     {
-      hoursWorked: 3.0,
+      hoursWorked: 3,
       checkInTime: new Date("2026-02-10T11:00:00"),
       checkOutTime: new Date("2026-02-10T14:00:00"),
-      volunteerId: volunteer.id,
-      eventId: createdEvents[3].id, // Art & Crafts Day
+      volunteer: { connect: { id: volunteer.id } },
+      event: { connect: { id: createdEvents[3].id } },
     },
     {
       hoursWorked: 2.5,
       checkInTime: new Date("2026-02-20T14:00:00"),
       checkOutTime: new Date("2026-02-20T16:30:00"),
-      volunteerId: volunteer.id,
-      eventId: createdEvents[2].id, // Reading Workshop
+      volunteer: { connect: { id: volunteer.id } },
+      event: { connect: { id: createdEvents[2].id } },
     },
   ];
 
   let totalHoursAdded = 0;
   for (const attendance of attendanceData) {
-    // Check if attendance already exists for this volunteer/event combo
+    const volunteerId = attendance.volunteer.connect?.id;
+    const eventId = attendance.event.connect?.id;
+
+    if (!volunteerId || !eventId) {
+      continue;
+    }
+
     const existingAttendance = await prisma.volunteerAttendance.findFirst({
       where: {
-        volunteerId: attendance.volunteerId,
-        eventId: attendance.eventId,
+        volunteerId,
+        eventId,
       },
     });
 
     if (existingAttendance) {
-      console.log(`  Attendance already exists for event ${attendance.eventId}`);
+      console.log(`  Attendance already exists for event ${eventId}`);
     } else {
       const record = await prisma.volunteerAttendance.create({ data: attendance });
-      console.log(`  Created attendance: ${attendance.hoursWorked} hours for event ${attendance.eventId}`);
-      totalHoursAdded += attendance.hoursWorked;
+      console.log(`  Created attendance: ${attendance.hoursWorked} hours for event ${eventId}`);
+      totalHoursAdded += record.hoursWorked;
     }
   }
 
-  // Summary
   console.log("\n=== Summary ===");
   console.log(`Events created/found: ${createdEvents.length}`);
   console.log(`New hours added: ${totalHoursAdded}`);
 
-  // Get total hours for the volunteer
   const totals = await prisma.volunteerAttendance.aggregate({
     where: { volunteerId: volunteer.id },
     _sum: { hoursWorked: true },
@@ -138,12 +137,3 @@ async function main() {
 
   console.log("\nDone!");
 }
-
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

@@ -1,8 +1,6 @@
 import { PrismaClient, VolunteerAppStatus } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
-async function main() {
+export async function seedVolunteerApplications(prisma: PrismaClient) {
   const existing = await prisma.volunteerApplication.findMany({
     select: { id: true },
     take: 1,
@@ -124,12 +122,3 @@ async function main() {
 
   console.log(`Seeded ${result.count} volunteer application records.`);
 }
-
-main()
-  .catch((error) => {
-    console.error("Error seeding volunteer applications:", error);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

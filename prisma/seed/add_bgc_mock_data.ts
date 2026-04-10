@@ -1,11 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+import { Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
-async function main() {
+export async function seedBackgroundChecks(prisma: PrismaClient) {
   console.log("Adding mock VolunteerBackgroundCheck data...\n");
 
-  const records = [
+  const records: Prisma.VolunteerBackgroundCheckCreateInput[] = [
     {
       fullName: "Maria Gonzalez",
       dateOfBirth: new Date("1992-04-15"),
@@ -84,18 +82,22 @@ async function main() {
   ];
 
   for (const record of records) {
+    const existing = await prisma.volunteerBackgroundCheck.findFirst({
+      where: {
+        fullName: record.fullName,
+        signatureDate: record.signatureDate,
+      },
+      select: { id: true },
+    });
+
+    if (existing) {
+      console.log(`Skipping: ${record.fullName} — already exists.`);
+      continue;
+    }
+
     const created = await prisma.volunteerBackgroundCheck.create({ data: record });
     console.log(`Created: ${created.fullName} (ID: ${created.id})`);
   }
 
   console.log("\nDone. 5 background check records added.");
 }
-
-main()
-  .catch(e => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
