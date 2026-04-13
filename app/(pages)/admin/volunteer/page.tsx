@@ -42,7 +42,7 @@ export default function VolunteersPage() {
 
   const fetchVolunteersData = async () => {
     try {
-      const response = await fetch("/api/admin/volunteer/get", {
+      const response = await fetch("/api/volunteer/get", {
         method: "GET",
       });
 
@@ -58,8 +58,8 @@ export default function VolunteersPage() {
 
       setIsLoading(false);
     } catch (error) {
-      console.error("Error fetching:", error);
       router.push("/not-found");
+      console.error("Error fetching:", error);
     }
   };
 
@@ -84,7 +84,9 @@ export default function VolunteersPage() {
                     </Link>
                   </TableCell>
                   <TableCell sx={styles.tableCell}>{volunteer.emailAddress}</TableCell>
-                  <TableCell sx={styles.tableCell}>{volunteer.registration ? "Registered" : "Not Registered"}</TableCell>
+                  <TableCell sx={styles.tableCell}>
+                    {volunteer.registration ? "Registered" : "Not Registered"}
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
