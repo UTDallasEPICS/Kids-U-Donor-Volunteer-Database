@@ -10,6 +10,8 @@ const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 const TOKEN_EXPIRY = '7d'; 
 const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const TWO_FA_CODE_REGEX = /^\d{6}$/;
 
 if (!JWT_SECRET) {
   throw new Error('JWT_SECRET environment variable is not defined');
@@ -17,12 +19,27 @@ if (!JWT_SECRET) {
 
 export async function POST(request: NextRequest) {
   try {
-    const { email, password, twoFactorCode } = await request.json(); 
+    const { email: rawEmail, password, twoFactorCode } = await request.json(); 
+    const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';
 
     // Validate input
-    if (!email || !password) {
+    if (!email || typeof password !== 'string' || password.length === 0) {
       return NextResponse.json(
         { error: 'Email and password are required' },
+        { status: 400 }
+      );
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
+        { status: 400 }
+      );
+    }
+
+    if (twoFactorCode !== undefined && (typeof twoFactorCode !== 'string' || !TWO_FA_CODE_REGEX.test(twoFactorCode.trim()))) {
+      return NextResponse.json(
+        { error: 'Invalid 2FA code format' },
         { status: 400 }
       );
     }
@@ -99,7 +116,7 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        if (user.twoFactorCode !== twoFactorCode) {
+        if (user.twoFactorCode !== twoFactorCode.trim()) {
           return NextResponse.json(
             { error: 'Invalid 2FA code' },
             { status: 401 }

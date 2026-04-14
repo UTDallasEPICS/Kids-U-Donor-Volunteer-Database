@@ -30,8 +30,10 @@ export async function POST(request: NextRequest) {
     } = await request.json();
 
     const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+    const normalizedFirstName = typeof firstName === "string" ? firstName.trim() : "";
+    const normalizedLastName = typeof lastName === "string" ? lastName.trim() : "";
 
-    if (!email || !password || !firstName || !lastName) {
+    if (!email || !password || !normalizedFirstName || !normalizedLastName) {
       return NextResponse.json({ error: "Email, password, first name, and last name are required" }, { status: 400 });
     }
 
@@ -72,8 +74,8 @@ export async function POST(request: NextRequest) {
     const result = await prisma.$transaction(async (prisma) => {
       const person = await prisma.person.create({
         data: {
-          firstName,
-          lastName,
+          firstName: normalizedFirstName,
+          lastName: normalizedLastName,
           emailAddress: email,
           phoneNumber: phoneNumber,
         },
@@ -81,9 +83,9 @@ export async function POST(request: NextRequest) {
 
       const volunteer = await prisma.volunteer.create({
         data: {
-          firstName,
+          firstName: normalizedFirstName,
           middleInitial: middleInitial || null,
-          lastName,
+          lastName: normalizedLastName,
           emailAddress: email,
           phoneNumber: phoneNumber || "Not provided",
           addressLine: addressLine || "Not provided",
@@ -125,7 +127,7 @@ export async function POST(request: NextRequest) {
     // Temporarily skip email sending for development
     // TODO: Add Mailtrap credentials to .env file
     try {
-      await sendVerificationEmail(email, verificationToken, firstName);
+      await sendVerificationEmail(email, verificationToken, normalizedFirstName);
       console.log("Email sent successfully to:", email);
     } catch (emailError) {
       console.warn("Email sending failed (development mode):", emailError);
