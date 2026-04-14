@@ -6,7 +6,7 @@ import { sendVerificationEmail, generateToken } from "../../../utils/email";
 
 const prisma = new PrismaClient();
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d]).{8,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
 
 export async function POST(request: NextRequest) {
   try {
