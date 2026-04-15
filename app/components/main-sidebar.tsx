@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 type SubmenuItem = {
   name: string;
   reference: string;
+  hasBadge?: boolean;
 };
 
 type SidebarItem = {
@@ -13,6 +14,7 @@ type SidebarItem = {
   reference: string;
   hasSubmenu?: boolean;
   submenuItems?: SubmenuItem[];
+  hasBadge?: boolean;
 };
 
 type MainSidebarProps = {
@@ -204,7 +206,16 @@ const iconMap: { [key: string]: React.ReactNode } = {
 
 export default function MainSidebar({ items }: MainSidebarProps) {
   const pathname = usePathname();
-  const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(new Set());
+  const [openDropdowns, setOpenDropdowns] = useState<Set<string>>(() => {
+    // Auto-open any dropdown that has a badge or an active submenu item
+    const initial = new Set<string>();
+    items?.forEach(item => {
+      if (item.hasSubmenu && (item.hasBadge || item.submenuItems?.some(s => s.hasBadge))) {
+        initial.add(item.name);
+      }
+    });
+    return initial;
+  });
 
   const toggleDropdown = (itemName: string) => {
     setOpenDropdowns(prev => {
@@ -251,6 +262,9 @@ export default function MainSidebar({ items }: MainSidebarProps) {
                     {iconMap[item.name] || "📄"}
                   </span>
                   <span className="text-sm flex-1 text-left">{item.name}</span>
+                  {item.hasBadge && (
+                    <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
+                  )}
 
                   {item.hasSubmenu && (
                     <svg
@@ -278,12 +292,15 @@ export default function MainSidebar({ items }: MainSidebarProps) {
                           <Link
                             key={subIndex}
                             href={subItem.reference}
-                            className={`block px-4 py-2 rounded-md text-sm transition-all duration-200 ${isSubActive
+                            className={`flex items-center justify-between px-4 py-2 rounded-md text-sm transition-all duration-200 ${isSubActive
                               ? "bg-blue-100 text-blue-700 font-medium"
                               : "text-gray-600 hover:bg-blue-100/50 hover:text-gray-900"
                               }`}
                           >
                             {subItem.name}
+                            {subItem.hasBadge && (
+                              <span className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0 ml-1" />
+                            )}
                           </Link>
                         );
                       })}

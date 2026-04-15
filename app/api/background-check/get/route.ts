@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     const existing = await prisma.volunteerBackgroundCheck.findUnique({
       where: { volunteerId: volunteer.id },
-      select: { id: true, createdAt: true, approved: true },
+      select: { id: true, createdAt: true, status: true },
     });
 
     if (!existing) {

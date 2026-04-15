@@ -1,9 +1,37 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
+const Field = ({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
+    <div>
+        <label className="block mb-2">
+            {label}{required && <span className="text-red-500 ml-0.5"> *</span>}
+        </label>
+        {children}
+    </div>
+);
+
+const RadioGroup = ({ label, required = false, children }: { label: string; required?: boolean; children: React.ReactNode }) => (
+    <div className="flex items-center">
+        <span className="mr-4">
+            {label}{required && <span className="text-red-500 ml-0.5"> *</span>}
+        </span>
+        {children}
+    </div>
+);
 
 const VolunteerApplication = () => {
     const [step, setStep] = useState<'form' | 'confirm'>('form');
+    const [appStatus, setAppStatus] = useState<'loading' | 'NONE' | 'PENDING' | 'APPROVED' | 'REJECTED'>('loading');
+    const [showForm, setShowForm] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/volunteer/application/check')
+            .then(res => res.json())
+            .then(data => setAppStatus(data.status ?? 'NONE'))
+            .catch(() => setAppStatus('NONE'));
+    }, []);
+
     const [formData, setFormData] = useState({
         // Personal Information
         date: new Date().toISOString().split('T')[0],
@@ -92,22 +120,23 @@ const VolunteerApplication = () => {
                 highSchoolName: formData.highSchoolName || null,
                 collegeName: formData.collegeName || null,
                 degreeObtained: formData.collegeDegree || null,
-                additionalInfo1: null, // or use formData fields if you have more
+                additionalInfo1: null,
                 additionalInfo2: null,
                 arrestedOrConvicted: formData.hasCriminalRecord === 'yes',
                 convictionExplanation: formData.criminalRecordExplanation || null,
                 agreedToTerms: formData.agreeToBackgroundCheck,
                 eSignature: formData.electronicSignature
             };
-    
+
             const response = await fetch('/api/volunteer/application/post', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
             });
-    
+
             if (response.ok) {
-                alert('Application submitted successfully!');
+                setAppStatus('PENDING');
+                setShowForm(false);
             } else {
                 throw new Error('Submission failed');
             }
@@ -116,7 +145,77 @@ const VolunteerApplication = () => {
             alert('There was an error submitting your application.');
         }
     };
-    
+
+    if (appStatus === 'loading') {
+        return <div className="text-center py-16 text-gray-500">Loading...</div>;
+    }
+
+    if (appStatus === 'PENDING' && !showForm) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <header className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-800">Kids-U Volunteer Application</h1>
+                </header>
+                <div className="bg-white rounded-lg shadow-md p-8 text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 font-semibold px-4 py-2 rounded-full text-sm">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full inline-block"></span>
+                        Sent
+                    </div>
+                    <p className="text-gray-600">Your volunteer application has been submitted and is pending review.</p>
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="mt-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-6 rounded"
+                    >
+                        Submit a New Application
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (appStatus === 'APPROVED') {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <header className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-800">Kids-U Volunteer Application</h1>
+                </header>
+                <div className="bg-white rounded-lg shadow-md p-8 text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 font-semibold px-4 py-2 rounded-full text-sm">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Approved
+                    </div>
+                    <p className="text-gray-600">Your volunteer application has been reviewed and approved. Welcome to the team!</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (appStatus === 'REJECTED' && !showForm) {
+        return (
+            <div className="container mx-auto px-4 py-8 max-w-4xl">
+                <header className="mb-8 text-center">
+                    <h1 className="text-3xl font-bold text-gray-800">Kids-U Volunteer Application</h1>
+                </header>
+                <div className="bg-white rounded-lg shadow-md p-8 text-center space-y-4">
+                    <div className="inline-flex items-center gap-2 bg-red-100 text-red-700 font-semibold px-4 py-2 rounded-full text-sm">
+                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                        Not Approved
+                    </div>
+                    <p className="text-gray-600">Your application was not approved. Please contact Kids-U for more information.</p>
+                    <button
+                        onClick={() => setShowForm(true)}
+                        className="mt-4 bg-gray-800 hover:bg-gray-900 text-white font-semibold py-2 px-6 rounded"
+                    >
+                        Submit a New Application
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto px-4 py-8 max-w-4xl">
@@ -134,8 +233,7 @@ const VolunteerApplication = () => {
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Personal Information</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2">Date</label>
+                            <Field label="Date" required>
                                 <input
                                     type="date"
                                     name="date"
@@ -144,10 +242,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Legal Name</label>
+                            <Field label="Legal Name" required>
                                 <input
                                     type="text"
                                     name="legalName"
@@ -156,10 +253,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Preferred Name</label>
+                            <Field label="Preferred Name">
                                 <input
                                     type="text"
                                     name="preferredName"
@@ -167,10 +263,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Maiden Name (if applicable)</label>
+                            <Field label="Maiden Name (if applicable)">
                                 <input
                                     type="text"
                                     name="maidenName"
@@ -178,10 +273,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">SSN (Last 4 digits only)</label>
+                            <Field label="SSN (Last 4 digits only)" required>
                                 <input
                                     type="text"
                                     name="ssn"
@@ -192,10 +286,9 @@ const VolunteerApplication = () => {
                                     maxLength={4}
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Current Address</label>
+                            <Field label="Current Address" required>
                                 <input
                                     type="text"
                                     name="currentAddress"
@@ -204,10 +297,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Phone Number</label>
+                            <Field label="Phone Number" required>
                                 <input
                                     type="tel"
                                     name="phone"
@@ -216,10 +308,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Email</label>
+                            <Field label="Email" required>
                                 <input
                                     type="email"
                                     name="email"
@@ -228,12 +319,11 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
                         </div>
 
                         <div className="mt-4 space-y-4">
-                            <div className="flex items-center">
-                                <label className="mr-4">Are you a U.S. citizen or lawful permanent resident?</label>
+                            <RadioGroup label="Are you a U.S. citizen or lawful permanent resident?" required>
                                 <label className="mr-4">
                                     <input
                                         type="radio"
@@ -257,10 +347,9 @@ const VolunteerApplication = () => {
                                     />
                                     No
                                 </label>
-                            </div>
+                            </RadioGroup>
 
-                            <div className="flex items-center">
-                                <label className="mr-4">Do you have a driver's license?</label>
+                            <RadioGroup label="Do you have a driver's license?" required>
                                 <label className="mr-4">
                                     <input
                                         type="radio"
@@ -284,11 +373,10 @@ const VolunteerApplication = () => {
                                     />
                                     No
                                 </label>
-                            </div>
+                            </RadioGroup>
 
                             {formData.hasDriverLicense === 'yes' && (
-                                <div className="flex items-center">
-                                    <label className="mr-4">Do you drive your own vehicle?</label>
+                                <RadioGroup label="Do you drive your own vehicle?">
                                     <label className="mr-4">
                                         <input
                                             type="radio"
@@ -311,38 +399,35 @@ const VolunteerApplication = () => {
                                         />
                                         No
                                     </label>
-                                </div>
+                                </RadioGroup>
                             )}
 
-                                
-                                <div className="flex items-center">
-                                    <label className="mr-4">Do you speak Spanish?</label>
-                                    <label className="mr-4">
-                                        <input
-                                            type="radio"
-                                            name="languages"
-                                            value="yes"
-                                            checked={formData.languages === 'yes'}
-                                            onChange={handleChange}
-                                            className="mr-2"
-                                        />
-                                        Yes
-                                    </label>
-                                    <label>
-                                        <input
-                                            type="radio"
-                                            name="languages"
-                                            value="no"
-                                            checked={formData.languages === 'no'}
-                                            onChange={handleChange}
-                                            className="mr-2"
-                                        />
-                                        No
-                                    </label>
-                                </div>
-                            
-                                <div>
-                                <label className="block mb-2">Do you speak other languages?</label>
+                            <RadioGroup label="Do you speak Spanish?">
+                                <label className="mr-4">
+                                    <input
+                                        type="radio"
+                                        name="languages"
+                                        value="yes"
+                                        checked={formData.languages === 'yes'}
+                                        onChange={handleChange}
+                                        className="mr-2"
+                                    />
+                                    Yes
+                                </label>
+                                <label>
+                                    <input
+                                        type="radio"
+                                        name="languages"
+                                        value="no"
+                                        checked={formData.languages === 'no'}
+                                        onChange={handleChange}
+                                        className="mr-2"
+                                    />
+                                    No
+                                </label>
+                            </RadioGroup>
+
+                            <Field label="Do you speak other languages?" required>
                                 <input
                                     type="text"
                                     name="otherLanguages"
@@ -351,11 +436,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-
-                            <div>
-                                <label className="block mb-2">How did you hear about this volunteer position?</label>
+                            <Field label="How did you hear about this volunteer position?">
                                 <input
                                     type="text"
                                     name="heardAboutPosition"
@@ -363,7 +446,7 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
                         </div>
                     </section>
 
@@ -372,8 +455,7 @@ const VolunteerApplication = () => {
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Contacts & References</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2">Emergency Contact Name</label>
+                            <Field label="Emergency Contact Name" required>
                                 <input
                                     type="text"
                                     name="emergencyContactName"
@@ -382,10 +464,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Emergency Contact Phone</label>
+                            <Field label="Emergency Contact Phone" required>
                                 <input
                                     type="tel"
                                     name="emergencyContactPhone"
@@ -394,10 +475,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Professional Reference Name</label>
+                            <Field label="Professional Reference Name" required>
                                 <input
                                     type="text"
                                     name="professionalReferenceName"
@@ -406,10 +486,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Professional Reference Phone</label>
+                            <Field label="Professional Reference Phone" required>
                                 <input
                                     type="tel"
                                     name="professionalReferencePhone"
@@ -418,10 +497,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Personal Reference Name</label>
+                            <Field label="Personal Reference Name" required>
                                 <input
                                     type="text"
                                     name="personalReferenceName"
@@ -430,10 +508,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Personal Reference Phone</label>
+                            <Field label="Personal Reference Phone" required>
                                 <input
                                     type="tel"
                                     name="personalReferencePhone"
@@ -442,7 +519,7 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
                         </div>
                     </section>
 
@@ -451,8 +528,7 @@ const VolunteerApplication = () => {
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Education</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2">Highest level of education completed</label>
+                            <Field label="Highest level of education completed" required>
                                 <select
                                     name="highestEducation"
                                     value={formData.highestEducation}
@@ -468,10 +544,9 @@ const VolunteerApplication = () => {
                                     <option value="master">Master's Degree</option>
                                     <option value="doctorate">Doctorate</option>
                                 </select>
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Name of High School</label>
+                            <Field label="Name of High School">
                                 <input
                                     type="text"
                                     name="highSchoolName"
@@ -479,10 +554,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">What degree was obtained? (if applicable)</label>
+                            <Field label="What degree was obtained? (if applicable)">
                                 <input
                                     type="text"
                                     name="collegeDegree"
@@ -490,10 +564,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Name of College/University (if applicable)</label>
+                            <Field label="Name of College/University (if applicable)">
                                 <input
                                     type="text"
                                     name="collegeName"
@@ -501,7 +574,7 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
                         </div>
                     </section>
 
@@ -509,8 +582,7 @@ const VolunteerApplication = () => {
                     <section>
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Volunteer Questions</h2>
 
-                        <div>
-                            <label className="block mb-2">Why do you want to volunteer at Kids-U?</label>
+                        <Field label="Why do you want to volunteer at Kids-U?" required>
                             <textarea
                                 name="whyVolunteer"
                                 value={formData.whyVolunteer}
@@ -519,7 +591,7 @@ const VolunteerApplication = () => {
                                 rows={4}
                                 required
                             />
-                        </div>
+                        </Field>
                     </section>
 
                     {/* Legal Section */}
@@ -527,8 +599,7 @@ const VolunteerApplication = () => {
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Legal Information</h2>
 
                         <div className="space-y-4">
-                            <div className="flex items-center">
-                                <label className="mr-4">Have you ever been arrested or convicted of any criminal offense?</label>
+                            <RadioGroup label="Have you ever been arrested or convicted of any criminal offense?" required>
                                 <label className="mr-4">
                                     <input
                                         type="radio"
@@ -552,31 +623,29 @@ const VolunteerApplication = () => {
                                     />
                                     No
                                 </label>
-                            </div>
+                            </RadioGroup>
 
                             {formData.hasCriminalRecord === 'yes' && (
-                                <div>
-                                    <label className="block mb-2">Please explain:</label>
+                                <Field label="Please explain:" required>
                                     <textarea
                                         name="criminalRecordExplanation"
                                         value={formData.criminalRecordExplanation}
                                         onChange={handleChange}
                                         className="w-full p-2 border rounded"
                                         rows={3}
-                                        required={formData.hasCriminalRecord === 'yes'}
+                                        required
                                     />
-                                </div>
+                                </Field>
                             )}
                         </div>
                     </section>
 
-                    {/* Background Check Section */}
+                    {/* Background Verification Section */}
                     <section>
                         <h2 className="text-xl font-semibold border-b pb-2 mb-4">Background Verification</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block mb-2">Date of Birth</label>
+                            <Field label="Date of Birth" required>
                                 <input
                                     type="date"
                                     name="dob"
@@ -585,10 +654,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Driver's License Number</label>
+                            <Field label="Driver's License Number">
                                 <input
                                     type="text"
                                     name="driversLicenseNumber"
@@ -596,10 +664,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">State Issued</label>
+                            <Field label="State Issued">
                                 <input
                                     type="text"
                                     name="driversLicenseState"
@@ -607,10 +674,9 @@ const VolunteerApplication = () => {
                                     onChange={handleChange}
                                     className="w-full p-2 border rounded"
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Position Applied For</label>
+                            <Field label="Position Applied For" required>
                                 <input
                                     type="text"
                                     name="positionAppliedFor"
@@ -619,10 +685,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Gender</label>
+                            <Field label="Gender" required>
                                 <select
                                     name="gender"
                                     value={formData.gender}
@@ -636,10 +701,9 @@ const VolunteerApplication = () => {
                                     <option value="other">Other</option>
                                     <option value="prefer_not_to_say">Prefer not to say</option>
                                 </select>
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Race/Ethnicity</label>
+                            <Field label="Race/Ethnicity" required>
                                 <select
                                     name="race"
                                     value={formData.race}
@@ -655,7 +719,7 @@ const VolunteerApplication = () => {
                                     <option value="hispanic">Hispanic</option>
                                     <option value="other">Other</option>
                                 </select>
-                            </div>
+                            </Field>
                         </div>
                     </section>
 
@@ -675,11 +739,11 @@ const VolunteerApplication = () => {
                                 />
                                 <label>
                                     I hereby certify that all information submitted on this application is true and give Dallas Community Lighthouse dba Kids-U permission to conduct a criminal background check and contact my references.
+                                    <span className="text-red-500 ml-0.5"> *</span>
                                 </label>
                             </div>
 
-                            <div>
-                                <label className="block mb-2">Applicant Electronic Signature (Full Name)</label>
+                            <Field label="Applicant Electronic Signature (Full Name)" required>
                                 <input
                                     type="text"
                                     name="electronicSignature"
@@ -688,10 +752,9 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
-                            <div>
-                                <label className="block mb-2">Date</label>
+                            <Field label="Date" required>
                                 <input
                                     type="date"
                                     name="date"
@@ -700,11 +763,10 @@ const VolunteerApplication = () => {
                                     className="w-full p-2 border rounded"
                                     required
                                 />
-                            </div>
+                            </Field>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label className="block mb-2">Parent/Guardian Signature (if under 18)</label>
+                                <Field label="Parent/Guardian Signature (if under 18)">
                                     <input
                                         type="text"
                                         name="parentSignature"
@@ -712,10 +774,9 @@ const VolunteerApplication = () => {
                                         onChange={handleChange}
                                         className="w-full p-2 border rounded"
                                     />
-                                </div>
+                                </Field>
 
-                                <div>
-                                    <label className="block mb-2">Parent/Guardian Signature Date</label>
+                                <Field label="Parent/Guardian Signature Date">
                                     <input
                                         type="date"
                                         name="parentSignatureDate"
@@ -723,7 +784,7 @@ const VolunteerApplication = () => {
                                         onChange={handleChange}
                                         className="w-full p-2 border rounded"
                                     />
-                                </div>
+                                </Field>
                             </div>
                         </div>
                     </section>
