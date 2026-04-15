@@ -5,27 +5,35 @@ import { jwtVerify } from "jose";
 interface UserJwtPayload {
   userId: string;
   email: string;
-  role: "ADMIN" | "VOLUNTEER" | "SUPER_ADMIN";
+  role: "SUPER_ADMIN" | "ADMIN" | "VOLUNTEER";
   iat: number;
   exp: number;
 }
 
 const JWT_SECRET = process.env.JWT_SECRET;
-
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET environment variable is not defined");
-}
+if (!JWT_SECRET) throw new Error("JWT_SECRET not defined");
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
-async function verifyToken(token: string | undefined): Promise<UserJwtPayload | null> {
-  if (!token) {
-    return null;
-  }
+const ROLE_LEVEL = {
+  VOLUNTEER: 1,
+  ADMIN: 2,
+  SUPER_ADMIN: 3,
+} as const;
+
+const hasRequiredRole = (userRole: UserJwtPayload["role"], requiredRole: UserJwtPayload["role"]) =>
+  ROLE_LEVEL[userRole] >= ROLE_LEVEL[requiredRole];
+
+async function verifyToken(token?: string): Promise<UserJwtPayload | null> {
+  if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secretKey);
-    return payload as unknown as UserJwtPayload;
-  } catch (error) {
+    const user = payload as unknown as Partial<UserJwtPayload>;
+    if (!user.userId || !user.email || !user.role) {
+      return null;
+    }
+    return user as UserJwtPayload;
+  } catch {
     return null;
   }
 }
@@ -44,87 +52,75 @@ const publicPaths = [
   "/verification/forgot-password",
   "/verification/reset-password",
 ];
-const adminPaths = ["/admin", "/api/admin", "/api/grantors"];
 
-const superAdminPaths = ["/super-admin", "/api/super-admin"];
-
-const volunteerPaths = [
-  "/volunteers",
-  "/api/volunteer",
-  "/api/event-registration",
-  "/api/events",
-  "/api/locations",
-  "/api/orientations",
-  "/api/background-check",
-];
+const routePermissions = [
+  {
+    role: "SUPER_ADMIN",
+    paths: ["/super-admin", "/api/super-admin"],
+  },
+  {
+    role: "ADMIN",
+    paths: ["/admin", "/api/admin", "/api/grantors"],
+  },
+  {
+    role: "VOLUNTEER",
+    paths: [
+      "/volunteers",
+      "/api/volunteer",
+      "/api/event-registration",
+      "/api/events",
+      "/api/locations",
+      "/api/orientations",
+      "/api/background-check",
+    ],
+  },
+] as const;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isApi = pathname.startsWith("/api");
 
-  if (publicPaths.some((path) => pathname === path || pathname.startsWith(path + "/"))) {
+  if (publicPaths.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
     return NextResponse.next();
   }
 
   const token = request.cookies.get("token")?.value;
   const user = await verifyToken(token);
 
-  const loginUrl = new URL("/login", request.url);
-  const isApiRoute = pathname.startsWith("/api");
-
-  // unauthenticated users
   if (!user) {
-    if (isApiRoute) {
-      return NextResponse.json({ error: "Unauthorized. Please login." }, { status: 401 });
+    if (isApi) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const loginUrl = new URL("/", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
-    return NextResponse.redirect(loginUrl);
+
+    const url = new URL("/", request.url);
+    url.searchParams.set("redirect", pathname);
+    return NextResponse.redirect(url);
   }
 
-  //admin only routes
-  const userRole = user.role;
-
-  if (adminPaths.some((path) => pathname.startsWith(path))) {
-    if (userRole !== "ADMIN" && userRole !== "SUPER_ADMIN") {
-      if (isApiRoute) {
-        return NextResponse.json({ error: "Forbidden. You do not have admin privileges." }, { status: 403 });
+  for (const route of routePermissions) {
+    if (route.paths.some((p) => pathname.startsWith(p)) && !hasRequiredRole(user.role, route.role)) {
+      if (isApi) {
+        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
-      const dashboardUrl = new URL("/volunteers", request.url);
-      return NextResponse.redirect(dashboardUrl);
+
+      return NextResponse.redirect(new URL("/volunteers", request.url));
     }
   }
 
-  // Super admin only routes
-  if (superAdminPaths.some((path) => pathname.startsWith(path))) {
-    if (userRole !== "SUPER_ADMIN") {
-      if (isApiRoute) {
-        return NextResponse.json({ error: "Forbidden. You do not have super admin privileges." }, { status: 403 });
-      }
-      const dashboardUrl = new URL("/volunteers", request.url);
-      return NextResponse.redirect(dashboardUrl);
-    }
-  }
-
-  //volunteer or admin users
-  if (volunteerPaths.some((path) => pathname.startsWith(path))) {
-    if (userRole !== "VOLUNTEER" && userRole !== "ADMIN") {
-      if (isApiRoute) {
-        return NextResponse.json({ error: "Forbidden. You do not have access." }, { status: 403 });
-      }
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("x-user-payload", JSON.stringify(user));
+  const headers = new Headers(request.headers);
+  headers.set("x-user-payload", JSON.stringify(user));
 
   return NextResponse.next({
-    request: {
-      headers: requestHeaders,
-    },
+    request: { headers },
   });
 }
 
 export const config = {
-  matcher: ["/api/:path*", "/admin/:path*", "/volunteers/:path*", "/((?!_next/static|_next/image|favicon.ico).*)"],
+  matcher: [
+    "/api/:path*",
+    "/admin/:path*",
+    "/super-admin/:path*",
+    "/volunteers/:path*",
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
 };

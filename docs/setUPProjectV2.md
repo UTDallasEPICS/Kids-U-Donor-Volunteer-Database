@@ -34,8 +34,9 @@
 - Create Mailtrap account, paste from sandbox `HOST`,`PORT`, `USER`, and `PASS`
 - In the VSCode terminal, run `npm install`
 - Open the docker application, then in the VSCode terminal, run `docker compose up -d`
--   Don't register/login to Docker, just press skip
+- Don't register/login to Docker, just press skip
 - Again, in the VSCode terminal, run `npx prisma migrate dev` to initialize the database migrations (docker should still be open)
+- Then run `npm run seed` to populate the database with mock data
 
 ## 4. Start web application
 
@@ -46,6 +47,7 @@
 
 - Now you only have to do "npm run dev" every time you want to start the app. The Docker container also needs to be open in order to access database items, if there are any.
 - "npx prisma migrate dev" only needs to run if changes to the prisma schema are made.
+- "npm run seed" can be run whenever you need to repopulate mock data.
 - There are currently no test files to run in order to import data for grants/grantors/donations/donors.
 - Donations and Donors Add pages are working in order to add data that way, otherwise grants/grantors will need to be manually added.
 - `npx prisma studio` can be used in order to manually make changes to the database, or external programs like Table Plus

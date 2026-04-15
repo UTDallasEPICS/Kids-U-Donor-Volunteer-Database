@@ -229,14 +229,14 @@ model Volunteer {
   preferredEvents     String[]
 
   // Compliance & Requirements
-  volunteerApplicationStatus VolunteerAppStatus @default(PENDING)
-  volunteerApplicationCompleted Boolean @default(false)
-  backgroundCheckCompleted      Boolean @default(false)
-  codeOfEthicsFormSigned        Boolean @default(false)
-  abuseNeglectReportFormSigned  Boolean @default(false)
-  personnelPoliciesFormSigned   Boolean @default(false)
-  orientationCompleted          Boolean @default(false)
-  trainingModulesCompleted      Boolean @default(false)
+  volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
+  volunteerApplicationCompleted Boolean            @default(false)
+  backgroundCheckCompleted      Boolean            @default(false)
+  codeOfEthicsFormSigned        Boolean            @default(false)
+  abuseNeglectReportFormSigned  Boolean            @default(false)
+  personnelPoliciesFormSigned   Boolean            @default(false)
+  orientationCompleted          Boolean            @default(false)
+  trainingModulesCompleted      Boolean            @default(false)
 
   // Volunteer Events & Hours
   volunteerEvents  Event[]
@@ -244,14 +244,14 @@ model Volunteer {
   isDeleted        Boolean     @default(false)
 
   // Relations
-  application         VolunteerApplication? @relation(fields: [applicationId], references: [id])
+  application         VolunteerApplication?     @relation(fields: [applicationId], references: [id])
   applicationId       String?
   EmergencyContact    EmergencyContact?
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
-  Person              Person?               @relation(fields: [personId], references: [id])
-  personId            String?               @unique
+  Person              Person?                   @relation(fields: [personId], references: [id])
+  personId            String?                   @unique
   backgroundCheck     VolunteerBackgroundCheck?
 }
 
@@ -335,9 +335,8 @@ model VolunteerApplication {
 
   agreedToTerms Boolean
   eSignature    String
-  softdelete Boolean @default(false)
-  status VolunteerAppStatus @default(PENDING)
-  
+  softdelete    Boolean            @default(false)
+  status        VolunteerAppStatus @default(PENDING)
 
   volunteer Volunteer[]
 }
@@ -364,7 +363,7 @@ model VolunteerBackgroundCheck {
 
   approved Boolean @default(false)
 
-  volunteerId String?   @unique
+  volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
 }
 

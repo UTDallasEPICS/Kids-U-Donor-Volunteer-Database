@@ -1,11 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
+import { Prisma, PrismaClient } from "@prisma/client";
 
-const prisma = new PrismaClient();
-
-async function main() {
+export async function seedMockLocations(prisma: PrismaClient) {
   console.log("Adding mock locations...\n");
 
-  const locations = [
+  const locations: Prisma.LocationCreateInput[] = [
     {
       name: "Kids-U Main Campus",
       address: "1234 Education Blvd",
@@ -38,19 +36,16 @@ async function main() {
     },
   ];
 
-  for (const loc of locations) {
-    const existing = await prisma.location.findFirst({ where: { name: loc.name } });
+  for (const location of locations) {
+    const existing = await prisma.location.findFirst({ where: { name: location.name } });
     if (existing) {
-      console.log(`Skipping "${loc.name}" — already exists.`);
+      console.log(`Skipping "${location.name}" — already exists.`);
       continue;
     }
-    const created = await prisma.location.create({ data: loc });
+
+    const created = await prisma.location.create({ data: location });
     console.log(`Created: ${created.name} (ID: ${created.id})`);
   }
 
   console.log("\nDone.");
 }
-
-main()
-  .catch((e) => { console.error(e); process.exit(1); })
-  .finally(() => prisma.$disconnect());
