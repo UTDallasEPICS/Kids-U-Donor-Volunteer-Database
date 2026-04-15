@@ -14,22 +14,30 @@ export default function AdminDashboard() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [newTask, setNewTask] = useState("");
 
+  const fetchJson = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Request failed: ${url}`);
+    return res.json();
+  };
+
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/admin/dashboard/box1').then(res => res.json()),
-      fetch('/api/admin/dashboard/box2').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/hours').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/donation').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/grants').then(res => res.json()),
-      fetch('/api/admin/dashboard/box6').then(res => res.json()),
-    ]).then(([volunteers, donors, hours, donation, grants, tasksData]) => {
+      fetchJson('/api/admin/dashboard/box1'),
+      fetchJson('/api/admin/dashboard/box2'),
+      fetchJson('/api/admin/dashboard/box3'),
+      fetchJson('/api/admin/dashboard/box7/hours'),
+      fetchJson('/api/admin/dashboard/box7/donation'),
+      fetchJson('/api/admin/dashboard/box7/grants'),
+      fetchJson('/api/admin/dashboard/box6'),
+    ]).then(([volunteers, donors, grantsCount, hours, donation, grants, tasksData]) => {
       setTotalVolunteers(volunteers.total);
       setTotalDonors(donors.total);
+      setTotalGrants(grantsCount.total);
       setVolunteerHours(hours.total);
       setAverageDonation(donation.average);
       setPendingGrants(grants.total);
-      setTasks(tasksData);
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
     }).catch(err => console.error('Failed to fetch dashboard data:', err));
   }, []);
 
@@ -41,8 +49,11 @@ export default function AdminDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTask, completed: false })
       });
+      if (!res.ok) return;
       const createdTask = await res.json();
-      setTasks([...tasks, createdTask]);
+      if (createdTask && typeof createdTask.id === "number") {
+        setTasks([...tasks, createdTask]);
+      }
       setNewTask("");
     }
   };
@@ -57,13 +68,17 @@ export default function AdminDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: task.title, completed: !task.completed })
     });
+    if (!res.ok) return;
     const updatedTask = await res.json();
-    setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+    if (updatedTask && typeof updatedTask.id === "number") {
+      setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+    }
   };
 
 
   const handleDelete = async (id: number) => {
-    await fetch(`/api/admin/dashboard/box6/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/dashboard/box6/${id}`, { method: "DELETE" });
+    if (!res.ok) return;
     setTasks(tasks.filter(task => task.id !== id));
   };
 
