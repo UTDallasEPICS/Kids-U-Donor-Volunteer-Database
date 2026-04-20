@@ -47,8 +47,8 @@ export async function POST(req: NextRequest) {
       gender: sex || "",
       agreedToBackgroundCheck: Boolean(agreeToBackgroundCheck),
       eSignature: electronicSignature || "",
-      signatureDate: signatureDate || new Date().toISOString().split('T')[0],
-      approved: false,
+      signatureDate: signatureDate || new Date().toISOString().split("T")[0],
+      status: "PENDING" as const,
     };
 
     console.log("Background check data:", JSON.stringify(data, null, 2));
@@ -80,9 +80,6 @@ export async function POST(req: NextRequest) {
     if (error instanceof Error) {
       console.error("Stack trace:", error.stack);
     }
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }

@@ -14,12 +14,13 @@ export default function VolunteerTopNavigationBar() {
     avatar: ''
   });
   const [avatarError, setAvatarError] = useState(false);
+  const [bgCheckApproved, setBgCheckApproved] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/auth/me'); 
+        const response = await fetch('/api/auth/me');
         const data = await response.json();
         if (data.success) {
           setUser({
@@ -36,7 +37,20 @@ export default function VolunteerTopNavigationBar() {
       }
     };
 
+    const fetchBgCheckStatus = async () => {
+      try {
+        const res = await fetch('/api/background-check/get');
+        const data = await res.json();
+        if (data.submitted && data.record?.status === "APPROVED") {
+          setBgCheckApproved(true);
+        }
+      } catch {
+        // non-blocking
+      }
+    };
+
     fetchUserData();
+    fetchBgCheckStatus();
   }, []);
 
   const handleLogout = async () => {
@@ -94,23 +108,32 @@ export default function VolunteerTopNavigationBar() {
                 <p className="text-sm font-semibold text-gray-700">{user.name}</p>
                 <p className="text-xs text-gray-500">{user.role}</p>
               </div>
-              {user.avatar && !avatarError ? (
-                <div className="relative w-10 h-10 rounded-full overflow-hidden shadow-md">
-                  <Image
-                    src={user.avatar}
-                    alt="Profile avatar"
-                    fill
-                    sizes="40px"
-                    className="object-cover"
-                    onError={() => setAvatarError(true)}
-                    unoptimized
-                  />
-                </div>
-              ) : (
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4a6fa5] to-[#2f4b7c] flex items-center justify-center text-white font-semibold shadow-md">
-                  {user.initials}
-                </div>
-              )}
+              <div className="relative">
+                {user.avatar && !avatarError ? (
+                  <div className="relative w-10 h-10 rounded-full overflow-hidden shadow-md">
+                    <Image
+                      src={user.avatar}
+                      alt="Profile avatar"
+                      fill
+                      sizes="40px"
+                      className="object-cover"
+                      onError={() => setAvatarError(true)}
+                      unoptimized
+                    />
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#4a6fa5] to-[#2f4b7c] flex items-center justify-center text-white font-semibold shadow-md">
+                    {user.initials}
+                  </div>
+                )}
+                {bgCheckApproved && (
+                  <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center ring-2 ring-white">
+                    <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414L8.414 15l-4.121-4.121a1 1 0 011.414-1.414L8.414 12.172l7.879-7.879a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </span>
+                )}
+              </div>
               <svg
                 className={`w-4 h-4 text-gray-500 transition-transform ${menuOpen ? 'rotate-180' : ''}`}
                 fill="none"

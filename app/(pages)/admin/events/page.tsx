@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
-import { FiCalendar, FiMapPin, FiUsers, FiEdit2, FiTrash2, FiPlus, FiSettings, FiMail, FiPhone, FiX } from "react-icons/fi";
+import { FiCalendar, FiMapPin, FiUsers, FiEdit2, FiTrash2, FiPlus, FiSettings, FiMail, FiPhone, FiX, FiShield } from "react-icons/fi";
 
 interface Location {
   id: string;
@@ -36,7 +36,7 @@ interface Event {
   schedule: string;
   location: Location | null;
   eventRegistrations: EventRegistration[];
-  backgroundCheckRequired: boolean;
+  bgCheckRequired: boolean;
 }
 
 export default function EventsPage() {
@@ -58,7 +58,7 @@ export default function EventsPage() {
     date: "",
     time: "",
     locationId: "",
-    backgroundCheckRequired: false,
+    bgCheckRequired: false,
   });
 
   const [locationData, setLocationData] = useState({
@@ -112,7 +112,7 @@ export default function EventsPage() {
         date: format(scheduleDate, "yyyy-MM-dd"),
         time: format(scheduleDate, "HH:mm"),
         locationId: event.location?.id || "",
-        backgroundCheckRequired: event.backgroundCheckRequired,
+        bgCheckRequired: event.bgCheckRequired,
       });
     } else {
       setEditingEvent(null);
@@ -122,7 +122,7 @@ export default function EventsPage() {
         date: "",
         time: "",
         locationId: "",
-        backgroundCheckRequired: false,
+        bgCheckRequired: false,
       });
     }
     setShowModal(true);
@@ -146,7 +146,7 @@ export default function EventsPage() {
         description: formData.description,
         schedule,
         locationId: formData.locationId || null,
-        backgroundCheckRequired: formData.backgroundCheckRequired,
+        bgCheckRequired: formData.bgCheckRequired,
       };
 
       const url = editingEvent
@@ -342,6 +342,12 @@ export default function EventsPage() {
                     </div>
                   </div>
                 )}
+                <div className="flex items-center gap-2 mt-3">
+                  <FiShield className={event.bgCheckRequired ? "text-amber-500 flex-shrink-0" : "text-gray-400 flex-shrink-0"} size={18} />
+                  <p className={event.bgCheckRequired ? "text-amber-500" : "text-gray-400"}>
+                    {event.bgCheckRequired ? "Background check required" : "Background check not required"}
+                  </p>
+                </div>
               </div>
 
               
@@ -489,11 +495,11 @@ export default function EventsPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={formData.backgroundCheckRequired}
+                  checked={formData.bgCheckRequired}
                   onChange={(e) =>
                     setFormData({
                       ...formData,
-                      backgroundCheckRequired: e.target.checked,
+                      bgCheckRequired: e.target.checked,
                     })
                   }
                 />

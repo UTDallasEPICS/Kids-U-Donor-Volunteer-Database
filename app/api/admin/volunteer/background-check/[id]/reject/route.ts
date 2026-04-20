@@ -11,24 +11,24 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     const bgc = await prisma.volunteerBackgroundCheck.update({
       where: { id },
-      data: { status: "APPROVED" },
+      data: { status: "REJECTED" },
       select: { volunteerId: true },
     });
 
     if (bgc.volunteerId) {
       await prisma.volunteer.update({
         where: { id: bgc.volunteerId },
-        data: { backgroundCheckCompleted: true },
+        data: { backgroundCheckCompleted: false },
       });
     }
 
     return NextResponse.json(
-      { message: "Background check approved", volunteerUpdated: !!bgc.volunteerId },
+      { message: "Background check rejected", volunteerUpdated: !!bgc.volunteerId },
       { status: 200 }
     );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error approving background check:", id, errorMessage);
+    console.error("Error rejecting background check:", id, errorMessage);
 
     if ((error as any)?.code === "P2025") {
       return NextResponse.json({ message: "Record not found" }, { status: 404 });

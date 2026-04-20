@@ -363,7 +363,6 @@ model VolunteerBackgroundCheck {
   signatureDate           String
 
   status        BackgroundCheckStatus @default(PENDING)
-  approved      Boolean               @default(false) // Deprecated, use status instead
   declineReason String?
 
   volunteerId String?    @unique

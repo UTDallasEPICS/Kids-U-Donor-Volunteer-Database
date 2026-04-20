@@ -197,12 +197,14 @@ if (requestor?.role !== "SUPER_ADMIN") {
 }
 
 const {userID, targetRole} = await request.json();
-const normalizedTargetRole: TargetRole = ["VOLUNTEER", "ADMIN", "SUPER_ADMIN"].includes(targetRole)
-    ? targetRole
-    : "SUPER_ADMIN";
+const normalizedTargetRole = typeof targetRole === "string" ? targetRole.trim().toUpperCase() : "";
 
 if (!userID || typeof userID !== "string") {
     return NextResponse.json({ error: "Invalid user id" }, { status: 400 });
+}
+
+if (!["VOLUNTEER", "ADMIN", "SUPER_ADMIN"].includes(normalizedTargetRole)) {
+    return NextResponse.json({ error: "Invalid target role" }, { status: 400 });
 }
 
 if (userID === requestor.userId && normalizedTargetRole !== "SUPER_ADMIN") {
@@ -235,7 +237,7 @@ const existingSuperAdmin = await prisma.superAdmin.findUnique({
     select: { id: true },
 });
 
-if (user.role === normalizedTargetRole) {
+if (user.role === (normalizedTargetRole as TargetRole)) {
     return NextResponse.json({ message: `User is already ${normalizedTargetRole}` }, { status: 200 });
 }
 
@@ -260,7 +262,7 @@ if (normalizedTargetRole === "SUPER_ADMIN") {
 await prisma.$transaction(async (tx) => {
     await tx.user.update({
         where: { id: userID },
-        data: { role: normalizedTargetRole },
+        data: { role: normalizedTargetRole as TargetRole },
     });
 
     if (existingSuperAdmin) {
