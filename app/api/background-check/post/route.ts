@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       agreedToBackgroundCheck: agreeToBackgroundCheck,
       eSignature: electronicSignature,
       signatureDate,
-      approved: false,
+      status: "PENDING" as const,
     };
 
     let record;

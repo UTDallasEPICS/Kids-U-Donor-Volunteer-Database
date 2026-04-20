@@ -366,7 +366,7 @@ model VolunteerBackgroundCheck {
   eSignature              String
   signatureDate           String
 
-  approved Boolean @default(false)
+  status    BGCheckStatus @default(PENDING)
 
   volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
@@ -529,4 +529,10 @@ enum OrientationInviteStatus {
   SENT
   CONFIRMED
   EXPIRED
+}
+
+enum BGCheckStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }

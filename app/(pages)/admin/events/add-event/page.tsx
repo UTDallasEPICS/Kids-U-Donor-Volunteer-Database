@@ -256,8 +256,8 @@ export default function AddEvent() {
               <label className="flex items-center">
               <input
                 type="checkbox"
-                name="backgroundCheckRequired"
-                checked={eventData.backgroundCheckRequired}
+                name="bgCheckRequired"
+                checked={eventData.bgCheckRequired}
                 onChange={handleEventChange}
                 className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
               />
