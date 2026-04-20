@@ -36,36 +36,50 @@ export async function POST(req: NextRequest) {
     }
 
     const data = {
-      fullName,
-      dateOfBirth: new Date(dateOfBirth),
+      fullName: fullName || "",
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : new Date(),
       addressLine: currentAddress ?? "",
       city: city ?? "",
       state: state ?? "",
       zipCode: zipCode ?? "",
       county: county ?? "",
-      race,
-      gender: sex,
-      agreedToBackgroundCheck: agreeToBackgroundCheck,
-      eSignature: electronicSignature,
-      signatureDate,
+      race: race || "",
+      gender: sex || "",
+      agreedToBackgroundCheck: Boolean(agreeToBackgroundCheck),
+      eSignature: electronicSignature || "",
+      signatureDate: signatureDate || new Date().toISOString().split('T')[0],
       approved: false,
     };
 
+    console.log("Background check data:", JSON.stringify(data, null, 2));
+
     let record;
-    if (volunteerId) {
-      record = await prisma.volunteerBackgroundCheck.upsert({
-        where: { volunteerId },
-        update: { ...data, createdAt: new Date() },
-        create: { ...data, volunteerId },
-      });
-    } else {
-      record = await prisma.volunteerBackgroundCheck.create({ data });
+    try {
+      if (volunteerId) {
+        console.log("Upserting background check for volunteerId:", volunteerId);
+        record = await prisma.volunteerBackgroundCheck.upsert({
+          where: { volunteerId },
+          update: { ...data },
+          create: { ...data, volunteerId },
+        });
+      } else {
+        console.log("Creating new background check record");
+        record = await prisma.volunteerBackgroundCheck.create({ data });
+      }
+      console.log("Background check record created/updated:", record.id);
+    } catch (dbError) {
+      console.error("Database error:", dbError);
+      throw dbError;
     }
 
     return NextResponse.json({ message: "Background check submitted", id: record.id }, { status: 201 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error submitting background check:", errorMessage);
+    console.error("Full error:", error);
+    if (error instanceof Error) {
+      console.error("Stack trace:", error.stack);
+    }
     return NextResponse.json(
       { message: "Internal server error", error: errorMessage },
       { status: 500 }

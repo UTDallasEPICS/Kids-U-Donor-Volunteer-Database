@@ -344,6 +344,7 @@ model VolunteerApplication {
 model VolunteerBackgroundCheck {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Personal Info
   fullName    String
@@ -361,7 +362,9 @@ model VolunteerBackgroundCheck {
   eSignature              String
   signatureDate           String
 
-  approved Boolean @default(false)
+  status        BackgroundCheckStatus @default(PENDING)
+  approved      Boolean               @default(false) // Deprecated, use status instead
+  declineReason String?
 
   volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
@@ -478,4 +481,10 @@ enum VolunteerAppStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum BackgroundCheckStatus {
+  PENDING
+  APPROVED
+  DECLINED
 }

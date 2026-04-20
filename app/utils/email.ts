@@ -207,6 +207,151 @@ export async function sendPasswordResetEmail(
   return info;
 }
 
+// Send rejection email for volunteer application
+export async function sendApplicationRejectionEmail(
+  to: string,
+  firstName: string,
+  rejectionReason?: string
+) {
+  const transporter = createTransporter();
+
+  const info = await transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: to,
+    subject: 'Application Status Update - Kids-U Volunteer Program',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #ef4444; color: white; padding: 20px; text-align: center; }
+            .content { background-color: #f9fafb; padding: 30px; }
+            .notice { background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 20px 0; }
+            .reason { background-color: #white; border-left: 4px solid #4F46E5; padding: 15px; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
+            .contact-info { margin: 20px 0; padding: 15px; background-color: #f3f4f6; border-radius: 5px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Application Status Update</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${firstName},</h2>
+              <p>Thank you for your interest in volunteering with Kids-U. We appreciate the time and effort you invested in submitting your application.</p>
+              
+              <div class="notice">
+                <p><strong>Status:</strong> Your volunteer application has been reviewed and unfortunately, we are unable to move forward at this time.</p>
+              </div>
+
+              ${rejectionReason ? `
+              <div class="reason">
+                <p><strong>Reason for Decision:</strong></p>
+                <p>${rejectionReason}</p>
+              </div>
+              ` : ''}
+
+              <p>If you believe this decision was made in error, or if you have questions about your application, please don't hesitate to reach out to us.</p>
+
+              <div class="contact-info">
+                <p><strong>Next Steps:</strong></p>
+                <ul>
+                  <li>You may reapply in the future if your circumstances change</li>
+                  <li>For more information or to discuss further, please contact us</li>
+                  <li>We encourage you to check our website for other volunteer opportunities</li>
+                </ul>
+              </div>
+
+              <p>Thank you for considering Kids-U as a place to make a difference!</p>
+            </div>
+            <div class="footer">
+              <p>&copy; ${new Date().getFullYear()} EPICS Project. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `Hello ${firstName},\n\nThank you for your interest in volunteering with Kids-U. We appreciate the time and effort you invested in submitting your application.\n\nStatus: Your volunteer application has been reviewed and unfortunately, we are unable to move forward at this time.${rejectionReason ? `\n\nReason for Decision:\n${rejectionReason}` : ''}\n\nIf you believe this decision was made in error, or if you have questions about your application, please don't hesitate to reach out to us.\n\nThank you for considering Kids-U as a place to make a difference!\n\n&copy; ${new Date().getFullYear()} EPICS Project.`,
+  });
+
+  return info;
+}
+
+// Send approval email for volunteer application
+export async function sendApplicationApprovalEmail(
+  to: string,
+  firstName: string
+) {
+  const transporter = createTransporter();
+  const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/volunteers`;
+
+  const info = await transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to: to,
+    subject: 'Application Approved - Welcome to Kids-U Volunteer Program',
+    html: `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background-color: #10b981; color: white; padding: 20px; text-align: center; }
+            .content { background-color: #f9fafb; padding: 30px; }
+            .success-box { background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; }
+            .button { display: inline-block; padding: 12px 30px; background-color: #10b981; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+            .next-steps { background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; }
+            .footer { text-align: center; padding: 20px; color: #6b7280; font-size: 12px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Welcome to Kids-U!</h1>
+            </div>
+            <div class="content">
+              <h2>Hello ${firstName},</h2>
+              
+              <div class="success-box">
+                <p><strong>Congratulations!</strong> Your volunteer application has been approved. We're excited to have you join the Kids-U volunteer team!</p>
+              </div>
+
+              <div class="next-steps">
+                <h3>Next Steps:</h3>
+                <ul>
+                  <li>Log in to your volunteer account to complete any remaining requirements</li>
+                  <li>Schedule your orientation session</li>
+                  <li>Review the volunteer code of conduct and training materials</li>
+                  <li>Attend your background check appointment if required</li>
+                </ul>
+              </div>
+
+              <p style="text-align: center;">
+                <a href="${dashboardUrl}" class="button">Access Your Volunteer Dashboard</a>
+              </p>
+
+              <p>If you have any questions or need assistance, please don't hesitate to reach out to our volunteer coordinator.</p>
+
+              <p>Thank you for your commitment to making a difference in our community!</p>
+            </div>
+            <div class="footer">
+              <p>&copy; ${new Date().getFullYear()} EPICS Project. All rights reserved.</p>
+            </div>
+          </div>
+        </body>
+      </html>
+    `,
+    text: `Hello ${firstName},\n\nCongratulations! Your volunteer application has been approved. We're excited to have you join the Kids-U volunteer team!\n\nNext Steps:\n- Log in to your volunteer account to complete any remaining requirements\n- Schedule your orientation session\n- Review the volunteer code of conduct and training materials\n- Attend your background check appointment if required\n\nAccess Your Volunteer Dashboard: ${dashboardUrl}\n\nIf you have any questions or need assistance, please don't hesitate to reach out to our volunteer coordinator.\n\nThank you for your commitment to making a difference in our community!\n\n&copy; ${new Date().getFullYear()} EPICS Project.`,
+  });
+
+  return info;
+}
+
 // generate 6-digit code 
 export function generate2FACode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();

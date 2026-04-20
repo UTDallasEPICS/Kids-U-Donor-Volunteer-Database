@@ -19,6 +19,9 @@ type ApplicationSummary = {
 
 export default function ApplicationsPage() {
   const [applications, setApplications] = useState<ApplicationSummary[]>([]);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
 
   useEffect(() => {
     fetch('/api/admin/volunteer/application/get')
@@ -49,32 +52,47 @@ export default function ApplicationsPage() {
         setPathapplications(apps =>
           apps.map(app => (app.id === id ? { ...app, status: "APPROVED", softdelete: false } : app))
         );
+        alert('Application approved and approval email sent!');
       } else {
         console.error('Failed to update accepted status');
+        alert('Failed to approve application');
       }
     } catch (error) {
       console.error('Error updating accepted status:', error);
+      alert('Error approving application');
     }
   };
 
-  const rejectApplication = async (id: string) => {
-    if (!confirm('Are you sure you want to reject this application?')) return;
+  const openRejectModal = (id: string) => {
+    setRejectingId(id);
+    setRejectionReason('');
+    setShowRejectModal(true);
+  };
+
+  const confirmReject = async () => {
+    if (!rejectingId) return;
 
     try {
-      const res = await fetch(`/api/admin/volunteer/application/${id}/delete`, {
+      const res = await fetch(`/api/admin/volunteer/application/${rejectingId}/delete`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data: { status: "REJECTED", softdelete: true } }), 
+        body: JSON.stringify({ rejectionReason: rejectionReason || undefined }), 
       });
 
       if (res.ok) {
-        setApplications(apps => apps.filter(app => app.id !== id));
-        setPathapplications(apps => apps.filter(app => app.id !== id));
+        setApplications(apps => apps.filter(app => app.id !== rejectingId));
+        setPathapplications(apps => apps.filter(app => app.id !== rejectingId));
+        alert('Application rejected and rejection email sent!');
+        setShowRejectModal(false);
+        setRejectingId(null);
+        setRejectionReason('');
       } else {
         console.error('Failed to reject the application');
+        alert('Failed to reject application');
       }
     } catch (error) {
       console.error('Error rejecting application:', error);
+      alert('Error rejecting application');
     }
   };
 
@@ -100,13 +118,13 @@ export default function ApplicationsPage() {
               <td className="p-2 space-x-2">
                 <button
                   onClick={() => toggleAccepted(app.id, app.accepted)}
-                  className="text-white bg-green-600 active:bg-green-700 px-2 py-1 rounded"
+                  className="text-white bg-green-600 active:bg-green-700 px-2 py-1 rounded hover:bg-green-700 transition"
                 >
                   {app.accepted ? 'Unaccept' : 'Accept'}
                 </button>
                 <button
-                  onClick={() => rejectApplication(app.id)}
-                  className="text-white bg-red-600 active:bg-red-700 px-2 py-1 rounded"
+                  onClick={() => openRejectModal(app.id)}
+                  className="text-white bg-red-600 active:bg-red-700 px-2 py-1 rounded hover:bg-red-700 transition"
                 >
                   Reject
                 </button>
@@ -159,6 +177,39 @@ export default function ApplicationsPage() {
     </div>
   </div>
   </div>
+
+  {/* Rejection Reason Modal */}
+  {showRejectModal && (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
+        <h2 className="text-xl font-bold mb-4">Reject Application</h2>
+        <p className="text-gray-600 mb-4">
+          Provide a reason for rejection (optional). This will be included in the rejection email sent to the applicant.
+        </p>
+        <textarea
+          value={rejectionReason}
+          onChange={(e) => setRejectionReason(e.target.value)}
+          placeholder="Enter rejection reason..."
+          className="w-full border border-gray-300 rounded p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-red-600"
+          rows={4}
+        />
+        <div className="flex space-x-3 justify-end">
+          <button
+            onClick={() => setShowRejectModal(false)}
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={confirmReject}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+          >
+            Confirm Rejection
+          </button>
+        </div>
+      </div>
+    </div>
+  )}
   </div>
   );
 }
