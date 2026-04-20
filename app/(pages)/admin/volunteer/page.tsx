@@ -11,17 +11,27 @@ interface Volunteer {
   lastName: string;
   emailAddress: string;
   registration: boolean;
+  dateSubmitted: string;
+  orientationInvitation?: {
+    id: string;
+    status: "DRAFT" | "SENT" | "CONFIRMED" | "EXPIRED";
+    firstEmailSentAt: string | null;
+  } | null;
 }
 
 const headCells = [
   { id: "name", numeric: false, label: "Name" },
   { id: "email", numeric: false, label: "Email" },
+  { id: "joined", numeric: false, label: "Joined" },
   { id: "registration", numeric: false, label: "Registration Status" },
+  { id: "orientation", numeric: false, label: "Orientation" },
+  { id: "actions", numeric: false, label: "Actions" },
 ];
 
 export default function VolunteersPage() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [scheduleTarget, setScheduleTarget] = useState<Volunteer | null>(null);
 
   const router = useRouter();
 
@@ -64,6 +74,13 @@ export default function VolunteersPage() {
     return <Loading />;
   }
 
+  const isNewVolunteer = (dateSubmitted: string) => {
+    const submitted = new Date(dateSubmitted).getTime();
+    const now = Date.now();
+    const sevenDaysMs = 7 * 24 * 60 * 60 * 1000;
+    return now - submitted <= sevenDaysMs;
+  };
+
   return (
     <div className="flex font-sans">
       <div className="flex-grow p-5">
@@ -97,43 +114,70 @@ export default function VolunteersPage() {
               {volunteers.map((volunteer) => (
                 <tr key={volunteer.id} className="hover:bg-gray-50 cursor-pointer">
                   <td className="px-6 py-4 border-b">
-                    <Link
-                      className="text-blue-500"
-                      href={`/admin/volunteer/${volunteer.id}`}
-                    >
-                      {`${volunteer.firstName} ${volunteer.lastName}`}
-                    </Link>
+                    <div className="flex items-center gap-2">
+                      <Link
+                        className="text-blue-500"
+                        href={`/admin/volunteer/${volunteer.id}`}
+                      >
+                        {`${volunteer.firstName} ${volunteer.lastName}`}
+                      </Link>
+                      {isNewVolunteer(volunteer.dateSubmitted) && (
+                        <span className="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-800">
+                          New Volunteer
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 border-b">{volunteer.emailAddress}</td>
                   <td className="px-6 py-4 border-b">
+                    {new Date(volunteer.dateSubmitted).toLocaleDateString("en-US")}
+                  </td>
+                  <td className="px-6 py-4 border-b">
                     {volunteer.registration ? "Registered" : "Not Registered"}
+                  </td>
+                  <td className="px-6 py-4 border-b">
+                    {volunteer.orientationInvitation?.firstEmailSentAt
+                      ? "Email sent"
+                      : "Not sent"}
+                  </td>
+                  <td className="px-6 py-4 border-b">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleTarget(volunteer)}
+                      className="bg-[#2f4b7c] hover:bg-[#1f3659] text-white text-sm font-semibold py-2 px-3 rounded"
+                    >
+                      Schedule Orientation
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+
+        {scheduleTarget && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+            <div className="w-full max-w-lg rounded-lg bg-white p-6 shadow-xl">
+              <h3 className="text-lg font-bold mb-2">Schedule Orientation</h3>
+              <p className="text-sm text-gray-700 mb-4">
+                Starting from this volunteer row: <strong>{scheduleTarget.firstName} {scheduleTarget.lastName}</strong>
+              </p>
+              <p className="text-sm text-gray-600 mb-6">
+                The full scheduling setup (meeting link + click-to-select availability) is the next slice.
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded"
+                  onClick={() => setScheduleTarget(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 }
-
-const styles = {
-  box: {
-    marginLeft: "1em",
-    marginRight: "1em",
-    marginTop: "5em",
-  },
-  table: {
-    minWidth: 750,
-    borderLeft: "1px solid #ccc",
-    borderRight: "1px solid #ccc",
-    borderTop: "1px solid #ccc",
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-  },
-  tableCell: {
-    borderTop: "1px solid #ccc",
-  },
-};
