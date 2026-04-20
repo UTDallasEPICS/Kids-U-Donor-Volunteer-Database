@@ -207,6 +207,150 @@ export async function sendPasswordResetEmail(
   return info;
 }
 
+type OrientationScheduleEmailInput = {
+  to: string;
+  firstName: string;
+  volunteerPortalUrl?: string;
+  expiresAt: Date;
+};
+
+type OrientationConfirmationEmailInput = {
+  volunteerName: string;
+  volunteerEmail: string;
+  adminName: string;
+  adminEmail: string;
+  meetingLink: string;
+  startTime: Date;
+  endTime: Date;
+};
+
+function formatGoogleDate(date: Date): string {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+}
+
+function buildGoogleCalendarLink({
+  title,
+  details,
+  location,
+  startTime,
+  endTime,
+}: {
+  title: string;
+  details: string;
+  location: string;
+  startTime: Date;
+  endTime: Date;
+}): string {
+  const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+  const params = new URLSearchParams({
+    text: title,
+    details,
+    location,
+    dates: `${formatGoogleDate(startTime)}/${formatGoogleDate(endTime)}`,
+  });
+  return `${baseUrl}&${params.toString()}`;
+}
+
+export async function sendOrientationScheduleEmail({
+  to,
+  firstName,
+  volunteerPortalUrl,
+  expiresAt,
+}: OrientationScheduleEmailInput) {
+  const transporter = createTransporter();
+
+  const portalUrl = volunteerPortalUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/volunteers`;
+  const deadlineText = expiresAt.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
+  return transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    to,
+    subject: 'Choose your orientation time',
+    html: `
+      <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
+        <h2>Hello ${firstName},</h2>
+        <p>Thank you for requesting to volunteer at Kids University. We are excited to get you started. Prior to volunteering, you will need to attend an online orientation which will last about 30 minutes. Please let us know which of the following dates/times work best for you.</p>
+        <p>Please go to the website, sign in, and choose a time slot from your <strong>Upcoming Events</strong> area.</p>
+        <p>You have <strong>24 hours from this email</strong> to pick one of the available slots.</p>
+        <p>If new slots are added by admins, your available choices will update automatically.</p>
+        <p><a href="${portalUrl}" style="display:inline-block;padding:10px 16px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;">Choose a Time Slot</a></p>
+        <p><strong>Deadline:</strong> ${deadlineText}</p>
+        <p>If you have any questions, reply to this email.</p>
+      </div>
+    `,
+    text: `Hello ${firstName},\n\nThank you for requesting to volunteer at Kids University. We are excited to get you started. Prior to volunteering, you will need to attend an online orientation which will last about 30 minutes. Please let us know which of the following dates/times work best for you.\n\nPlease go to the website, sign in, and choose a time slot from your Upcoming Events area:\n${portalUrl}\n\nYou have 24 hours from this email to pick one of the available slots.\nIf new slots are added by admins, your available choices will update automatically.\n\nDeadline: ${deadlineText}\n\nIf you have questions, reply to this email.`,
+  });
+}
+
+export async function sendOrientationConfirmationEmails({
+  volunteerName,
+  volunteerEmail,
+  adminName,
+  adminEmail,
+  meetingLink,
+  startTime,
+  endTime,
+}: OrientationConfirmationEmailInput) {
+  const transporter = createTransporter();
+
+  const title = 'Kids-U Volunteer Orientation';
+  const details = `Orientation confirmed with ${adminName}. Meeting link: ${meetingLink}`;
+  const calendarUrl = buildGoogleCalendarLink({
+    title,
+    details,
+    location: meetingLink,
+    startTime,
+    endTime,
+  });
+
+  const dateText = startTime.toLocaleString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+
+  const html = (recipientName: string, counterpart: string) => `
+    <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
+      <h2>Hello ${recipientName},</h2>
+      <p>Your orientation is confirmed with a specific admin host.</p>
+      <p><strong>Date & Time:</strong> ${dateText}</p>
+      <p><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
+      <p><strong>With:</strong> ${counterpart}</p>
+      <p><a href="${calendarUrl}" style="display:inline-block;padding:10px 16px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;">Add to Calendar</a></p>
+    </div>
+  `;
+
+  const text = (recipientName: string, counterpart: string) =>
+    `Hello ${recipientName},\n\nYour orientation is confirmed with a specific admin host.\nDate & Time: ${dateText}\nMeeting Link: ${meetingLink}\nWith: ${counterpart}\nCalendar: ${calendarUrl}`;
+
+  await Promise.all([
+    transporter.sendMail({
+      from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      to: volunteerEmail,
+      subject: 'Orientation confirmed',
+      html: html(volunteerName, adminName),
+      text: text(volunteerName, adminName),
+    }),
+    transporter.sendMail({
+      from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      to: adminEmail,
+      subject: 'Orientation confirmed',
+      html: html(adminName, volunteerName),
+      text: text(adminName, volunteerName),
+    }),
+  ]);
+
+  return { calendarUrl };
+}
+
 // generate 6-digit code 
 export function generate2FACode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
