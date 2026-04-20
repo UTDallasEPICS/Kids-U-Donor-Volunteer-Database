@@ -1,10 +1,10 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 function createTransporter() {
   return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: parseInt(process.env.SMTP_PORT || '587'),
-    secure: process.env.SMTP_SECURE === 'true',
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: parseInt(process.env.SMTP_PORT || "587"),
+    secure: process.env.SMTP_SECURE === "true",
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -16,16 +16,16 @@ export async function verifyEmailConfig() {
   try {
     const transporter = createTransporter();
     await transporter.verify();
-    console.log('SMTP Connection Successful');
-    console.log('SMTP Config:', {
+    console.log("SMTP Connection Successful");
+    console.log("SMTP Config:", {
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT,
       user: process.env.SMTP_USER,
-      hasPassword: !!process.env.SMTP_PASS
+      hasPassword: !!process.env.SMTP_PASS,
     });
     return true;
   } catch (error) {
-    console.error('Connection Failed', error);
+    console.error("Connection Failed", error);
     return false;
   }
 }
@@ -33,24 +33,19 @@ export async function verifyEmailConfig() {
 verifyEmailConfig();
 
 // Send email verification email
-export async function sendVerificationEmail(
-  to: string,
-  token: string,
-  firstName: string
-) {
-  
-  if (!to || typeof to !== 'string' || !to.includes('@')) {
+export async function sendVerificationEmail(to: string, token: string, firstName: string) {
+  if (!to || typeof to !== "string" || !to.includes("@")) {
     throw new Error(`Invalid email address: ${to}`);
   }
-  
+
   const transporter = createTransporter();
-  
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verification/verify-email?token=${token}`;
+
+  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verification/verify-email?token=${token}`;
 
   const message: any = {};
-  message.from = `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`;
-  message.to = String(to); 
-  message.subject = 'Verify Your Email Address';
+  message.from = `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`;
+  message.to = String(to);
+  message.subject = "Verify Your Email Address";
   message.text = `Hello ${firstName},\n\nThank you for registering! Please verify your email by visiting: ${verificationUrl}\n\nThis link will expire in 24 hours.\n\nIf you didn't create an account, please ignore this email.`;
   message.html = `
     <!DOCTYPE html>
@@ -91,22 +86,18 @@ export async function sendVerificationEmail(
   `;
 
   const info = await transporter.sendMail(message);
-  
+
   return info;
 }
 
 // Send 2FA code email
-export async function send2FACode(
-  to: string,
-  code: string,
-  firstName: string
-) {
-  const transporter = createTransporter(); 
+export async function send2FACode(to: string, code: string, firstName: string) {
+  const transporter = createTransporter();
 
   const info = await transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
     to: to,
-    subject: 'Your Two-Factor Authentication Code',
+    subject: "Your Two-Factor Authentication Code",
     html: `
       <!DOCTYPE html>
       <html>
@@ -147,19 +138,15 @@ export async function send2FACode(
 }
 
 // Send password reset email
-export async function sendPasswordResetEmail(
-  to: string,
-  token: string,
-  firstName: string
-) {
-  const transporter = createTransporter(); 
-  
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verification/reset-password?token=${token}`;
+export async function sendPasswordResetEmail(to: string, token: string, firstName: string) {
+  const transporter = createTransporter();
+
+  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/verification/reset-password?token=${token}`;
 
   const info = await transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
     to: to,
-    subject: 'Reset Your Password',
+    subject: "Reset Your Password",
     html: `
       <!DOCTYPE html>
       <html>
@@ -225,7 +212,10 @@ type OrientationConfirmationEmailInput = {
 };
 
 function formatGoogleDate(date: Date): string {
-  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
+  return date
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}Z$/, "Z");
 }
 
 function buildGoogleCalendarLink({
@@ -241,7 +231,7 @@ function buildGoogleCalendarLink({
   startTime: Date;
   endTime: Date;
 }): string {
-  const baseUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE';
+  const baseUrl = "https://calendar.google.com/calendar/render?action=TEMPLATE";
   const params = new URLSearchParams({
     text: title,
     details,
@@ -259,19 +249,19 @@ export async function sendOrientationScheduleEmail({
 }: OrientationScheduleEmailInput) {
   const transporter = createTransporter();
 
-  const portalUrl = volunteerPortalUrl || `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/volunteers`;
-  const deadlineText = expiresAt.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  const portalUrl = volunteerPortalUrl || `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/volunteers`;
+  const deadlineText = expiresAt.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 
   return transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+    from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
     to,
-    subject: 'Choose your orientation time',
+    subject: "Choose your orientation time",
     html: `
       <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
         <h2>Hello ${firstName},</h2>
@@ -299,7 +289,7 @@ export async function sendOrientationConfirmationEmails({
 }: OrientationConfirmationEmailInput) {
   const transporter = createTransporter();
 
-  const title = 'Kids-U Volunteer Orientation';
+  const title = "Kids-U Volunteer Orientation";
   const details = `Orientation confirmed with ${adminName}. Meeting link: ${meetingLink}`;
   const calendarUrl = buildGoogleCalendarLink({
     title,
@@ -309,12 +299,12 @@ export async function sendOrientationConfirmationEmails({
     endTime,
   });
 
-  const dateText = startTime.toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
+  const dateText = startTime.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 
   const html = (recipientName: string, counterpart: string) => `
@@ -333,16 +323,16 @@ export async function sendOrientationConfirmationEmails({
 
   await Promise.all([
     transporter.sendMail({
-      from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
       to: volunteerEmail,
-      subject: 'Orientation confirmed',
+      subject: "Orientation confirmed",
       html: html(volunteerName, adminName),
       text: text(volunteerName, adminName),
     }),
     transporter.sendMail({
-      from: `"${process.env.SMTP_FROM_NAME || 'Kids-U'}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
       to: adminEmail,
-      subject: 'Orientation confirmed',
+      subject: "Orientation confirmed",
       html: html(adminName, volunteerName),
       text: text(adminName, volunteerName),
     }),
@@ -351,12 +341,12 @@ export async function sendOrientationConfirmationEmails({
   return { calendarUrl };
 }
 
-// generate 6-digit code 
+// generate 6-digit code
 export function generate2FACode(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
 // secure token generator
 export function generateToken(): string {
-  return require('crypto').randomBytes(32).toString('hex');
+  return require("crypto").randomBytes(32).toString("hex");
 }

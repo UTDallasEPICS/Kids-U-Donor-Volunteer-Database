@@ -44,27 +44,27 @@ model Organization {
 }
 
 model User {
-  id                 String    @id @default(uuid())
-  role               Role
-  personId           String?   @unique
-  person             Person?   @relation(fields: [personId], references: [id])
-  email              String    @unique
-  avatarPath         String?
-  deletedAt          DateTime?
-  password           String
-  emailVerified      DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  verified           Boolean   @default(false)
-  verificationToken  String?   @unique
-  verificationExpiry DateTime?
-  twoFactorEnabled   Boolean   @default(false)
-  twoFactorCode      String?
-  twoFactorExpiry    DateTime?
-  resetToken         String?   @unique
-  resetTokenExpiry   DateTime?
-  orientationSlotsCreated   VolunteerOrientationSlot[]       @relation("SlotAdminUser")
-  orientationInvitesSent    VolunteerOrientationInvitation[] @relation("InitialInviteSender")
+  id                          String                           @id @default(uuid())
+  role                        Role
+  personId                    String?                          @unique
+  person                      Person?                          @relation(fields: [personId], references: [id])
+  email                       String                           @unique
+  avatarPath                  String?
+  deletedAt                   DateTime?
+  password                    String
+  emailVerified               DateTime?
+  createdAt                   DateTime                         @default(now())
+  updatedAt                   DateTime                         @updatedAt
+  verified                    Boolean                          @default(false)
+  verificationToken           String?                          @unique
+  verificationExpiry          DateTime?
+  twoFactorEnabled            Boolean                          @default(false)
+  twoFactorCode               String?
+  twoFactorExpiry             DateTime?
+  resetToken                  String?                          @unique
+  resetTokenExpiry            DateTime?
+  orientationSlotsCreated     VolunteerOrientationSlot[]       @relation("SlotAdminUser")
+  orientationInvitesSent      VolunteerOrientationInvitation[] @relation("InitialInviteSender")
   orientationInvitesConfirmed VolunteerOrientationInvitation[] @relation("ConfirmedAdminUser")
 }
 
@@ -247,17 +247,17 @@ model Volunteer {
   isDeleted        Boolean     @default(false)
 
   // Relations
-  application         VolunteerApplication?     @relation(fields: [applicationId], references: [id])
-  applicationId       String?
-  EmergencyContact    EmergencyContact?
-  VolunteerAttendance VolunteerAttendance[]
-  EventRegistration   EventRegistration[]
-  MailRecipient       MailRecipient[]
-  Person              Person?                   @relation(fields: [personId], references: [id])
-  personId            String?                   @unique
-  backgroundCheck     VolunteerBackgroundCheck?
-  orientationInvitation VolunteerOrientationInvitation?
-  bookedOrientationSlots VolunteerOrientationSlot[] @relation("BookedVolunteer")
+  application            VolunteerApplication?           @relation(fields: [applicationId], references: [id])
+  applicationId          String?
+  EmergencyContact       EmergencyContact?
+  VolunteerAttendance    VolunteerAttendance[]
+  EventRegistration      EventRegistration[]
+  MailRecipient          MailRecipient[]
+  Person                 Person?                         @relation(fields: [personId], references: [id])
+  personId               String?                         @unique
+  backgroundCheck        VolunteerBackgroundCheck?
+  orientationInvitation  VolunteerOrientationInvitation?
+  bookedOrientationSlots VolunteerOrientationSlot[]      @relation("BookedVolunteer")
 }
 
 // model volunteerAccount {
@@ -366,7 +366,7 @@ model VolunteerBackgroundCheck {
   eSignature              String
   signatureDate           String
 
-  status    BGCheckStatus @default(PENDING)
+  status BGCheckStatus @default(PENDING)
 
   volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
@@ -427,38 +427,38 @@ model Orientation {
 }
 
 model VolunteerOrientationInvitation {
-  id                    String                  @id @default(uuid())
-  volunteerId           String                  @unique
-  volunteer             Volunteer               @relation(fields: [volunteerId], references: [id])
-  meetingLink           String
-  status                OrientationInviteStatus @default(DRAFT)
-  createdAt             DateTime                @default(now())
-  updatedAt             DateTime                @updatedAt
-  firstEmailSentAt      DateTime?
-  selectionDeadline     DateTime?
+  id                       String                     @id @default(uuid())
+  volunteerId              String                     @unique
+  volunteer                Volunteer                  @relation(fields: [volunteerId], references: [id])
+  meetingLink              String
+  status                   OrientationInviteStatus    @default(DRAFT)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  firstEmailSentAt         DateTime?
+  selectionDeadline        DateTime?
   initialEmailSentByUserId String?
-  initialEmailSentByUser   User?               @relation("InitialInviteSender", fields: [initialEmailSentByUserId], references: [id])
-  confirmedAt           DateTime?
-  confirmedAdminUserId  String?
-  confirmedAdminUser    User?                  @relation("ConfirmedAdminUser", fields: [confirmedAdminUserId], references: [id])
-  selectedSlotId        String?                @unique
-  selectedSlot          VolunteerOrientationSlot? @relation("SelectedSlot", fields: [selectedSlotId], references: [id])
-  slots                 VolunteerOrientationSlot[] @relation("InvitationSlots")
+  initialEmailSentByUser   User?                      @relation("InitialInviteSender", fields: [initialEmailSentByUserId], references: [id])
+  confirmedAt              DateTime?
+  confirmedAdminUserId     String?
+  confirmedAdminUser       User?                      @relation("ConfirmedAdminUser", fields: [confirmedAdminUserId], references: [id])
+  selectedSlotId           String?                    @unique
+  selectedSlot             VolunteerOrientationSlot?  @relation("SelectedSlot", fields: [selectedSlotId], references: [id])
+  slots                    VolunteerOrientationSlot[] @relation("InvitationSlots")
 }
 
 model VolunteerOrientationSlot {
-  id                 String                         @id @default(uuid())
-  invitationId       String
-  invitation         VolunteerOrientationInvitation @relation("InvitationSlots", fields: [invitationId], references: [id])
-  adminUserId        String
-  adminUser          User                           @relation("SlotAdminUser", fields: [adminUserId], references: [id])
-  startTime          DateTime
-  endTime            DateTime
-  createdAt          DateTime                       @default(now())
-  isBooked           Boolean                        @default(false)
-  bookedAt           DateTime?
-  bookedByVolunteerId String?
-  bookedByVolunteer  Volunteer?                     @relation("BookedVolunteer", fields: [bookedByVolunteerId], references: [id])
+  id                   String                          @id @default(uuid())
+  invitationId         String
+  invitation           VolunteerOrientationInvitation  @relation("InvitationSlots", fields: [invitationId], references: [id])
+  adminUserId          String
+  adminUser            User                            @relation("SlotAdminUser", fields: [adminUserId], references: [id])
+  startTime            DateTime
+  endTime              DateTime
+  createdAt            DateTime                        @default(now())
+  isBooked             Boolean                         @default(false)
+  bookedAt             DateTime?
+  bookedByVolunteerId  String?
+  bookedByVolunteer    Volunteer?                      @relation("BookedVolunteer", fields: [bookedByVolunteerId], references: [id])
   selectedByInvitation VolunteerOrientationInvitation? @relation("SelectedSlot")
 
   @@unique([invitationId, startTime, adminUserId])
