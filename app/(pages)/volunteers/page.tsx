@@ -3,12 +3,39 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "@/app/logo.png";
 
+type OrientationSlot = {
+  id: string;
+  startTime: string;
+  endTime: string;
+  adminUser: {
+    email: string;
+    person: {
+      firstName: string;
+      lastName: string;
+    } | null;
+  };
+};
+
+type OrientationInvitation = {
+  id: string;
+  status: "DRAFT" | "SENT" | "CONFIRMED" | "EXPIRED";
+  meetingLink: string;
+  selectionDeadline: string | null;
+  slots: OrientationSlot[];
+};
+
 export default function VolunteerDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState<number>(0);
   const [attendedCount, setAttendedCount] = useState<number>(0);
   const [nextEventDays, setNextEventDays] = useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [orientationInvitation, setOrientationInvitation] = useState<OrientationInvitation | null>(null);
+  const [showOrientationModal, setShowOrientationModal] = useState(false);
+  const [selectedOrientationSlotId, setSelectedOrientationSlotId] = useState("");
+  const [orientationError, setOrientationError] = useState("");
+  const [orientationSuccess, setOrientationSuccess] = useState("");
+  const [isSubmittingOrientation, setIsSubmittingOrientation] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -26,6 +53,12 @@ export default function VolunteerDashboard() {
             .then((res) => res.json())
             .catch(() => ({ images: [] })),
         ]);
+
+        const orientationRes = await fetch("/api/volunteer/orientation/options");
+        if (orientationRes.ok) {
+          const orientationData = await orientationRes.json();
+          setOrientationInvitation(orientationData?.invitation ?? null);
+        }
 
         setUpcomingEvents(events);
         setTotalHours(hours.total || 0);
@@ -49,6 +82,61 @@ export default function VolunteerDashboard() {
 
     fetchData();
   }, []);
+
+  const formatOrientationTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  };
+
+  const getAdminName = (slot: OrientationSlot) => {
+    const first = slot.adminUser?.person?.firstName || "";
+    const last = slot.adminUser?.person?.lastName || "";
+    const full = `${first} ${last}`.trim();
+    return full || slot.adminUser?.email || "Admin";
+  };
+
+  const handleConfirmOrientation = async () => {
+    if (!selectedOrientationSlotId) {
+      setOrientationError("Please choose a time slot.");
+      return;
+    }
+
+    setIsSubmittingOrientation(true);
+    setOrientationError("");
+    setOrientationSuccess("");
+
+    try {
+      const res = await fetch("/api/volunteer/orientation/select", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slotId: selectedOrientationSlotId }),
+      });
+
+      const result = await res.json();
+      if (!res.ok) {
+        throw new Error(result?.error || "Failed to confirm orientation");
+      }
+
+      setOrientationSuccess("Orientation confirmed. A confirmation email has been sent.");
+      setShowOrientationModal(false);
+      setSelectedOrientationSlotId("");
+
+      const refresh = await fetch("/api/volunteer/orientation/options");
+      if (refresh.ok) {
+        const refreshed = await refresh.json();
+        setOrientationInvitation(refreshed?.invitation ?? null);
+      }
+    } catch (error) {
+      setOrientationError(error instanceof Error ? error.message : "Failed to confirm orientation");
+    } finally {
+      setIsSubmittingOrientation(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-6">
@@ -174,6 +262,44 @@ export default function VolunteerDashboard() {
                 <span className="text-sm font-bold text-[#2f4b7c]">{upcomingEvents.length} events</span>
               </div>
             </div>
+
+            {orientationInvitation && orientationInvitation.status !== "CONFIRMED" && (
+              <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-4">
+                <p className="text-sm font-bold text-[#1f3659]">Orientation Scheduling Required</p>
+                <p className="text-sm text-[#1f3659] mt-1">
+                  Please choose your orientation time from the available slots in Upcoming Events.
+                </p>
+                {orientationInvitation.selectionDeadline && (
+                  <p className="text-xs text-[#1f3659] mt-2">
+                    Deadline: {new Date(orientationInvitation.selectionDeadline).toLocaleString("en-US")}
+                  </p>
+                )}
+                {orientationInvitation.status === "EXPIRED" ? (
+                  <p className="text-sm text-red-700 mt-3">
+                    Your 24-hour selection window has expired. Please contact an admin.
+                  </p>
+                ) : (
+                  <button
+                    type="button"
+                    className="mt-3 rounded-lg bg-[#2f4b7c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1f3659]"
+                    onClick={() => {
+                      setShowOrientationModal(true);
+                      setOrientationError("");
+                      setOrientationSuccess("");
+                    }}
+                  >
+                    Choose Orientation Time
+                  </button>
+                )}
+              </div>
+            )}
+
+            {orientationSuccess && (
+              <p className="mb-4 text-sm text-green-700">{orientationSuccess}</p>
+            )}
+            {orientationError && !showOrientationModal && (
+              <p className="mb-4 text-sm text-red-700">{orientationError}</p>
+            )}
 
             <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
               {upcomingEvents.length > 0 ? (
@@ -439,6 +565,68 @@ export default function VolunteerDashboard() {
           </div>
         </div>
       </div>
+
+      {showOrientationModal && orientationInvitation && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-xl rounded-lg bg-white p-6 shadow-xl">
+            <h3 className="text-lg font-bold text-[#2f4b7c] mb-2">Choose Orientation Time</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              Select one available slot. Once confirmed, you and your admin host will receive a final confirmation email.
+            </p>
+
+            <div className="max-h-64 overflow-y-auto rounded border border-gray-200 p-2 mb-4">
+              {orientationInvitation.slots.length === 0 ? (
+                <p className="text-sm text-gray-600">No slots available yet. Please check back soon.</p>
+              ) : (
+                <div className="space-y-2">
+                  {orientationInvitation.slots.map((slot) => (
+                    <label
+                      key={slot.id}
+                      className="flex items-start gap-2 rounded border border-gray-200 p-3 cursor-pointer hover:bg-gray-50"
+                    >
+                      <input
+                        type="radio"
+                        name="orientation-slot"
+                        value={slot.id}
+                        checked={selectedOrientationSlotId === slot.id}
+                        onChange={() => setSelectedOrientationSlotId(slot.id)}
+                        className="mt-1"
+                      />
+                      <span className="text-sm text-gray-700">
+                        <strong>{formatOrientationTime(slot.startTime)}</strong>
+                        <br />
+                        Host: {getAdminName(slot)}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {orientationError && (
+              <p className="text-sm text-red-700 mb-3">{orientationError}</p>
+            )}
+
+            <div className="flex justify-end gap-2">
+              <button
+                type="button"
+                className="rounded border border-gray-300 px-4 py-2 text-sm text-gray-700"
+                onClick={() => setShowOrientationModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="rounded bg-[#2f4b7c] px-4 py-2 text-sm font-semibold text-white hover:bg-[#1f3659] disabled:bg-gray-400"
+                disabled={isSubmittingOrientation || orientationInvitation.slots.length === 0}
+                onClick={handleConfirmOrientation}
+              >
+                {isSubmittingOrientation ? "Confirming..." : "Confirm Orientation"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <style jsx global>{`
         .custom-scrollbar::-webkit-scrollbar {
