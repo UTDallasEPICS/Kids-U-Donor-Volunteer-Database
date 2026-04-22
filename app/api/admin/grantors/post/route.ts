@@ -62,7 +62,7 @@ export async function POST(request: Request) {
             },
           },
         },
-        deletedAt: grantor.DateTime,
+        
         status: grantor.status,
       },
     });
