@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 // Email verification endpoint
 export async function POST(request: NextRequest) {
   try {
-    const { token } = await request.json();
+    const { token: rawToken } = await request.json();
+    const token = typeof rawToken === 'string' ? rawToken.trim() : '';
 
     if (!token) {
       return NextResponse.json(

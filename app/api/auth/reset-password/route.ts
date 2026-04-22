@@ -4,21 +4,23 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
 
 export async function POST(request: NextRequest) {
   try {
-    const { token, newPassword } = await request.json();
+    const { token: rawToken, newPassword } = await request.json();
+    const token = typeof rawToken === 'string' ? rawToken.trim() : '';
 
-    if (!token || !newPassword) {
+    if (!token || typeof newPassword !== 'string') {
       return NextResponse.json(
         { error: 'Token and new password are required' },
         { status: 400 }
       );
     }
 
-    if (newPassword.length < 8) {
+    if (!PASSWORD_REGEX.test(newPassword)) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        { error: 'Password must be 8+ characters and include uppercase, lowercase, number, and special character' },
         { status: 400 }
       );
     }

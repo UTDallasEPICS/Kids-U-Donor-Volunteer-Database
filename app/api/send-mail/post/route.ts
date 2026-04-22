@@ -3,15 +3,29 @@ import nodemailer from "nodemailer";
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export async function POST(request: Request) {
   try {
     // Parse request body
     const { recipientType, to, subject, body, from } = await request.json();
+    const normalizedRecipientType = typeof recipientType === "string" ? recipientType.trim().toLowerCase() : "";
+    const normalizedTo = typeof to === "string" ? to.trim().toLowerCase() : "";
+    const normalizedFrom = typeof from === "string" ? from.trim().toLowerCase() : "";
+    const normalizedSubject = typeof subject === "string" ? subject.trim() : "";
+    const normalizedBody = typeof body === "string" ? body.trim() : "";
 
     // Validate required fields
-    if (!subject || !body) {
+    if (!normalizedSubject || !normalizedBody) {
       return NextResponse.json({ error: "Missing required fields: subject and body are required" }, { status: 400 });
+    }
+
+    if (!["individual", "volunteers", "admins"].includes(normalizedRecipientType)) {
+      return NextResponse.json({ error: "Invalid recipient type" }, { status: 400 });
+    }
+
+    if (normalizedFrom && !EMAIL_REGEX.test(normalizedFrom)) {
+      return NextResponse.json({ error: "Invalid sender email address" }, { status: 400 });
     }
 
     // Create transporter with SMTP configuration
@@ -31,22 +45,21 @@ export async function POST(request: Request) {
     let emailCount = 0;
 
     // Determine recipients based on type
-    if (recipientType === "individual") {
-      if (!to) {
+    if (normalizedRecipientType === "individual") {
+      if (!normalizedTo) {
         return NextResponse.json({ error: "Recipient email is required for individual emails" }, { status: 400 });
       }
 
       // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(to)) {
+      if (!EMAIL_REGEX.test(normalizedTo)) {
         return NextResponse.json({ error: "Invalid email address" }, { status: 400 });
       }
 
-      recipients = [to];
-    } else if (recipientType === "volunteers" || recipientType === "admins") {
+      recipients = [normalizedTo];
+    } else if (normalizedRecipientType === "volunteers" || normalizedRecipientType === "admins") {
       const users = await prisma.user.findMany({
         where: {
-          role: recipientType === "volunteers" ? "VOLUNTEER" : "ADMIN",
+          role: normalizedRecipientType === "volunteers" ? "VOLUNTEER" : "ADMIN",
         },
         select: {
           email: true,
@@ -65,10 +78,10 @@ export async function POST(request: Request) {
 
     // Send emails
     const mailOptions = {
-      from: from, //replace with the email variable  for admin //
-      subject: subject,
-      text: body,
-      html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${body.replace(/\n/g, "<br>")}</div>`,
+      from: normalizedFrom || process.env.SMTP_USER, //replace with the email variable  for admin //
+      subject: normalizedSubject,
+      text: normalizedBody,
+      html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${normalizedBody.replace(/\n/g, "<br>")}</div>`,
     };
 
     

@@ -32,7 +32,7 @@ interface Event {
     city: string;
     state: string;
   };
-  backgroundCheckRequired: boolean;
+  bgCheckRequired: boolean;
   eventRegistrations: EventRegistration[];
 }
 
