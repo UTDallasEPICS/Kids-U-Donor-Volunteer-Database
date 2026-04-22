@@ -111,16 +111,29 @@ export async function POST(request: Request) {
 
   
     // Send to all recipients
-    
+    for (const recipientEmail of recipients) {
       try {
         await transporter.sendMail({
           ...mailOptions,
-          to: recipients, //chaged to reciptients in order to send an email to all volunteers and admins if selected//
+          to: recipientEmail,
         });
         emailCount++;
+
+        // Persist to volunteer inbox if recipient is a volunteer
+        if (recipientType !== 'admins') {
+          const volunteer = await prisma.volunteer.findFirst({
+            where: { emailAddress: recipientEmail },
+            select: { id: true },
+          });
+          if (volunteer) {
+            await prisma.sentEmail.create({
+              data: { subject, body, volunteerId: volunteer.id },
+            });
+          }
+        }
       } catch (error) {
-        console.error(`Failed to send email:`, error);
-        // Continue sending to other recipients even if one fails
+        console.error(`Failed to send email to ${recipientEmail}:`, error);
+      }
     }
 
     

@@ -33,7 +33,7 @@ export default function EventRegPage() {
         setVolunteerId(userData.user.volunteerId);
 
         const bgData = await bgCheckResponse.json();
-        setBgCheckApproved(bgData.submitted && bgData.record?.approved === true);
+        setBgCheckApproved(bgData.submitted && bgData.record?.status === "APPROVED");
 
         if (!eventResponse.ok) throw new Error("Failed to fetch event");
         const eventData = await eventResponse.json();

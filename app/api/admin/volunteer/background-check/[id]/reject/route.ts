@@ -15,13 +15,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       select: { volunteerId: true },
     });
 
-    if (bgc.volunteerId) {
-      await prisma.volunteer.update({
-        where: { id: bgc.volunteerId },
-        data: { backgroundCheckCompleted: false },
-      });
-    }
-
     return NextResponse.json(
       { message: "Background check rejected", volunteerUpdated: !!bgc.volunteerId },
       { status: 200 }

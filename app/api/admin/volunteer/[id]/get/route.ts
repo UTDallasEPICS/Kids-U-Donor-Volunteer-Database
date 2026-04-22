@@ -20,6 +20,7 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
         VolunteerAttendance: true,
         EventRegistration: true,
         MailRecipient: true,
+        backgroundCheck: true,
       },
     });
 
