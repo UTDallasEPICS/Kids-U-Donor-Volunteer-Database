@@ -231,7 +231,6 @@ model Volunteer {
   // Compliance & Requirements
   volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
   volunteerApplicationCompleted Boolean            @default(false)
-  backgroundCheckCompleted      Boolean            @default(false)
   codeOfEthicsFormSigned        Boolean            @default(false)
   abuseNeglectReportFormSigned  Boolean            @default(false)
   personnelPoliciesFormSigned   Boolean            @default(false)
@@ -253,6 +252,7 @@ model Volunteer {
   Person              Person?                   @relation(fields: [personId], references: [id])
   personId            String?                   @unique
   backgroundCheck     VolunteerBackgroundCheck?
+  sentEmails          SentEmail[]
 }
 
 // model volunteerAccount {
@@ -460,6 +460,16 @@ model MailRecipient {
   volunteer      Volunteer      @relation(fields: [volunteerId], references: [id])
   mailId         String
   mail           Mail           @relation(fields: [mailId], references: [id])
+}
+
+model SentEmail {
+  id          String    @id @default(uuid())
+  subject     String
+  body        String
+  sentAt      DateTime  @default(now())
+  isRead      Boolean   @default(false)
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
 }
 
 enum RecipientType {
