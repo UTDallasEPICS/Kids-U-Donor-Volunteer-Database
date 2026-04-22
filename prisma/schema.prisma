@@ -120,15 +120,15 @@ model Grant {
   amountRequested         Float
   amountAwarded           Float                 @default(0)
   purpose                 String //specific area or general
-  startDate               DateTime
-  endDate                 DateTime
+  startDate               DateTime?
+  endDate                 DateTime?
   isMultipleYears         Boolean
   quarter                 String
   acknowledgementSent     Boolean
   awardNotificationDate   DateTime?
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
-  proposalDueDate         DateTime
+  proposalDueDate         DateTime?
   proposalSummary         String?
   proposalSubmissionDate  DateTime?
   applicationType         String

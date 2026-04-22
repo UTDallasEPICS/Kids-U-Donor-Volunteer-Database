@@ -1,6 +1,6 @@
 import { Control } from "react-hook-form";
 import { SxProps, Theme } from "@mui/material";
-import { AddressState, DonationState, DonorState, OrganizationState, PersonState } from "@/app/types/states";
+import { AddressState, DonationState, DonorState, OrganizationState, PersonState, VolunteerState, GrantorState, GrantState } from "@/app/types/states";
 
 export type MenuItem = {
   label: string;
@@ -27,6 +27,18 @@ export type DonorFormProps = {
   person?: PersonState;
   organization?: OrganizationState;
   address: AddressState;
+};
+
+export type VolunteerFormProps = {
+  volunteer: VolunteerState;
+};
+
+export type GrantorFormProps = {
+  grantor: GrantorState;
+};
+
+export type GrantFormProps = {
+  grant: GrantState;
 };
 
 export type AddDonationDonorFormProps = DonationFormProps & DonorFormProps;
@@ -311,4 +323,97 @@ export const donorModes: MenuItem[] = [
   { label: "Anonymous", value: "Anonymous" },
   { label: "New", value: "New" },
   { label: "Existing", value: "Existing" },
+];
+
+export const volunteerPreferences: MenuItem[] = [
+  { label: "No preference", value: "No preference" },
+  { label: "Children", value: "Children" },
+  { label: "Seniors", value: "Seniors" },
+  { label: "Community Events", value: "Community Events" },
+];
+
+export const volunteerApplicationStatuses: MenuItem[] = [
+  { label: "PENDING", value: "PENDING" },
+  { label: "APPROVED", value: "APPROVED" },
+  { label: "REJECTED", value: "REJECTED" },
+];
+
+export const yesNoOptions: MenuItem[] = [
+  { label: "Yes", value: "true" },
+  { label: "No", value: "false" },
+];
+
+export const grantorTypes: MenuItem[] = [
+  { label: "Private Foundation", value: "Private Foundation" },
+  { label: "Corporate Partner", value: "Corporate Partner" },
+  { label: "Federal Government", value: "Federal Government" },
+  { label: "State Government", value: "State Government" },
+  { label: "Local Government", value: "Local Government" },
+  { label: "Individual Major Donor", value: "Individual Major Donor" },
+];
+
+export const grantorAddressTypes: MenuItem[] = [
+  { label: "Business", value: "Business" },
+  { label: "Personal", value: "Personal" },
+  { label: "P.O. Box", value: "P.O. Box" },
+];
+
+export const grantorCommunicationPreferences: MenuItem[] = [
+  { label: "Email", value: "Email" },
+  { label: "Phone", value: "Phone" },
+  { label: "In-person", value: "In-person" },
+  { label: "Event Participation", value: "Event Participation" },
+];
+
+export const grantorRecognitionPreferences: MenuItem[] = [
+  { label: "Public Recognition", value: "Public Recognition" },
+  { label: "Anonymous", value: "Anonymous" },
+];
+
+export const grantStatuses: MenuItem[] = [
+  { label: "Not Written", value: "Not Written" },
+  { label: "Planned", value: "Planned" },
+  { label: "LOI Submitted", value: "LOI Submitted" },
+  { label: "Proposal Submitted", value: "Proposal Submitted" },
+  { label: "Awarded", value: "Awarded" },
+  { label: "Declined", value: "Declined" },
+  { label: "Pending", value: "Pending" },
+];
+
+export const grantPurposes: MenuItem[] = [
+  { label: "After-School Tutoring Program", value: "After-School Tutoring Program" },
+  { label: "Summer Program", value: "Summer Program" },
+  { label: "Family & Community Engagement", value: "Family & Community Engagement" },
+  { label: "Nutrition and Meal Programs", value: "Nutrition and Meal Programs" },
+  { label: "Community Safety Initiatives", value: "Community Safety Initiatives" },
+  { label: "General", value: "General" },
+];
+
+export const grantFundingAreas: MenuItem[] = [
+  { label: "After-School Tutoring", value: "After-school Tutoring" },
+  { label: "Summer Programs", value: "Summer Programs" },
+  { label: "Family & Community Engagement", value: "Family & Community Engagement" },
+  { label: "General", value: "General" },
+];
+
+export const grantUseAreas: MenuItem[] = [
+  { label: "Educational Programming", value: "Educational Programming" },
+  { label: "Social-Emotional Learning", value: "Social-Emotional Learning" },
+  { label: "Community Safety", value: "Community Safety" },
+  { label: "Nutrition Programs", value: "Nutrition Programs" },
+  { label: "General", value: "General" },
+];
+
+export const grantQuarters: MenuItem[] = [
+  { label: "Q1", value: "Q1" },
+  { label: "Q2", value: "Q2" },
+  { label: "Q3", value: "Q3" },
+  { label: "Q4", value: "Q4" },
+];
+
+export const grantRenewalStatuses: MenuItem[] = [
+  { label: "Submitted", value: "Submitted" },
+  { label: "Awarded", value: "Awarded" },
+  { label: "Declined", value: "Declined" },
+  { label: "Pending", value: "Pending" },
 ];
