@@ -3,11 +3,24 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import logo from "@/app/logo.png";
 
+function getTimeUntil(dateStr: string): string {
+  const diffMs = new Date(dateStr).getTime() - Date.now();
+  if (diffMs <= 0) return "Now";
+  const mins = Math.floor(diffMs / 60000);
+  if (mins < 60) return `In ${mins}m`;
+  const hours = Math.floor(diffMs / 3600000);
+  if (hours < 24) return `In ${hours}h`;
+  const days = Math.floor(diffMs / 86400000);
+  if (days === 1) return "Tomorrow";
+  if (days < 7) return `In ${days} days`;
+  const weeks = Math.floor(days / 7);
+  return `In ${weeks} week${weeks > 1 ? "s" : ""}`;
+}
+
 export default function VolunteerDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState<number>(0);
   const [attendedCount, setAttendedCount] = useState<number>(0);
-  const [nextEventDays, setNextEventDays] = useState<number | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
 
   useEffect(() => {
@@ -30,14 +43,6 @@ export default function VolunteerDashboard() {
         setUpcomingEvents(events);
         setTotalHours(hours.total || 0);
         setAttendedCount(hours.attendedCount || 0);
-
-        if (events.length > 0) {
-          const nextEvent = new Date(events[0].date);
-          const today = new Date();
-          const diffTime = nextEvent.getTime() - today.getTime();
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-          setNextEventDays(diffDays);
-        }
 
         if (gallery.images) {
           setGalleryImages(gallery.images);
@@ -238,15 +243,13 @@ export default function VolunteerDashboard() {
                         </div>
                       </div>
 
-                      {/* Next Event Badge */}
-                      {idx === 0 && nextEventDays !== null && (
-                        <div className="flex-shrink-0 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white px-5 py-3 rounded-2xl shadow-md">
+                      {/* Time Until Badge */}
+                      <div className="flex-shrink-0 bg-gradient-to-br from-emerald-500 to-emerald-600 text-white px-4 py-2.5 rounded-2xl shadow-md text-center min-w-[80px]">
+                        {idx === 0 && (
                           <p className="text-xs font-bold uppercase tracking-wide mb-1">Next Event</p>
-                          <p className="text-2xl font-bold">
-                            {nextEventDays} <span className="text-sm font-normal">days</span>
-                          </p>
-                        </div>
-                      )}
+                        )}
+                        <p className="text-sm font-bold">{getTimeUntil(event.date)}</p>
+                      </div>
                     </div>
                   </div>
                 ))

@@ -20,19 +20,39 @@ interface Event {
 export const VolRegTable = () => {
   const router = useRouter();
   const [events, setEvents] = useState<Event[]>([]);
+  const [registeredEventIds, setRegisteredEventIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    fetch("/api/events/get")
-      .then((res) => res.json())
-      .then((data) => {
-        setEvents(data);
+    const fetchData = async () => {
+      try {
+        const [eventsRes, authRes] = await Promise.all([
+          fetch("/api/events/get"),
+          fetch("/api/auth/me"),
+        ]);
+
+        const eventsData = await eventsRes.json();
+        setEvents(eventsData);
+
+        if (authRes.ok) {
+          const authData = await authRes.json();
+          const volunteerId = authData.user?.volunteerId;
+          if (volunteerId) {
+            const regRes = await fetch(`/api/volunteer/events/registered?volunteerId=${volunteerId}`);
+            if (regRes.ok) {
+              const regData = await regRes.json();
+              setRegisteredEventIds(new Set(regData.map((e: { id: string }) => e.id)));
+            }
+          }
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
         setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
   const handleViewEvent = (id: string) => {
@@ -110,10 +130,18 @@ export const VolRegTable = () => {
 
                       {/* Event Details */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-2 flex-wrap">
                           <h4 className="font-bold text-gray-900 text-lg group-hover:text-[#2f4b7c] transition-colors">
                             {event.name}
                           </h4>
+                          {registeredEventIds.has(event.id) && (
+                            <span className="inline-flex items-center gap-1 bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l3-3z" clipRule="evenodd" />
+                              </svg>
+                              Registered
+                            </span>
+                          )}
                           {event.bgCheckRequired && (
                             <span className="inline-flex items-center gap-1 bg-orange-100 text-orange-700 text-xs font-semibold px-2 py-0.5 rounded-full">
                               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
