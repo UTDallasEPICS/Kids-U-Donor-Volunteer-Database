@@ -1,4 +1,4 @@
-sad'use client';
+'use client';
 
 import { useState, useEffect } from 'react';
 
@@ -8,10 +8,19 @@ interface BackgroundCheck {
   updatedAt: string;
   fullName: string;
   dateOfBirth: string;
-  email?: string;
+  county: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  race: string;
+  gender: string;
   status: 'PENDING' | 'APPROVED' | 'DECLINED';
   declineReason?: string;
   signatureDate: string;
+  agreedToBackgroundCheck: boolean;
+  eSignature: string;
+  volunteerId?: string;
 }
 
 export default function BackgroundCheckHistory() {
@@ -243,40 +252,107 @@ export default function BackgroundCheckHistory() {
       {/* View Modal */}
       {selectedCheck && !showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-96 overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Background Check Details</h2>
-            <div className="space-y-3">
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Full Name</p>
-                <p className="text-gray-900">{selectedCheck.fullName}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Date of Birth</p>
-                <p className="text-gray-900">{new Date(selectedCheck.dateOfBirth).toLocaleDateString()}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Status</p>
-                <p>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedCheck.status)}`}>
-                    {getStatusLabel(selectedCheck.status)}
-                  </span>
-                </p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Submitted</p>
-                <p className="text-gray-900">{new Date(selectedCheck.createdAt).toLocaleString()}</p>
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-600">Last Updated</p>
-                <p className="text-gray-900">{new Date(selectedCheck.updatedAt).toLocaleString()}</p>
-              </div>
-              {selectedCheck.declineReason && (
+          <div className="bg-white rounded-lg p-6 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-6">Background Check Details</h2>
+            
+            {/* Personal Information Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Personal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-600">Decline Reason</p>
-                  <p className="text-red-600">{selectedCheck.declineReason}</p>
+                  <p className="text-sm font-semibold text-gray-600">Full Name</p>
+                  <p className="text-gray-900">{selectedCheck.fullName}</p>
                 </div>
-              )}
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Date of Birth</p>
+                  <p className="text-gray-900">{new Date(selectedCheck.dateOfBirth).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Race</p>
+                  <p className="text-gray-900">{selectedCheck.race}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Gender</p>
+                  <p className="text-gray-900">{selectedCheck.gender}</p>
+                </div>
+              </div>
             </div>
+
+            {/* Address Information Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Address Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Address Line</p>
+                  <p className="text-gray-900">{selectedCheck.addressLine}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">City</p>
+                  <p className="text-gray-900">{selectedCheck.city}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">State</p>
+                  <p className="text-gray-900">{selectedCheck.state}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Zip Code</p>
+                  <p className="text-gray-900">{selectedCheck.zipCode}</p>
+                </div>
+                <div className="md:col-span-2">
+                  <p className="text-sm font-semibold text-gray-600">County</p>
+                  <p className="text-gray-900">{selectedCheck.county}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Certification Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Certification</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Agreed to Background Check</p>
+                  <p className="text-gray-900">{selectedCheck.agreedToBackgroundCheck ? 'Yes' : 'No'}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Signature Date</p>
+                  <p className="text-gray-900">{selectedCheck.signatureDate}</p>
+                </div>
+                <div className="md:col-span-2">
+                  <p className="text-sm font-semibold text-gray-600">Electronic Signature</p>
+                  <p className="text-gray-900 break-words">{selectedCheck.eSignature}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Status Section */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4 text-gray-800 border-b pb-2">Status</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Current Status</p>
+                  <p>
+                    <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(selectedCheck.status)}`}>
+                      {getStatusLabel(selectedCheck.status)}
+                    </span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Submitted</p>
+                  <p className="text-gray-900">{new Date(selectedCheck.createdAt).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-gray-600">Last Updated</p>
+                  <p className="text-gray-900">{new Date(selectedCheck.updatedAt).toLocaleString()}</p>
+                </div>
+                {selectedCheck.declineReason && (
+                  <div className="md:col-span-2">
+                    <p className="text-sm font-semibold text-gray-600">Decline Reason</p>
+                    <p className="text-red-600">{selectedCheck.declineReason}</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <button
               onClick={() => setSelectedCheck(null)}
               className="mt-6 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

@@ -20,10 +20,11 @@ interface BackgroundCheck {
 
 export default function AdminBackgroundCheckPage() {
   const [pendingChecks, setPendingChecks] = useState<BackgroundCheck[]>([]);
-  const [allChecks, setAllChecks] = useState<BackgroundCheck[]>([]);
+  const [approvedChecks, setApprovedChecks] = useState<BackgroundCheck[]>([]);
+  const [rejectedChecks, setRejectedChecks] = useState<BackgroundCheck[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'pending' | 'history'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
@@ -35,8 +36,8 @@ export default function AdminBackgroundCheckPage() {
   const fetchBackgroundChecks = async () => {
     try {
       setLoading(true);
-      console.log('Fetching background checks from /api/volunteer/background-check/history');
-      const response = await fetch('/api/volunteer/background-check/history');
+      console.log('Fetching background checks from /api/admin/volunteer/background-check/history');
+      const response = await fetch('/api/admin/volunteer/background-check/history');
       console.log('Response status:', response.status);
       
       if (!response.ok) {
@@ -49,10 +50,18 @@ export default function AdminBackgroundCheckPage() {
       console.log('Fetched data:', data);
       const checks = data.data || [];
       console.log('Total checks:', checks.length);
-      console.log('Pending checks:', checks.filter((c: BackgroundCheck) => c.status === 'PENDING').length);
       
-      setPendingChecks(checks.filter((c: BackgroundCheck) => c.status === 'PENDING'));
-      setAllChecks(checks);
+      const pending = checks.filter((c: BackgroundCheck) => c.status === 'PENDING');
+      const approved = checks.filter((c: BackgroundCheck) => c.status === 'APPROVED');
+      const rejected = checks.filter((c: BackgroundCheck) => c.status === 'DECLINED');
+      
+      console.log('Pending checks:', pending.length);
+      console.log('Approved checks:', approved.length);
+      console.log('Rejected checks:', rejected.length);
+      
+      setPendingChecks(pending);
+      setApprovedChecks(approved);
+      setRejectedChecks(rejected);
       setError('');
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Failed to load background checks';
@@ -67,17 +76,17 @@ export default function AdminBackgroundCheckPage() {
     if (!window.confirm('Are you sure you want to approve this background check?')) return;
     
     try {
-      const response = await fetch(`/api/volunteer/background-check/${id}/patch`, {
+      const response = await fetch(`/api/admin/volunteer/background-check/${id}/approve`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'APPROVED' }),
       });
       
       if (!response.ok) {
         throw new Error('Failed to approve background check');
       }
       
-      alert('Background check approved successfully!');
+      const result = await response.json();
+      alert(result.message || 'Background check approved successfully!');
       await fetchBackgroundChecks();
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Error approving background check');
@@ -97,26 +106,26 @@ export default function AdminBackgroundCheckPage() {
     }
 
     try {
-      const response = await fetch(`/api/volunteer/background-check/${rejectingId}/patch`, {
+      const response = await fetch(`/api/admin/volunteer/background-check/${rejectingId}/reject`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          status: 'DECLINED', 
           declineReason: rejectionReason 
         }),
       });
       
       if (!response.ok) {
-        throw new Error('Failed to decline background check');
+        throw new Error('Failed to reject background check');
       }
       
-      alert('Background check declined successfully!');
+      const result = await response.json();
+      alert(result.message || 'Background check rejected successfully!');
       setShowRejectModal(false);
       setRejectingId(null);
       setRejectionReason('');
       await fetchBackgroundChecks();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Error declining background check');
+      alert(err instanceof Error ? err.message : 'Error rejecting background check');
       console.error(err);
     }
   };
@@ -175,14 +184,24 @@ export default function AdminBackgroundCheckPage() {
           Pending ({pendingChecks.length})
         </button>
         <button
-          onClick={() => setActiveTab('history')}
+          onClick={() => setActiveTab('approved')}
           className={`px-4 py-2 font-medium ${
-            activeTab === 'history'
+            activeTab === 'approved'
               ? 'text-blue-600 border-b-2 border-blue-600'
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
-          History ({allChecks.length})
+          Approved ({approvedChecks.length})
+        </button>
+        <button
+          onClick={() => setActiveTab('rejected')}
+          className={`px-4 py-2 font-medium ${
+            activeTab === 'rejected'
+              ? 'text-blue-600 border-b-2 border-blue-600'
+              : 'text-gray-600 hover:text-gray-800'
+          }`}
+        >
+          Rejected ({rejectedChecks.length})
         </button>
       </div>
 
@@ -233,7 +252,7 @@ export default function AdminBackgroundCheckPage() {
                             onClick={() => openRejectModal(check.id)}
                             className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 transition"
                           >
-                            Decline
+                            Reject
                           </button>
                         </div>
                       </td>
@@ -246,26 +265,26 @@ export default function AdminBackgroundCheckPage() {
         </div>
       )}
 
-      {/* History Table */}
-      {activeTab === 'history' && (
+      {/* Approved Applications Table */}
+      {activeTab === 'approved' && (
         <div>
-          {allChecks.length === 0 ? (
+          {approvedChecks.length === 0 ? (
             <div className="p-8 bg-gray-50 rounded-lg text-center">
-              <p className="text-gray-600">No background check submissions yet</p>
+              <p className="text-gray-600">No approved background checks</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse bg-white shadow-lg rounded-lg overflow-hidden">
-                <thead className="bg-gray-800 text-white">
+                <thead className="bg-green-800 text-white">
                   <tr>
                     <th className="px-6 py-3 text-left">Name</th>
                     <th className="px-6 py-3 text-left">Location</th>
-                    <th className="px-6 py-3 text-left">Status</th>
                     <th className="px-6 py-3 text-left">Submitted</th>
+                    <th className="px-6 py-3 text-left">Approved Date</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {allChecks.map((check) => (
+                  {approvedChecks.map((check) => (
                     <tr key={check.id} className="border-b hover:bg-gray-50">
                       <td className="px-6 py-3">
                         <div>
@@ -275,19 +294,15 @@ export default function AdminBackgroundCheckPage() {
                       </td>
                       <td className="px-6 py-3">
                         <p className="text-sm text-gray-600">{check.city}, {check.state}</p>
-                        <p className="text-xs text-gray-500">{check.race} • {check.gender}</p>
-                      </td>
-                      <td className="px-6 py-3">
-                        <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(check.status)}`}>
-                          {getStatusLabel(check.status)}
-                        </span>
-                        {check.declineReason && (
-                          <p className="text-xs text-red-600 mt-1">Reason: {check.declineReason}</p>
-                        )}
+                        <p className="text-xs text-gray-500">{check.race} {check.gender}</p>
                       </td>
                       <td className="px-6 py-3">
                         <p className="text-sm text-gray-600">{new Date(check.createdAt).toLocaleDateString()}</p>
                         <p className="text-xs text-gray-500">{new Date(check.createdAt).toLocaleTimeString()}</p>
+                      </td>
+                      <td className="px-6 py-3">
+                        <p className="text-sm text-gray-600">{new Date(check.updatedAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">{new Date(check.updatedAt).toLocaleTimeString()}</p>
                       </td>
                     </tr>
                   ))}
@@ -298,18 +313,70 @@ export default function AdminBackgroundCheckPage() {
         </div>
       )}
 
-      {/* Decline Modal */}
+      {/* Rejected Applications Table */}
+      {activeTab === 'rejected' && (
+        <div>
+          {rejectedChecks.length === 0 ? (
+            <div className="p-8 bg-gray-50 rounded-lg text-center">
+              <p className="text-gray-600">No rejected background checks</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse bg-white shadow-lg rounded-lg overflow-hidden">
+                <thead className="bg-red-800 text-white">
+                  <tr>
+                    <th className="px-6 py-3 text-left">Name</th>
+                    <th className="px-6 py-3 text-left">Location</th>
+                    <th className="px-6 py-3 text-left">Submitted</th>
+                    <th className="px-6 py-3 text-left">Rejection Reason</th>
+                    <th className="px-6 py-3 text-left">Rejected Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {rejectedChecks.map((check) => (
+                    <tr key={check.id} className="border-b hover:bg-gray-50">
+                      <td className="px-6 py-3">
+                        <div>
+                          <p className="font-semibold text-gray-900">{check.fullName}</p>
+                          <p className="text-sm text-gray-600">DOB: {new Date(check.dateOfBirth).toLocaleDateString()}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-3">
+                        <p className="text-sm text-gray-600">{check.city}, {check.state}</p>
+                        <p className="text-xs text-gray-500">{check.race} {check.gender}</p>
+                      </td>
+                      <td className="px-6 py-3">
+                        <p className="text-sm text-gray-600">{new Date(check.createdAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">{new Date(check.createdAt).toLocaleTimeString()}</p>
+                      </td>
+                      <td className="px-6 py-3">
+                        <p className="text-sm text-red-600">{check.declineReason || 'No reason provided'}</p>
+                      </td>
+                      <td className="px-6 py-3">
+                        <p className="text-sm text-gray-600">{new Date(check.updatedAt).toLocaleDateString()}</p>
+                        <p className="text-xs text-gray-500">{new Date(check.updatedAt).toLocaleTimeString()}</p>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4 text-gray-900">Decline Background Check</h2>
+            <h2 className="text-xl font-bold mb-4 text-gray-900">Reject Background Check</h2>
             <p className="text-gray-600 mb-4">
-              Please provide a reason for declining this background check.
+              Please provide a reason for rejecting this background check.
             </p>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              placeholder="Enter reason for decline..."
+              placeholder="Enter reason for rejection..."
               className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-red-500"
               rows={4}
             />
@@ -329,7 +396,7 @@ export default function AdminBackgroundCheckPage() {
                 disabled={!rejectionReason.trim()}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Confirm Decline
+                Confirm Reject
               </button>
             </div>
           </div>

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const records = await prisma.volunteerBackgroundCheck.findMany({
-      where: { approved: false },
+      where: { status: "PENDING" },
       select: {
         id: true,
         fullName: true,
@@ -27,9 +27,6 @@ export async function GET() {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error fetching pending background checks:", errorMessage);
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }
