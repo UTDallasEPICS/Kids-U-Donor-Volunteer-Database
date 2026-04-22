@@ -57,7 +57,7 @@ const VolunteerDetailsPage = () => {
 
       <h2>Compliance & Requirements</h2>
       <p><strong>Application Completed:</strong> {volunteer.volunteerApplicationCompleted ? "Yes" : "No"}</p>
-      <p><strong>Background Check:</strong> {volunteer.backgroundCheckCompleted ? "Yes" : "No"}</p>
+      <p><strong>Background Check:</strong> {volunteer.backgroundCheck?.status === "APPROVED" ? "Yes" : "No"}</p>
       <p><strong>Code of Ethics Form Signed:</strong> {volunteer.codeOfEthicsFormSigned ? "Yes" : "No"}</p>
       <p><strong>Abuse/Neglect Report Form Signed:</strong> {volunteer.abuseNeglectReportFormSigned ? "Yes" : "No"}</p>
       <p><strong>Personnel Policies Form Signed:</strong> {volunteer.personnelPoliciesFormSigned ? "Yes" : "No"}</p>
