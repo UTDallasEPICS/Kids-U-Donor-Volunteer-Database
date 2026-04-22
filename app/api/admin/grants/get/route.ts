@@ -3,11 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 // Read
 export async function GET(req: NextRequest) {
-  //For pagination
-  const pageParam = req.nextUrl.searchParams.get("page");
-  const rowsPerPageParam = req.nextUrl.searchParams.get("rowsPerPage");
-  const pageNum = pageParam ? parseInt(pageParam, 10) : 0;
-  const rowsPerPageNum = rowsPerPageParam ? parseInt(rowsPerPageParam, 10) : 5;
   //For searching
   const searchCriteriaParam = req.nextUrl.searchParams.get("searchCriteria") || "";
   const searchValueParam = req.nextUrl.searchParams.get("searchValue") || "";
@@ -52,8 +47,6 @@ export async function GET(req: NextRequest) {
 
   try {
     const data = await prisma.grant.findMany({
-      skip: pageNum * rowsPerPageNum,
-      take: rowsPerPageNum,
       where, // Applies search filters if any
       include: {
         representativeGrant: {

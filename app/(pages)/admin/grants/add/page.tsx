@@ -224,8 +224,8 @@ const GrantAddPage = () => {
         type: "Foundation",
         websiteLink: newGrantor.link || null,
         communicationPreference: "Email",
-        recognitionPreference: "",
-        internalRelationshipManager: "",
+        recognitionPreference: "N/A",
+        internalRelationshipManager: "N/A",
         organization: {
           name: newGrantor.name,
           emailAddress: newGrantor.email,

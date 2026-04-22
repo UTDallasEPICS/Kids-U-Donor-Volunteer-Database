@@ -59,30 +59,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       select: { volunteerId: true },
     });
 
-    if (bgc.volunteerId) {
-      await prisma.volunteer.update({
-        where: { id: bgc.volunteerId },
-        data: { backgroundCheckCompleted: false },
-      });
-    }
-
-    // Send rejection email if email exists
-    let emailSent = false;
-    if (email) {
-      try {
-        const firstName = existingCheck.fullName.split(" ")[0];
-        console.log("Attempting to send rejection email to:", email, "for:", firstName, "reason:", declineReason);
-        await sendApplicationRejectionEmail(email, firstName, declineReason);
-        console.log("Rejection email sent successfully to:", email);
-        emailSent = true;
-      } catch (emailError) {
-        console.error("Error sending rejection email:", emailError);
-        // Don't fail the request if email fails, but log it
-      }
-    } else {
-      console.log("No email found for volunteer:", existingCheck.volunteerId);
-    }
-
     return NextResponse.json(
       {
         message: `Background check rejected${emailSent ? ". Email sent." : ""}`,

@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     if (event.bgCheckRequired) {
       const bgCheck = await prisma.volunteerBackgroundCheck.findFirst({
-        where: { volunteerId: body.volunteerId, approved: true },
+        where: { volunteerId: body.volunteerId, status: "APPROVED" },
         select: { id: true },
       });
 
