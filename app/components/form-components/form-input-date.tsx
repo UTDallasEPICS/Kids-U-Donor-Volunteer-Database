@@ -24,7 +24,7 @@ export const FormInputDate = ({
                 required: required,
               },
             }}
-            value={new Date(value)}
+            value={value ? new Date(value) : null}
             onChange={onChange}
           />
         )}

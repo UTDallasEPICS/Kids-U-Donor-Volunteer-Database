@@ -2,16 +2,16 @@ import { Box, Button, Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import { DonationFormProps, DonorFormProps } from "../form-components/form-input-props";
+import { DonationFormProps, DonorFormProps, GrantorFormProps, GrantFormProps, VolunteerFormProps } from "../form-components/form-input-props";
 
 type FooterProps = {
   id: string;
   name: string;
   href: string;
   apiUrl: string;
-  handleSubmit: UseFormHandleSubmit<DonorFormProps | DonationFormProps>;
+  handleSubmit: UseFormHandleSubmit<DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps>;
   isDirty: boolean;
-  errors: FieldErrors<DonorFormProps | DonationFormProps>;
+  errors: FieldErrors<DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps>;
 };
 
 export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, errors }: FooterProps) => {
@@ -19,7 +19,7 @@ export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, er
 
   const [isButtonDisabled, setIsButtonDisabled] = useState<boolean>(true);
 
-  const seconds: number = 4000;
+  const seconds: number = 1000;
   const handleButtonDisable = () => {
     setTimeout(() => {
       setIsButtonDisabled(false);

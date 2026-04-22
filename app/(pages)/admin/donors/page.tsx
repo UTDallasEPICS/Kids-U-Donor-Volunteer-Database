@@ -1,14 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from "@mui/material";
 import Link from "next/link";
 import type { Donor as PrismaDonor } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import Loading from "@/app/loading";
-
-/*
-place holder list
-*/
 
 const headCells = [
   { id: "type", numeric: false, label: "Donor Type" },
@@ -19,19 +14,6 @@ const headCells = [
   { id: "last", numeric: false, label: "Last Donation" },
   { id: "status", numeric: false, label: "Status" },
 ];
-export const TableHeader = () => {
-  return (
-    <TableHead>
-      <TableRow>
-        {headCells.map((headCell: any) => (
-          <TableCell key={headCell.id} style={styles.tableCellHeader}>
-            {headCell.label}
-          </TableCell>
-        ))}
-      </TableRow>
-    </TableHead>
-  );
-};
 
 type DonorWithRelations = PrismaDonor & {
   person?: { firstName: string; lastName: string; emailAddress: string; phoneNumber: string | null } | null;
@@ -58,28 +40,64 @@ export default function DonorsList() {
       }
 
       const result = await response.json();
-
       setData(result.data);
-
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching:", error);
       router.push("/not-found");
     }
   };
+
   useEffect(() => {
     fetchDonorData();
   }, []);
 
+  const Breadcrumb = () => (
+    <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
+      <span className="hover:text-blue-500 cursor-pointer transition-colors duration-200">
+        Home
+      </span>
+      <span className="text-gray-400">/</span>
+      <span className="font-semibold text-gray-700">Donors</span>
+      <span className="text-gray-400">/</span>
+      <span className="font-semibold text-gray-700">Donors List</span>
+    </div>
+  );
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <Box sx = {styles.box}>
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <TableContainer>
-          <Table stickyHeader sx={styles.table} aria-labelledby="tableTitle" size="small">
-            <TableHeader />
-            <TableBody>
+    <div className="flex font-sans">
+      <div className="flex-grow p-5">
+        <Breadcrumb />
+
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Donors</h2>
+          <Link
+            href="/admin/donors/add"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Add New Donor
+          </Link>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-gray-100">
+                {headCells.map((headCell) => (
+                  <th
+                    key={headCell.id}
+                    className="px-6 py-3 border-b text-left font-bold"
+                  >
+                    {headCell.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
               {data.map((donor) => {
                 const name = donor.person
                   ? `${donor.person.firstName} ${donor.person.lastName}`
@@ -91,26 +109,29 @@ export default function DonorsList() {
                 const last = lastDateIso ? new Date(lastDateIso).toLocaleDateString() : "";
 
                 return (
-                  <TableRow hover key={donor.id}>
-                    <TableCell sx={styles.tableCell}>
-                      <Link className="text-blue-500" href={`/admin/donors/detail/${donor.id}`}>
+                  <tr key={donor.id} className="hover:bg-gray-50 cursor-pointer">
+                    <td className="px-6 py-4 border-b">
+                      <Link
+                        className="text-blue-500"
+                        href={`/admin/donors/detail/${donor.id}`}
+                      >
                         {donor.type}
                       </Link>
-                    </TableCell>
-                    <TableCell sx={styles.tableCell}>{name}</TableCell>
-                    <TableCell sx={styles.tableCell}>{email}</TableCell>
-                    <TableCell sx={styles.tableCell}>{phone}</TableCell>
-                    <TableCell sx={styles.tableCell}>${total.toFixed(2)}</TableCell>
-                    <TableCell sx={styles.tableCell}>{last}</TableCell>
-                    <TableCell sx={styles.tableCell}>{donor.status}</TableCell>
-                  </TableRow>
+                    </td>
+                    <td className="px-6 py-4 border-b">{name}</td>
+                    <td className="px-6 py-4 border-b">{email}</td>
+                    <td className="px-6 py-4 border-b">{phone}</td>
+                    <td className="px-6 py-4 border-b">${total.toFixed(2)}</td>
+                    <td className="px-6 py-4 border-b">{last}</td>
+                    <td className="px-6 py-4 border-b">{donor.status}</td>
+                  </tr>
                 );
               })}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-    </Box>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
 

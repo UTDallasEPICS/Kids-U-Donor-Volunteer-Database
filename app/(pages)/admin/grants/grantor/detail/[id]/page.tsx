@@ -1,444 +1,307 @@
 "use client";
-import React from "react";
-import { useEffect, useState } from "react";
-import type { Grantor } from "@/prisma";
+
+import { useEffect, useState, useRef } from "react";
 import { useParams } from "next/navigation";
+import { Box, Typography } from "@mui/material";
+import { useForm } from "react-hook-form";
+import Loading from "@/app/loading";
+import { useRouter } from "next/navigation";
+import { DetailFooter } from "@/app/components/donations/detail-footer";
 import {
-    Box,
-    TextField,
-    Button,
-    Typography,
-    Breadcrumbs,
-    CircularProgress,
-    MenuItem,
-    InputAdornment,
-} from "@mui/material"
-import Grid from '@mui/material/Unstable_Grid2';
-import Link from "next/link"
+  GrantorFormProps,
+  grantorTypes,
+  grantorAddressTypes,
+  grantorCommunicationPreferences,
+  grantorRecognitionPreferences,
+} from "@/app/components/form-components/form-input-props";
+import { FormInputTextfield } from "@/app/components/form-components/form-input-textfield";
+import { FormInputDropdown } from "@/app/components/form-components/form-input-dropdown";
+import { grey } from "@mui/material/colors";
 
-const GrantorDetailPage = () => {
-    const { id } = useParams();
-    const [grantorDetails, setGrantorDetails] = useState<Grantor[]>([]);
-    const [isEditing, setIsEditing] = useState(false);
-    const [loading, setLoading] = useState(true);
-    const [showSave, setShowSave] = useState(false);
-    const [showEdit, setShowEdit] = useState(true);
-    const [showCancelEdit, setShowCancelEdit] = useState(false);
+const mapGrantorType = (value: string): string => {
+  const typeMap: Record<string, string> = {
+    "Foundation": "Private Foundation",
+    "Private Foundation": "Private Foundation",
+    "Corporate Partner": "Corporate Partner",
+    "Federal Government": "Federal Government",
+    "State Government": "State Government",
+    "Local Government": "Local Government",
+    "Individual Major Donor": "Individual Major Donor",
+  };
+  return typeMap[value] || "Private Foundation";
+};
 
-    useEffect(() => {
-        const fetchGrantorDetails = async () => {
-            try {
-                const response = await fetch(`/api/admin/grantors/${id}/get`);
-                const result = await response.json();
-                setGrantorDetails(result.data);
-                console.log(result.data);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching grant details:", error);
-                setLoading(false);
-            }
-        };
+const mapCommunicationPreference = (value: string): string => {
+  const prefMap: Record<string, string> = {
+    "Email": "Email",
+    "Phone": "Phone",
+    "In-person": "In-person",
+    "Event Participation": "Event Participation",
+    "Unknown": "Email",
+  };
+  return prefMap[value] || "Email";
+};
 
-        if (id) {
-            fetchGrantorDetails();
-        }
-    }, [id]);
+const mapRecognitionPreference = (value: string): string => {
+  const prefMap: Record<string, string> = {
+    "Public Recognition": "Public Recognition",
+    "Anonymous": "Anonymous",
+    "None": "Public Recognition",
+  };
+  return prefMap[value] || "Public Recognition";
+};
 
-    const handleEditClick = () => {
-        setIsEditing((prevState) => !prevState);
-        setShowEdit(false);
-        setShowSave(true);
-        setShowCancelEdit(true);
-    };
+export default function GrantorDetailPage() {
+  const { id } = useParams() as { id: string };
+  const router = useRouter();
 
-    const handleSaveClick = async () => {
-        setShowEdit(true);
-        setShowSave(false);
-        setShowCancelEdit(false);
-        try {
-            //const response = await fetch(`/api/grantors/${id}/patch`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(grantDetails) });
-            // const result = await response.json();
-            //setGrantDetails(result.data);
-            //console.log(result.data)
-            setIsEditing(false);
-        } catch (error) {
-            console.error("Error updating grant details:", error);
-            // Handle error
-        }
-    };
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const grantorNameRef = useRef<string>("");
 
-    const handleCancelEditClick = () => {
-        setShowEdit(true);
-        setShowSave(false);
-        setShowCancelEdit(false);
-        setIsEditing(false);
+  const {
+    handleSubmit,
+    control,
+    reset,
+    formState: { isDirty, errors },
+  } = useForm<GrantorFormProps>({
+    mode: "onChange",
+    defaultValues: {
+      grantor: {
+        type: "",
+        websiteLink: "",
+        communicationPreference: "Email",
+        recognitionPreference: "Public Recognition",
+        internalRelationshipManager: "",
+        organization: {
+          name: "",
+          emailAddress: "",
+          address: {
+            addressLine1: "",
+            addressLine2: "",
+            city: "",
+            state: "",
+            zipCode: "",
+            type: "Business",
+          },
+        },
+      },
+    },
+  });
+
+  useEffect(() => {
+    fetchGrantorDetails();
+  }, []);
+
+  const fetchGrantorDetails = async () => {
+    try {
+      const response = await fetch(`/api/admin/grantors/get?id=${id}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const message = errorData?.message || "Something went wrong";
+        throw new Error(message);
+      }
+
+      const { data } = await response.json();
+
+      grantorNameRef.current = data.organization?.name || "";
+
+    reset({
+        grantor: {
+            type: mapGrantorType(data.type || "Private Foundation"),
+            websiteLink: data.websiteLink || "",
+            communicationPreference: mapCommunicationPreference(data.communicationPreference || "Email"),
+            recognitionPreference: mapRecognitionPreference(data.recognitionPreference || "Public Recognition"),
+            internalRelationshipManager: data.internalRelationshipManager || "",
+            organization: {
+            name: data.organization?.name || "",
+            emailAddress: data.organization?.emailAddress || "",
+            address: {
+                addressLine1: data.organization?.address?.addressLine1 || "",
+                addressLine2: data.organization?.address?.addressLine2 || "",
+                city: data.organization?.address?.city || "",
+                state: data.organization?.address?.state || "",
+                zipCode: data.organization?.address?.zipCode || "",
+                type: data.organization?.address?.type || "Business",
+            },
+            },
+        },
+    });
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching grantor details:", error);
+      router.push("/not-found");
     }
+  };
 
-    //Old handleInputChange, not really sure how this works
+  if (isLoading) {
+    return <Loading />;
+  }
 
-    /*const handleInputChange = (e: any) => {
-      const { name, value } = e.target;
-      setGrantDetails((prevGrantDetails: any) => {
-        if (Array.isArray(prevGrantDetails[name])) {
-          // If the field is an array, split the value by comma
-          const values = value.split(",");
-          // Check if each item can be parsed as a Date object
-          const updatedValues = values.map((item: any) => {
-            const date = new Date(item.trim());
-            return isNaN(date.getTime()) ? item.trim() : date.toISOString(); // If it's not a valid date, keep it as string
-          });
-          return {
-            ...prevGrantDetails,
-            [name]: updatedValues,
-          };
-        } else if (value instanceof Date) {
-          // If the value is a Date object, convert it to an ISO 8601 string
-          return {
-            ...prevGrantDetails,
-            [name]: value.toISOString(),
-          };
-        } else {
-          // For other cases, directly update the value
-          return {
-            ...prevGrantDetails,
-            [name]: value,
-          };
-        }
-      });
-    };*/
-
-    //Only works for nothing at the moment, was supposed to be dynamic and work for all textfields
-    const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const { value } = event.target;
-
-        setGrantorDetails((prevState) => ({
-            ...prevState,
-            //status: value,
-        }));
-    };
-
-    if (loading) {
-        return <CircularProgress style={styles.center} />
-    }
-
-    if (!grantorDetails) {
-        return <div>Grantor not found</div>;
-    }
-
-    return (
-        <Box>
-            <Box>
-                <Breadcrumbs style={styles.breadcrumb}>
-                    <Link href={"/admin/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
-                    <Typography>Grants</Typography>
-                    <Link href={"/admin/grants"} style={{ textDecoration: 'underline', }}>Grantor List</Link>
-                    <Typography>Grantor Details</Typography>
-                </Breadcrumbs>
-            </Box>
-            <Box>
-                <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={2} marginBottom={2}>
-                    {showSave && <Button
-                        variant="contained"
-                        onClick={handleSaveClick}
-                    >
-                        <Typography>Save</Typography>
-                    </Button>
-                    }
-                    {showEdit && <Button
-                        variant="contained"
-                        onClick={handleEditClick}
-                    >
-                        <Typography>Edit</Typography>
-                    </Button>
-                    }
-                    {showCancelEdit && <Button
-                        variant="contained"
-                        onClick={handleCancelEditClick}
-                    >
-                        <Typography>Cancel Edit</Typography>
-                    </Button>
-                    }
-                </Grid>
-            </Box>
-            <Box flexGrow={1} p={2}>
-                <DetailsTable
-                    grantorDetails={grantorDetails}
-                    isEditing={isEditing}
-                    handleInputChange={handleInputChange}
-                />
-            </Box>
+  return (
+    <Box>
+      <Box sx={styles.container} component="form">
+        <Box sx={styles.title}>
+          <Typography variant="h4" sx={{ fontWeight: "bold" }}>
+            Grantor Details
+          </Typography>
+          <Typography variant="h6" sx={{ color: grey[700] }}>
+            {grantorNameRef.current}
+          </Typography>
         </Box>
-    );
-};
 
-const DetailsTable = ({ grantorDetails, isEditing, handleInputChange }: any) => {
+        {/* Organization Information Section */}
+        <Typography variant="h5" sx={styles.sectionTitle}>
+          Organization Information
+        </Typography>
 
-    const addressType = [
-        {
-            value: 'Business',
-            label: 'Business',
-        },
-        {
-            value: 'Personal',
-            label: 'Personal',
-        },
-        {
-            value: 'P.O. Box',
-            label: 'P.O. Box',
-        },
-    ];
+        <FormInputTextfield
+          name="grantor.organization.name"
+          control={control}
+          label="Organization Name"
+          required={true}
+          sx={styles.textField}
+        />
 
-    const grantorType = [
-        {
-            value: 'Private Foundation',
-            label: 'Private Foundation',
-        },
-        {
-            value: 'Corporate Partner',
-            label: 'Corporate Partner',
-        },
-        {
-            value: 'Federal Government',
-            label: 'Federal Governmen',
-        },
-        {
-            value: 'State Government',
-            label: 'State Government',
-        },
-        {
-            value: 'Local Government',
-            label: 'Local Government',
-        },
-        {
-            value: 'Individual Major Donor',
-            label: 'Individual Major Donor',
-        },
-    ];
+        <FormInputTextfield
+          name="grantor.organization.emailAddress"
+          control={control}
+          label="Email"
+          type="email"
+          sx={styles.textField}
+        />
 
-    const communicationPreference = [
-        {
-            value: 'Email',
-            label: 'Email',
-        },
-        {
-            value: 'Phone',
-            label: 'Phone',
-        },
-        {
-            value: 'In-person',
-            label: 'In-person',
-        },
-        {
-            value: 'Event Participation',
-            label: 'Event Participation',
-        },
-    ];
+        <FormInputTextfield
+          name="grantor.websiteLink"
+          control={control}
+          label="Website Link"
+          sx={styles.textField}
+        />
 
-    const recognitionPreference = [
-        {
-            value: 'Public Recognition',
-            label: 'Public Recognition',
-        },
-        {
-            value: 'Anonymous',
-            label: 'Anonymous',
-        },
-    ];
+        {/* Address Section */}
+        <Typography variant="h5" sx={styles.sectionTitle}>
+          Address
+        </Typography>
 
-    return (
+        <FormInputTextfield
+          name="grantor.organization.address.addressLine1"
+          control={control}
+          label="Address Line 1"
+          sx={styles.textField}
+        />
 
-        <Box sx={{ flexGrow: '2' }}>
-            <Grid container spacing={5} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Name-Text-Field"
-                        label="Grantor Name"
-                        variant="outlined"
-                        value={grantorDetails.organization.name}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
+        <FormInputTextfield
+          name="grantor.organization.address.addressLine2"
+          control={control}
+          label="Address Line 2"
+          sx={styles.textField}
+        />
 
-                {/*----------------------------------------------------------------*/}
+        <FormInputTextfield
+          name="grantor.organization.address.city"
+          control={control}
+          label="City"
+          sx={styles.textField}
+        />
 
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Address-Line-1-Text-Field"
-                        label="Address Line 1"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.addressLine1}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
+        <FormInputTextfield
+          name="grantor.organization.address.state"
+          control={control}
+          label="State"
+          sx={styles.textField}
+        />
 
-                {/*----------------------------------------------------------------*/}
+        <FormInputTextfield
+          name="grantor.organization.address.zipCode"
+          control={control}
+          label="Zipcode"
+          sx={styles.textField}
+        />
 
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Address-Line-2-Text-Field"
-                        label="Address Line 2"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.addressLine2}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
+        <FormInputDropdown
+          name="grantor.organization.address.type"
+          control={control}
+          label="Address Type"
+          menuItems={grantorAddressTypes}
+          sx={styles.textField}
+        />
 
-                {/*----------------------------------------------------------------*/}
+        {/* Grantor Details Section */}
+        <Typography variant="h5" sx={styles.sectionTitle}>
+          Grantor Details
+        </Typography>
 
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-City-Text-Field"
-                        label="City"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.city}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
+        <FormInputDropdown
+          name="grantor.type"
+          control={control}
+          label="Grantor Type"
+          required={true}
+          menuItems={grantorTypes}
+          sx={styles.textField}
+        />
 
-                {/*----------------------------------------------------------------*/}
+        <FormInputDropdown
+          name="grantor.communicationPreference"
+          control={control}
+          label="Communication Preference"
+          required={true}
+          menuItems={grantorCommunicationPreferences}
+          sx={styles.textField}
+        />
 
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-City-Text-Field"
-                        label="State"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.state}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
+        <FormInputDropdown
+          name="grantor.recognitionPreference"
+          control={control}
+          label="Recognition Preference"
+          required={true}
+          menuItems={grantorRecognitionPreferences}
+          sx={styles.textField}
+        />
 
-                {/*----------------------------------------------------------------*/}
+        <FormInputTextfield
+          name="grantor.internalRelationshipManager"
+          control={control}
+          label="Internal Relationship Manager"
+          sx={styles.textField}
+        />
 
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Zipcode-Text-Field"
-                        label="Zipcode"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.zipCode}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Address-Type-Text-Field"
-                        label="Address Type"
-                        variant="outlined"
-                        value={grantorDetails.organization.address.type}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }}
-                        select>
-                        {addressType.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Type-Text-Field"
-                        label="Grantor Type"
-                        variant="outlined"
-                        value={grantorDetails.type}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }}
-                        select>
-                        {grantorType.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Website-Link-Text-Field"
-                        label="Grantor Website Link"
-                        variant="outlined"
-                        value={grantorDetails.websiteLink}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Communication-Preference-Text-Field"
-                        label="Communication Preference"
-                        variant="outlined"
-                        value={grantorDetails.communicationPreference}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }}
-                        select>
-                        {communicationPreference.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Recognition-Preference-Text-Field"
-                        label="Recognition Preference"
-                        variant="outlined"
-                        value={grantorDetails.recognitionPreference}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }}
-                        select>
-                        {recognitionPreference.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-                <Grid size={{ xs: 3, sm: 3, md: 4 }}>
-                    <TextField
-                        id="grantor-Internal-Relationship-Manager-Text-Field"
-                        label="Internal Relationship Manager"
-                        variant="outlined"
-                        value={grantorDetails.internalRelationshipManager}
-                        disabled={!isEditing}
-                        sx={{ width: '100%', height: '40px', '& .MuiInputBase-root': { height: '40px' }, "& .MuiInputBase-input.Mui-disabled": { WebkitTextFillColor: "#000000" } }} />
-                </Grid>
-
-                {/*----------------------------------------------------------------*/}
-
-            </Grid>
-        </Box >
-    );
-};
+        {/* Footer with Save/Cancel/Delete */}
+        <DetailFooter
+          id={id}
+          name="grantor"
+          href="/admin/grants/grantor"
+          apiUrl="/admin/grantors"
+          handleSubmit={handleSubmit}
+          isDirty={isDirty}
+          errors={errors}
+        />
+      </Box>
+    </Box>
+  );
+}
 
 const styles = {
-    center: {
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        height: "100vh",
-        marginLeft: "auto",
-        marginRight: "auto",
-    },
-    breadcrumb: {
-        marginLeft: "5px",
-        marginTop: "8px"
-    }
+  container: {
+    p: 4,
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 2,
+    width: "100%",
+  },
+  title: {
+    gridColumn: "span 3",
+    fontWeight: "bold",
+    mb: 3,
+  },
+  sectionTitle: {
+    gridColumn: "span 3",
+    fontWeight: "bold",
+    mt: 2,
+    mb: 1,
+    color: grey[800],
+  },
+  textField: {
+    flex: 1,
+  },
 };
-
-export default GrantorDetailPage;
