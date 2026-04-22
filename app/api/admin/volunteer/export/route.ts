@@ -27,6 +27,7 @@ export async function GET() {
     const volunteers = await prisma.volunteer.findMany({
       include: {
         EmergencyContact: true,
+        backgroundCheck: true,
       },
       orderBy: { dateSubmitted: "desc" },
     });
@@ -94,7 +95,7 @@ export async function GET() {
         v.preferredEvents.join("; "),
         v.referenceName ?? "",
         boolToYesNo(v.volunteerApplicationCompleted),
-        boolToYesNo(v.backgroundCheckCompleted),
+        v.backgroundCheck?.status === "APPROVED" ? "Yes" : "No",
         boolToYesNo(v.codeOfEthicsFormSigned),
         boolToYesNo(v.abuseNeglectReportFormSigned),
         boolToYesNo(v.personnelPoliciesFormSigned),
