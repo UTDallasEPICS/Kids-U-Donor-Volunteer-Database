@@ -61,7 +61,7 @@ const routePermissions = [
   },
   {
     paths: ["/volunteers"],
-    allowedRoles: ["VOLUNTEER", "SUPER_ADMIN"] as const,
+    allowedRoles: ["VOLUNTEER"] as const,
   },
   {
     paths: [
