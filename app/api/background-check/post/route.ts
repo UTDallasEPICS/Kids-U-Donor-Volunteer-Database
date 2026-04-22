@@ -1,74 +1,41 @@
 import prisma from "@/app/utils/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const body = await req.json();
-    const {
-      fullName,
-      dateOfBirth,
-      currentAddress,
-      city,
-      state,
-      zipCode,
-      county,
-      race,
-      sex,
-      agreeToBackgroundCheck,
-      electronicSignature,
-      signatureDate,
-    } = body;
+    const data = await request.json();
 
-    if (!fullName || !dateOfBirth || !race || !sex || !electronicSignature || !agreeToBackgroundCheck) {
+    // Validate required fields
+    if (!data.fullName || !data.dateOfBirth || !data.race || !data.sex) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
     }
 
-    // Try to link to the volunteer via JWT payload injected by middleware
-    let volunteerId: string | undefined;
-    const userPayloadHeader = req.headers.get("x-user-payload");
-    if (userPayloadHeader) {
-      const userPayload = JSON.parse(userPayloadHeader);
-      const volunteer = await prisma.volunteer.findFirst({
-        where: { emailAddress: userPayload.email },
-        select: { id: true },
-      });
-      if (volunteer) volunteerId = volunteer.id;
-    }
+    // Map form data to schema field names
+    const backgroundCheck = await prisma.volunteerBackgroundCheck.create({
+      data: {
+        fullName: data.fullName,
+        dateOfBirth: new Date(data.dateOfBirth),
+        county: data.county || "",
+        addressLine: data.currentAddress || "",
+        city: data.city || "",
+        state: data.state || "",
+        zipCode: data.zipCode || "",
+        race: data.race,
+        gender: data.sex, // Map sex to gender
+        agreedToBackgroundCheck: data.agreeToBackgroundCheck || false,
+        eSignature: data.electronicSignature || "",
+        signatureDate: data.signatureDate || new Date().toISOString().split("T")[0],
+        status: "PENDING",
+      },
+    });
 
-    const data = {
-      fullName,
-      dateOfBirth: new Date(dateOfBirth),
-      addressLine: currentAddress ?? "",
-      city: city ?? "",
-      state: state ?? "",
-      zipCode: zipCode ?? "",
-      county: county ?? "",
-      race,
-      gender: sex,
-      agreedToBackgroundCheck: agreeToBackgroundCheck,
-      eSignature: electronicSignature,
-      signatureDate,
-      status: "PENDING" as const,
-    };
-
-    let record;
-    if (volunteerId) {
-      record = await prisma.volunteerBackgroundCheck.upsert({
-        where: { volunteerId },
-        update: { ...data, createdAt: new Date() },
-        create: { ...data, volunteerId },
-      });
-    } else {
-      record = await prisma.volunteerBackgroundCheck.create({ data });
-    }
-
-    return NextResponse.json({ message: "Background check submitted", id: record.id }, { status: 201 });
+    return NextResponse.json(
+      { message: "Background check submitted successfully", data: backgroundCheck },
+      { status: 201 }
+    );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error submitting background check:", errorMessage);
-    return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }

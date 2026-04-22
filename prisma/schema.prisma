@@ -166,8 +166,13 @@ model Donor {
   communicationPreference String
   status                  String
   notes                   String
-  isRetained              Boolean
+  isRetained              Boolean       @default(false)
   isCorporateSponsor      Boolean       @default(false)
+  supporterId             String?       @unique // Supporter ID from external systems
+  totalContributed        Float? // Total amount contributed
+  lastPaymentReceived     DateTime? // Last payment date
+  tags                    String? // Tags or categories
+  anonymous               Boolean? // Anonymous supporter flag
   donation                Donation[]
   personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
@@ -344,6 +349,7 @@ model VolunteerApplication {
 model VolunteerBackgroundCheck {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Personal Info
   fullName    String
@@ -361,7 +367,8 @@ model VolunteerBackgroundCheck {
   eSignature              String
   signatureDate           String
 
-  status    BGCheckStatus @default(PENDING)
+  status        BackgroundCheckStatus @default(PENDING)
+  declineReason String?
 
   volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
@@ -490,8 +497,8 @@ enum VolunteerAppStatus {
   REJECTED
 }
 
-enum BGCheckStatus {
+enum BackgroundCheckStatus {
   PENDING
   APPROVED
-  REJECTED
+  DECLINED
 }
