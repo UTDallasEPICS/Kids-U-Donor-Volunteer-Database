@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE "Event" DROP COLUMN "backgroundCheckRequired";
+-- ALTER TABLE "Event" DROP COLUMN "backgroundCheckRequired";

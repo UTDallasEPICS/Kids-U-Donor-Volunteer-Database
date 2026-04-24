@@ -5,8 +5,8 @@
 
 */
 -- CreateEnum
-CREATE TYPE "BGCheckStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+-- CREATE TYPE "BGCheckStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- AlterTable
-ALTER TABLE "VolunteerBackgroundCheck" DROP COLUMN "approved",
-ADD COLUMN     "status" "BGCheckStatus" NOT NULL DEFAULT 'PENDING';
+ALTER TABLE "VolunteerBackgroundCheck" DROP COLUMN "approved";
+-- ADD COLUMN     "status" "BGCheckStatus" NOT NULL DEFAULT 'PENDING';
