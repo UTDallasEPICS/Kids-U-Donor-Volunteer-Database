@@ -81,22 +81,59 @@ export async function POST(request: Request) {
       from: normalizedFrom || process.env.SMTP_USER, //replace with the email variable  for admin //
       subject: normalizedSubject,
       text: normalizedBody,
-      html: `<div style="font-family: Arial, sans-serif; line-height: 1.6; white-space: pre-wrap;">${normalizedBody.replace(/\n/g, "<br>")}</div>`,
+      html: `<html>
+              <head>
+                <meta charset="UTF-8">
+                <style> 
+                body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                .container {max-width: 600px; margin: 0 auto; padding: 20px}
+                .header{background-color: #4F46E5; color: white; padding: 20px; text-align: center;}
+                .content {background-color: #f9fafb; padding: 20px; }
+                </style>
+              </head>
+              <body>
+                <div class="container">
+                  <div class="header">
+                    <h1> Email From Kids U </h1>              
+                  </div>
+                  <div class="content">
+                     <h2>${normalizedSubject}</h2>
+                     <p>${normalizedBody.replace(/\n/g, "<br>")}</p>
+                     <div style= "text-allign: center;">
+                     </div>
+                   </div>
+                  </div>
+                </div>
+              </body>
+            </html>`
+
     };
 
-    
-
+  
     // Send to all recipients
-    
+    for (const recipientEmail of recipients) {
       try {
         await transporter.sendMail({
           ...mailOptions,
-          to: recipients, //chaged to reciptients in order to send an email to all volunteers and admins if selected//
+          to: recipientEmail,
         });
         emailCount++;
+
+        // Persist to volunteer inbox if recipient is a volunteer
+        if (recipientType !== 'admins') {
+          const volunteer = await prisma.volunteer.findFirst({
+            where: { emailAddress: recipientEmail },
+            select: { id: true },
+          });
+          if (volunteer) {
+            await prisma.sentEmail.create({
+              data: { subject, body, volunteerId: volunteer.id },
+            });
+          }
+        }
       } catch (error) {
-        console.error(`Failed to send email:`, error);
-        // Continue sending to other recipients even if one fails
+        console.error(`Failed to send email to ${recipientEmail}:`, error);
+      }
     }
 
     

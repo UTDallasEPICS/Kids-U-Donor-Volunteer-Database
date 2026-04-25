@@ -15,14 +15,11 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET not defined");
 
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
-const ROLE_LEVEL = {
-  VOLUNTEER: 1,
-  ADMIN: 2,
-  SUPER_ADMIN: 3,
-} as const;
-
-const hasRequiredRole = (userRole: UserJwtPayload["role"], requiredRole: UserJwtPayload["role"]) =>
-  ROLE_LEVEL[userRole] >= ROLE_LEVEL[requiredRole];
+const roleHome: Record<UserJwtPayload["role"], string> = {
+  VOLUNTEER: "/volunteers",
+  ADMIN: "/admin",
+  SUPER_ADMIN: "/super-admin",
+};
 
 async function verifyToken(token?: string): Promise<UserJwtPayload | null> {
   if (!token) return null;
@@ -55,17 +52,19 @@ const publicPaths = [
 
 const routePermissions = [
   {
-    role: "SUPER_ADMIN",
     paths: ["/super-admin", "/api/super-admin"],
+    allowedRoles: ["SUPER_ADMIN"] as const,
   },
   {
-    role: "ADMIN",
     paths: ["/admin", "/api/admin", "/api/grantors"],
+    allowedRoles: ["ADMIN", "SUPER_ADMIN"] as const,
   },
   {
-    role: "VOLUNTEER",
+    paths: ["/volunteers"],
+    allowedRoles: ["VOLUNTEER"] as const,
+  },
+  {
     paths: [
-      "/volunteers",
       "/api/volunteer",
       "/api/event-registration",
       "/api/events",
@@ -73,6 +72,7 @@ const routePermissions = [
       "/api/orientations",
       "/api/background-check",
     ],
+    allowedRoles: ["VOLUNTEER", "ADMIN", "SUPER_ADMIN"] as const,
   },
 ] as const;
 
@@ -98,12 +98,15 @@ export async function middleware(request: NextRequest) {
   }
 
   for (const route of routePermissions) {
-    if (route.paths.some((p) => pathname.startsWith(p)) && !hasRequiredRole(user.role, route.role)) {
+    if (
+      route.paths.some((p) => pathname.startsWith(p)) &&
+      !(route.allowedRoles as readonly string[]).includes(user.role)
+    ) {
       if (isApi) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
-      return NextResponse.redirect(new URL("/volunteers", request.url));
+      return NextResponse.redirect(new URL(roleHome[user.role], request.url));
     }
   }
 

@@ -33,8 +33,6 @@ export async function GET(req: NextRequest) {
   }
 
   // Handle list request
-  const page = Number(req.nextUrl.searchParams.get("page")) || 0;
-  const rowsPerPage = Number(req.nextUrl.searchParams.get("rowsPerPage")) || 5;
   const searchCriteria = req.nextUrl.searchParams.get("searchCriteria") || "";
   const searchValue = req.nextUrl.searchParams.get("searchValue") || "";
 
@@ -84,8 +82,6 @@ export async function GET(req: NextRequest) {
   try {
     const [data, count] = await Promise.all([
       prisma.grantor.findMany({
-        skip: page * rowsPerPage,
-        take: rowsPerPage,
         where,
         include: {
           organization: {
@@ -103,12 +99,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       success: true,
       data,
-      pagination: {
-        total: count,
-        page,
-        pageSize: rowsPerPage,
-        totalPages: Math.ceil(count / rowsPerPage),
-      },
+      count,
     });
   } catch (error) {
     console.error("Error fetching grantors:", error);

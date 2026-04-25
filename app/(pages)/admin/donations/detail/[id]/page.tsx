@@ -63,20 +63,25 @@ export default function DonationDetail() {
 
   const fetchDonation = async () => {
     try {
-      const result = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/donations/${id}`, {
+      const result = await fetch(`/api/admin/donations/${id}`, {
         method: "GET",
       });
 
-      const { data } = (await result.json()) as DonationResponse;
-
       if (!result.ok) {
-        const errorData = await result.json();
-        const message = errorData?.message || "Something went wrong";
-        throw new Error(message);
+              const errorData = await result.json();
+              const message = errorData?.message || "Something went wrong";
+              throw new Error(message);
       }
 
+      const { data } = (await result.json()) as DonationResponse;
+
       if (data.donor && !data.isAnonymous) {
-        donorNameRef.current = `${data.donor.person.firstName} ${data.donor.person.lastName}`;
+        if(data.donor.person) {
+          donorNameRef.current = `${data.donor.person.firstName} ${data.donor.person.lastName}`;
+        }
+        else if(data.donor.organization) {
+          donorNameRef.current = data.donor.organization.name;
+        }
       }
       isAnonymousRef.current = data.isAnonymous;
 

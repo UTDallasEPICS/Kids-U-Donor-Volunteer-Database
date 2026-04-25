@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { BackgroundCheckStatus, Prisma, PrismaClient } from "@prisma/client";
 
 export async function seedBackgroundChecks(prisma: PrismaClient) {
   console.log("Adding mock VolunteerBackgroundCheck data...\n");
@@ -17,7 +17,7 @@ export async function seedBackgroundChecks(prisma: PrismaClient) {
       agreedToBackgroundCheck: true,
       eSignature: "Maria Gonzalez",
       signatureDate: "03/20/2026",
-      approved: false,
+      status: BackgroundCheckStatus.PENDING,
     },
     {
       fullName: "James Okafor",
@@ -32,7 +32,7 @@ export async function seedBackgroundChecks(prisma: PrismaClient) {
       agreedToBackgroundCheck: true,
       eSignature: "James Okafor",
       signatureDate: "03/21/2026",
-      approved: false,
+      status: BackgroundCheckStatus.PENDING,
     },
     {
       fullName: "Stephanie Chen",
@@ -47,7 +47,7 @@ export async function seedBackgroundChecks(prisma: PrismaClient) {
       agreedToBackgroundCheck: true,
       eSignature: "Stephanie Chen",
       signatureDate: "03/22/2026",
-      approved: false,
+      status: BackgroundCheckStatus.PENDING,
     },
     {
       fullName: "Tyler Brooks",
@@ -62,7 +62,7 @@ export async function seedBackgroundChecks(prisma: PrismaClient) {
       agreedToBackgroundCheck: true,
       eSignature: "Tyler Brooks",
       signatureDate: "03/23/2026",
-      approved: false,
+      status: BackgroundCheckStatus.PENDING,
     },
     {
       fullName: "Aisha Patel",
@@ -77,7 +77,7 @@ export async function seedBackgroundChecks(prisma: PrismaClient) {
       agreedToBackgroundCheck: true,
       eSignature: "Aisha Patel",
       signatureDate: "03/24/2026",
-      approved: false,
+      status: BackgroundCheckStatus.PENDING,
     },
   ];
 

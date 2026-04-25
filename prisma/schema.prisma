@@ -123,15 +123,15 @@ model Grant {
   amountRequested         Float
   amountAwarded           Float                 @default(0)
   purpose                 String //specific area or general
-  startDate               DateTime
-  endDate                 DateTime
+  startDate               DateTime?
+  endDate                 DateTime?
   isMultipleYears         Boolean
   quarter                 String
   acknowledgementSent     Boolean
   awardNotificationDate   DateTime?
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
-  proposalDueDate         DateTime
+  proposalDueDate         DateTime?
   proposalSummary         String?
   proposalSubmissionDate  DateTime?
   applicationType         String
@@ -169,8 +169,13 @@ model Donor {
   communicationPreference String
   status                  String
   notes                   String
-  isRetained              Boolean
+  isRetained              Boolean       @default(false)
   isCorporateSponsor      Boolean       @default(false)
+  supporterId             String?       @unique // Supporter ID from external systems
+  totalContributed        Float? // Total amount contributed
+  lastPaymentReceived     DateTime? // Last payment date
+  tags                    String? // Tags or categories
+  anonymous               Boolean? // Anonymous supporter flag
   donation                Donation[]
   personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
@@ -234,7 +239,6 @@ model Volunteer {
   // Compliance & Requirements
   volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
   volunteerApplicationCompleted Boolean            @default(false)
-  backgroundCheckCompleted      Boolean            @default(false)
   codeOfEthicsFormSigned        Boolean            @default(false)
   abuseNeglectReportFormSigned  Boolean            @default(false)
   personnelPoliciesFormSigned   Boolean            @default(false)
@@ -247,17 +251,18 @@ model Volunteer {
   isDeleted        Boolean     @default(false)
 
   // Relations
-  application            VolunteerApplication?           @relation(fields: [applicationId], references: [id])
-  applicationId          String?
-  EmergencyContact       EmergencyContact?
-  VolunteerAttendance    VolunteerAttendance[]
-  EventRegistration      EventRegistration[]
-  MailRecipient          MailRecipient[]
-  Person                 Person?                         @relation(fields: [personId], references: [id])
-  personId               String?                         @unique
-  backgroundCheck        VolunteerBackgroundCheck?
+  application         VolunteerApplication?     @relation(fields: [applicationId], references: [id])
+  applicationId       String?
+  EmergencyContact    EmergencyContact?
+  VolunteerAttendance VolunteerAttendance[]
+  EventRegistration   EventRegistration[]
+  MailRecipient       MailRecipient[]
+  Person              Person?                   @relation(fields: [personId], references: [id])
+  personId            String?                   @unique
+  backgroundCheck     VolunteerBackgroundCheck?
   orientationInvitation  VolunteerOrientationInvitation?
   bookedOrientationSlots VolunteerOrientationSlot[]      @relation("BookedVolunteer")
+  sentEmails          SentEmail[]
 }
 
 // model volunteerAccount {
@@ -349,6 +354,7 @@ model VolunteerApplication {
 model VolunteerBackgroundCheck {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Personal Info
   fullName    String
@@ -366,7 +372,8 @@ model VolunteerBackgroundCheck {
   eSignature              String
   signatureDate           String
 
-  status BGCheckStatus @default(PENDING)
+  status        BackgroundCheckStatus @default(PENDING)
+  declineReason String?
 
   volunteerId String?    @unique
   volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
@@ -506,6 +513,16 @@ model MailRecipient {
   mail           Mail           @relation(fields: [mailId], references: [id])
 }
 
+model SentEmail {
+  id          String    @id @default(uuid())
+  subject     String
+  body        String
+  sentAt      DateTime  @default(now())
+  isRead      Boolean   @default(false)
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+}
+
 enum RecipientType {
   PRIMARY
   CC
@@ -531,8 +548,8 @@ enum OrientationInviteStatus {
   EXPIRED
 }
 
-enum BGCheckStatus {
+enum BackgroundCheckStatus {
   PENDING
   APPROVED
-  REJECTED
+  DECLINED
 }
