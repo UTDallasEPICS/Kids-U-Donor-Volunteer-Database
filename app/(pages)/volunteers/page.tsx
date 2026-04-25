@@ -21,6 +21,11 @@ type OrientationInvitation = {
   status: "DRAFT" | "SENT" | "CONFIRMED" | "EXPIRED";
   meetingLink: string;
   selectionDeadline: string | null;
+  selectedSlot?: {
+    id: string;
+    startTime: string;
+    endTime: string;
+  } | null;
   slots: OrientationSlot[];
 };
 
@@ -36,6 +41,23 @@ export default function VolunteerDashboard() {
   const [orientationError, setOrientationError] = useState("");
   const [orientationSuccess, setOrientationSuccess] = useState("");
   const [isSubmittingOrientation, setIsSubmittingOrientation] = useState(false);
+
+  const buildOrientationEvent = (invitation: OrientationInvitation) => {
+    const isConfirmed = invitation.status === "CONFIRMED" && !!invitation.selectedSlot;
+    const dateValue = isConfirmed
+      ? invitation.selectedSlot!.startTime
+      : invitation.selectionDeadline || new Date().toISOString();
+
+    return {
+      name: isConfirmed ? "Orientation" : "Orientation Selection",
+      date: dateValue,
+      time: isConfirmed ? formatOrientationTime(invitation.selectedSlot!.startTime) : "Choose a time slot",
+      location: invitation.meetingLink || "Online",
+      attended: false,
+      isOrientation: true,
+      orientationStatus: invitation.status,
+    };
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,13 +76,18 @@ export default function VolunteerDashboard() {
             .catch(() => ({ images: [] })),
         ]);
 
-        const orientationRes = await fetch("/api/volunteer/orientation/options");
+        const orientationRes = await fetch(`/api/volunteer/orientation/options?volunteerId=${volunteerId}`);
+        let orientationEvent: any = null;
         if (orientationRes.ok) {
           const orientationData = await orientationRes.json();
-          setOrientationInvitation(orientationData?.invitation ?? null);
+          const invitation = orientationData?.invitation ?? null;
+          setOrientationInvitation(invitation);
+          if (invitation) {
+            orientationEvent = buildOrientationEvent(invitation);
+          }
         }
 
-        setUpcomingEvents(events);
+        setUpcomingEvents(orientationEvent ? [orientationEvent, ...events] : events);
         setTotalHours(hours.total || 0);
         setAttendedCount(hours.attendedCount || 0);
 
@@ -125,12 +152,7 @@ export default function VolunteerDashboard() {
       setOrientationSuccess("Orientation confirmed. A confirmation email has been sent.");
       setShowOrientationModal(false);
       setSelectedOrientationSlotId("");
-
-      const refresh = await fetch("/api/volunteer/orientation/options");
-      if (refresh.ok) {
-        const refreshed = await refresh.json();
-        setOrientationInvitation(refreshed?.invitation ?? null);
-      }
+      window.location.reload();
     } catch (error) {
       setOrientationError(error instanceof Error ? error.message : "Failed to confirm orientation");
     } finally {
@@ -322,6 +344,11 @@ export default function VolunteerDashboard() {
                         <h4 className="font-bold text-gray-900 mb-2 text-lg group-hover:text-[#2f4b7c] transition-colors">
                           {event.name}
                         </h4>
+                        {event.isOrientation && (
+                          <div className="mb-2 inline-flex items-center rounded-full bg-[#2f4b7c]/10 px-3 py-1 text-xs font-semibold text-[#2f4b7c]">
+                            Orientation {event.orientationStatus === "CONFIRMED" ? "confirmed" : "pending"}
+                          </div>
+                        )}
                         <div className="space-y-1.5">
                           <div className="flex items-center gap-2 text-sm text-gray-600">
                             <svg

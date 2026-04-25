@@ -63,6 +63,10 @@ export default function VolunteersPage() {
   const [isModalLoading, setIsModalLoading] = useState<boolean>(false);
   const [modalError, setModalError] = useState<string>("");
   const [modalSuccess, setModalSuccess] = useState<string>("");
+  const [showEmailPreview, setShowEmailPreview] = useState<boolean>(false);
+  const [emailBody, setEmailBody] = useState<string>("");
+  const [sendEmail, setSendEmail] = useState<boolean>(true);
+  const [isUpdateEmail, setIsUpdateEmail] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -115,6 +119,8 @@ export default function VolunteersPage() {
         const invitation = data?.invitation;
 
         setMeetingLink(invitation?.meetingLink ?? "");
+        setSendEmail(!invitation?.firstEmailSentAt ? true : false);
+        setIsUpdateEmail(Boolean(invitation?.firstEmailSentAt));
         setExistingSlots(
           Array.isArray(invitation?.slots)
             ? invitation.slots.map((slot: ExistingSlot) => ({
@@ -187,7 +193,18 @@ export default function VolunteersPage() {
     return `${year}-${month}-${day}`;
   };
 
-  const addTimeSlot = (timeValue: string) => {
+  const isTimeSelected = (timeValue: string) => {
+    if (!selectedDate) return false;
+
+    const [hours, minutes] = timeValue.split(":").map(Number);
+    const start = new Date(`${selectedDate}T00:00:00`);
+    start.setHours(hours, minutes, 0, 0);
+    const isoStart = start.toISOString();
+
+    return newSlots.some((slot) => slot.startTime === isoStart);
+  };
+
+  const toggleTimeSlot = (timeValue: string) => {
     if (!selectedDate) {
       setModalError("Choose a date first");
       return;
@@ -206,9 +223,13 @@ export default function VolunteersPage() {
     };
 
     const existsInExisting = existingSlots.some((s) => s.startTime === slot.startTime);
-    const existsInNew = newSlots.some((s) => s.startTime === slot.startTime);
+    if (existsInExisting) {
+      return;
+    }
 
-    if (existsInExisting || existsInNew) {
+    const existsInNew = newSlots.some((s) => s.startTime === slot.startTime);
+    if (existsInNew) {
+      setNewSlots((prev) => prev.filter((s) => s.startTime !== slot.startTime));
       return;
     }
 
@@ -233,6 +254,52 @@ export default function VolunteersPage() {
     }
 
     setModalError("");
+
+    const slotsList = newSlots
+      .map((slot) => formatSlotLabel(slot.startTime))
+      .join("\n");
+
+    const preview = isUpdateEmail
+      ? `Hello,
+
+We have added more time slots for your orientation.
+
+Please log in and choose one of the following available times:
+
+${slotsList}
+
+Meeting Link: ${meetingLink}
+
+${sendEmail ? "This update will be sent to the volunteer." : "No email will be sent right now."}`
+      : `Hello ${scheduleTarget.firstName},
+
+We're excited to schedule your Kids-U orientation!
+
+Your orientation is a required 30-minute session that will introduce you to our team and discuss your role as a volunteer.
+
+The following time slots are available for you to choose from (you have 24 hours to select one):
+
+${slotsList}
+
+Please visit our website to select your preferred time slot: ${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/volunteers
+
+Note: The available slots will be updated until you make your selection.
+
+Meeting Link: ${meetingLink}
+
+Thank you, and we look forward to meeting you!
+
+Kids-U Volunteer Team`;
+
+    setEmailBody(preview);
+    setShowEmailPreview(true);
+  };
+
+  const sendScheduleEmail = async () => {
+    if (!scheduleTarget) return;
+
+    setShowEmailPreview(false);
+    setModalError("");
     setModalSuccess("");
     setIsSaving(true);
 
@@ -244,6 +311,9 @@ export default function VolunteersPage() {
           volunteerId: scheduleTarget.id,
           meetingLink,
           slots: newSlots,
+          sendEmail,
+          emailSubject: isUpdateEmail ? "Orientation update" : "Choose your orientation time",
+          emailBody,
         }),
       });
 
@@ -279,6 +349,8 @@ export default function VolunteersPage() {
     setExistingSlots([]);
     setModalError("");
     setModalSuccess("");
+    setShowEmailPreview(false);
+    setEmailBody("");
   };
 
   return (
@@ -341,6 +413,15 @@ export default function VolunteersPage() {
                       : "Not sent"}
                   </td>
                   <td className="px-6 py-4 border-b">
+                    {volunteer.orientationInvitation?.firstEmailSentAt ? (
+                      <button
+                        type="button"
+                        onClick={() => setScheduleTarget(volunteer)}
+                        className="bg-[#2f4b7c] hover:bg-[#1f3659] text-white text-sm font-semibold py-2 px-3 rounded"
+                      >
+                        Add Times
+                      </button>
+                    ) : (
                     <button
                       type="button"
                       onClick={() => setScheduleTarget(volunteer)}
@@ -348,6 +429,7 @@ export default function VolunteersPage() {
                     >
                       Schedule Orientation
                     </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -419,8 +501,12 @@ export default function VolunteersPage() {
                         <button
                           key={time}
                           type="button"
-                          onClick={() => addTimeSlot(time)}
-                          className="rounded border border-gray-300 px-2 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100"
+                          onClick={() => toggleTimeSlot(time)}
+                          className={`rounded border px-2 py-2 text-xs font-semibold transition-colors ${
+                            isTimeSelected(time)
+                              ? "bg-[#2f4b7c] text-white border-[#2f4b7c]"
+                              : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                          }`}
                         >
                           {time}
                         </button>
@@ -497,9 +583,53 @@ export default function VolunteersPage() {
                   className="bg-[#2f4b7c] hover:bg-[#1f3659] disabled:bg-gray-400 text-white px-4 py-2 rounded"
                   onClick={handleSaveSchedule}
                 >
-                  {isSaving ? "Saving..." : "Save & Send"}
+                  Preview Email
                 </button>
               </div>
+            </div>
+          </div>
+        )}
+
+        {showEmailPreview && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 px-4">
+            <div className="w-full max-w-3xl rounded-lg bg-white p-6 shadow-2xl">
+              <h3 className="text-lg font-bold mb-2">Preview Email</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Review the message before sending. You can edit it directly.
+              </p>
+
+              <textarea
+                value={emailBody}
+                onChange={(e) => setEmailBody(e.target.value)}
+                className="h-80 w-full rounded border border-gray-300 p-3 text-sm font-mono"
+              />
+
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  className="border border-gray-300 text-gray-700 px-4 py-2 rounded"
+                  onClick={() => setShowEmailPreview(false)}
+                >
+                  Back
+                </button>
+                <button
+                  type="button"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:bg-gray-400"
+                  disabled={isSaving}
+                  onClick={sendScheduleEmail}
+                >
+                  {isSaving ? "Sending..." : "Send Email"}
+                </button>
+              </div>
+              <label className="mt-4 flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={sendEmail}
+                  onChange={(e) => setSendEmail(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                Send email to volunteer
+              </label>
             </div>
           </div>
         )}

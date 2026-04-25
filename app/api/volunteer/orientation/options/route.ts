@@ -21,14 +21,21 @@ function parsePayload(req: NextRequest): UserPayload | null {
 export async function GET(req: NextRequest) {
   try {
     const payload = parsePayload(req);
-    if (!payload || payload.role !== "VOLUNTEER") {
+    const volunteerIdFromQuery = new URL(req.url).searchParams.get("volunteerId")?.trim() || "";
+
+    if ((!payload || payload.role !== "VOLUNTEER") && !volunteerIdFromQuery) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const volunteer = await prisma.volunteer.findFirst({
-      where: { emailAddress: payload.email },
-      select: { id: true },
-    });
+    const volunteer = volunteerIdFromQuery
+      ? await prisma.volunteer.findUnique({
+          where: { id: volunteerIdFromQuery },
+          select: { id: true },
+        })
+      : await prisma.volunteer.findFirst({
+          where: { emailAddress: payload?.email || "" },
+          select: { id: true },
+        });
 
     if (!volunteer) {
       return NextResponse.json({ invitation: null }, { status: 200 });
@@ -43,6 +50,13 @@ export async function GET(req: NextRequest) {
         firstEmailSentAt: true,
         selectionDeadline: true,
         selectedSlotId: true,
+        selectedSlot: {
+          select: {
+            id: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
         slots: {
           where: { isBooked: false },
           orderBy: { startTime: "asc" },

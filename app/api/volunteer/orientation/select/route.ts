@@ -1,5 +1,5 @@
 import prisma from "@/app/utils/db";
-import { sendOrientationConfirmationEmails } from "@/app/utils/email";
+import { sendOrientationAdminNotification, sendOrientationConfirmationEmails } from "@/app/utils/email";
 import { NextRequest, NextResponse } from "next/server";
 
 type UserPayload = {
@@ -146,6 +146,14 @@ export async function POST(req: NextRequest) {
 
     const adminName = [admin.person?.firstName, admin.person?.lastName].filter(Boolean).join(" ") || admin.email;
     const volunteerName = `${volunteer.firstName} ${volunteer.lastName}`.trim();
+
+    await sendOrientationAdminNotification({
+      adminEmail: admin.email,
+      adminName,
+      volunteerName,
+      meetingLink: booked.meetingLink,
+      startTime: slot.startTime,
+    });
 
     await sendOrientationConfirmationEmails({
       volunteerName,

@@ -1,5 +1,5 @@
 import prisma from "@/app/utils/db";
-import { sendOrientationScheduleEmail } from "@/app/utils/email";
+import { sendCustomEmail, sendOrientationScheduleEmail } from "@/app/utils/email";
 import { NextRequest, NextResponse } from "next/server";
 
 type UserPayload = {
@@ -112,6 +112,9 @@ export async function POST(req: NextRequest) {
     const volunteerId = typeof body?.volunteerId === "string" ? body.volunteerId.trim() : "";
     const meetingLink = typeof body?.meetingLink === "string" ? body.meetingLink.trim() : "";
     const rawSlots = Array.isArray(body?.slots) ? (body.slots as SlotInput[]) : [];
+    const sendEmail = body?.sendEmail !== false;
+    const emailSubject = typeof body?.emailSubject === "string" ? body.emailSubject.trim() : "";
+    const emailBody = typeof body?.emailBody === "string" ? body.emailBody.trim() : "";
 
     if (!volunteerId || !meetingLink || rawSlots.length === 0) {
       return NextResponse.json(
@@ -170,23 +173,41 @@ export async function POST(req: NextRequest) {
     if (!invitation.firstEmailSentAt) {
       const selectionDeadline = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-      await sendOrientationScheduleEmail({
-        to: volunteer.emailAddress,
-        firstName: volunteer.firstName,
-        expiresAt: selectionDeadline,
-      });
+      if (sendEmail) {
+        if (emailBody) {
+          await sendCustomEmail({
+            to: volunteer.emailAddress,
+            subject: emailSubject || "Choose your orientation time",
+            text: emailBody,
+          });
+        } else {
+          await sendOrientationScheduleEmail({
+            to: volunteer.emailAddress,
+            firstName: volunteer.firstName,
+            expiresAt: selectionDeadline,
+          });
+        }
 
-      await prisma.volunteerOrientationInvitation.update({
-        where: { volunteerId },
-        data: {
-          status: "SENT",
-          firstEmailSentAt: now,
-          selectionDeadline,
-          initialEmailSentByUserId: payload.userId,
-        },
-      });
+        await prisma.volunteerOrientationInvitation.update({
+          where: { volunteerId },
+          data: {
+            status: "SENT",
+            firstEmailSentAt: now,
+            selectionDeadline,
+            initialEmailSentByUserId: payload.userId,
+          },
+        });
 
-      firstEmailSent = true;
+        firstEmailSent = true;
+      }
+    } else if (sendEmail) {
+      if (emailBody) {
+        await sendCustomEmail({
+          to: volunteer.emailAddress,
+          subject: emailSubject || "Orientation update",
+          text: emailBody,
+        });
+      }
     }
 
     const updated = await prisma.volunteerOrientationInvitation.findUnique({

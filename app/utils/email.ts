@@ -12,6 +12,38 @@ function createTransporter() {
   });
 }
 
+function getFromAddress() {
+  return `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`;
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+export async function sendCustomEmail({
+  to,
+  subject,
+  text,
+}: {
+  to: string;
+  subject: string;
+  text: string;
+}) {
+  const transporter = createTransporter();
+  return transporter.sendMail({
+    from: getFromAddress(),
+    to,
+    subject,
+    text,
+    html: `<div style="font-family: Arial, sans-serif; white-space: pre-wrap; color: #1f2937; line-height: 1.5;">${escapeHtml(text)}</div>`,
+  });
+}
+
 export async function verifyEmailConfig() {
   try {
     const transporter = createTransporter();
@@ -95,8 +127,8 @@ export async function send2FACode(to: string, code: string, firstName: string) {
   const transporter = createTransporter();
 
   const info = await transporter.sendMail({
-    from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
-    to: to,
+    from: getFromAddress(),
+    to,
     subject: "Your Two-Factor Authentication Code",
     html: `
       <!DOCTYPE html>
@@ -323,14 +355,14 @@ export async function sendOrientationConfirmationEmails({
 
   await Promise.all([
     transporter.sendMail({
-      from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      from: getFromAddress(),
       to: volunteerEmail,
       subject: "Orientation confirmed",
       html: html(volunteerName, adminName),
       text: text(volunteerName, adminName),
     }),
     transporter.sendMail({
-      from: `"${process.env.SMTP_FROM_NAME || "Kids-U"}" <${process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER}>`,
+      from: getFromAddress(),
       to: adminEmail,
       subject: "Orientation confirmed",
       html: html(adminName, volunteerName),
@@ -338,15 +370,56 @@ export async function sendOrientationConfirmationEmails({
     }),
   ]);
 
-  return { calendarUrl };
 }
 
-// generate 6-digit code
-export function generate2FACode(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-}
+export async function sendOrientationAdminNotification({
+  adminEmail,
+  adminName,
+  volunteerName,
+  meetingLink,
+  startTime,
+}: {
+  adminEmail: string;
+  adminName: string;
+  volunteerName: string;
+  meetingLink: string;
+  startTime: Date;
+}) {
+  const transporter = createTransporter();
+  const dateText = startTime.toLocaleString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 
-// secure token generator
-export function generateToken(): string {
-  return require("crypto").randomBytes(32).toString("hex");
+  const subject = "Volunteer scheduled orientation";
+  const text = `Hello ${adminName},
+
+The volunteer ${volunteerName} has scheduled an orientation with you.
+
+Date & Time: ${dateText}
+Meeting Link: ${meetingLink}
+
+Thank you,
+Kids-U`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; color: #1f2937; line-height: 1.5;">
+      <h2>Hello ${adminName},</h2>
+      <p>The volunteer <strong>${volunteerName}</strong> has scheduled an orientation with you.</p>
+      <p><strong>Date & Time:</strong> ${dateText}</p>
+      <p><strong>Meeting Link:</strong> <a href="${meetingLink}">${meetingLink}</a></p>
+      <p>Thank you,<br/>Kids-U</p>
+    </div>
+  `;
+
+  return transporter.sendMail({
+    from: getFromAddress(),
+    to: adminEmail,
+    subject,
+    html,
+    text,
+  });
 }

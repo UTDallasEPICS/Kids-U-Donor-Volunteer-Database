@@ -12,6 +12,21 @@ type OrientationReminder = {
   daysSinceSignup: number;
 };
 
+type OrientationTask = {
+  id: string;
+  meetingLink: string;
+  confirmedAt: string | null;
+  volunteer: {
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
+  };
+  selectedSlot: {
+    startTime: string;
+    endTime: string;
+  } | null;
+};
+
 
 export default function AdminDashboard() {
   const [totalVolunteers, setTotalVolunteers] = useState<number | null>(null);
@@ -23,6 +38,7 @@ export default function AdminDashboard() {
   const [tasks, setTasks] = useState<any[]>([]);
   const [newTask, setNewTask] = useState("");
   const [orientationReminders, setOrientationReminders] = useState<OrientationReminder[]>([]);
+  const [orientationTasks, setOrientationTasks] = useState<OrientationTask[]>([]);
 
   const fetchJson = async (url: string) => {
     const res = await fetch(url);
@@ -41,7 +57,8 @@ export default function AdminDashboard() {
       fetchJson('/api/admin/dashboard/box7/grants'),
       fetchJson('/api/admin/dashboard/box6'),
       fetchJson('/api/admin/orientation/reminders'),
-    ]).then(([volunteers, donors, grantsCount, hours, donation, grants, tasksData, reminders]) => {
+      fetchJson('/api/admin/orientation/tasks'),
+    ]).then(([volunteers, donors, grantsCount, hours, donation, grants, tasksData, reminders, orientationTasksData]) => {
       setTotalVolunteers(volunteers.total);
       setTotalDonors(donors.total);
       setTotalGrants(grantsCount.total);
@@ -50,6 +67,7 @@ export default function AdminDashboard() {
       setPendingGrants(grants.total);
       setTasks(Array.isArray(tasksData) ? tasksData : []);
       setOrientationReminders(Array.isArray(reminders?.reminders) ? reminders.reminders : []);
+      setOrientationTasks(Array.isArray(orientationTasksData?.tasks) ? orientationTasksData.tasks : []);
     }).catch(err => console.error('Failed to fetch dashboard data:', err));
   }, []);
 
@@ -250,6 +268,26 @@ export default function AdminDashboard() {
         {/* Tasks */}
         <div className="bg-white rounded-2xl p-6 shadow-sm row-span-2 flex flex-col">
           <h3 className="text-base font-semibold text-gray-900 mb-4">Tasks</h3>
+          {orientationTasks.length > 0 && (
+            <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3">
+              <p className="text-sm font-semibold text-blue-900 mb-2">Orientation reminders</p>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {orientationTasks.map((task) => (
+                  <div key={task.id} className="rounded-lg bg-white p-3 border border-blue-100 text-sm">
+                    <div className="font-medium text-gray-900">
+                      {task.volunteer.firstName} {task.volunteer.lastName}
+                    </div>
+                    <div className="text-gray-600 text-xs mt-1">
+                      {task.selectedSlot?.startTime ? new Date(task.selectedSlot.startTime).toLocaleString("en-US") : "Orientation confirmed"}
+                    </div>
+                    <div className="text-xs text-blue-700 mt-1 break-all">
+                      {task.meetingLink}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="flex gap-2 mb-4">
             <input
               type="text"
