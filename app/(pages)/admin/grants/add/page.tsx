@@ -686,7 +686,7 @@ const GrantAddPage = () => {
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={12} md={6}>
                 <TextField
-                    label="Grantor Name *"
+                    label="First and Last Name"
                     value={newGrantor.name}
                     onChange={(e) => handleGrantorChange('name', e.target.value)}
                     fullWidth
