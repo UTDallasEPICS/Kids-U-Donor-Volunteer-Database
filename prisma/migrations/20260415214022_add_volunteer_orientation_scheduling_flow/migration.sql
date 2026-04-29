@@ -8,7 +8,7 @@
 CREATE TYPE "OrientationInviteStatus" AS ENUM ('DRAFT', 'SENT', 'CONFIRMED', 'EXPIRED');
 
 -- AlterTable
-ALTER TABLE "Event" DROP COLUMN "backgroundCheckRequired";
+-- ALTER TABLE "Event" DROP COLUMN "backgroundCheckRequired";
 
 -- CreateTable
 CREATE TABLE "VolunteerOrientationInvitation" (
