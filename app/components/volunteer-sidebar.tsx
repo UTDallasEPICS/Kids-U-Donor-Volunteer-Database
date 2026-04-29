@@ -33,11 +33,11 @@ export default function VolunteerSidebar() {
               reference: "/volunteers/apply",
               hasBadge: appRejected,
             },
-            {
+            /*{
               name: "Background Check",
               reference: "/volunteers/apply/background-check",
               hasBadge: bgRejected,
-            },
+            },*/
           ],
         },
       ]}
