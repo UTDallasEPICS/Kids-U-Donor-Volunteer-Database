@@ -349,7 +349,7 @@ const VolunteerApplication = () => {
                                 </label>
                             </RadioGroup>
 
-                            <RadioGroup label="Do you have a driver's license?" required>
+                            <RadioGroup label="Do you have a driver&apos;s license?" required>
                                 <label className="mr-4">
                                     <input
                                         type="radio"
@@ -540,8 +540,8 @@ const VolunteerApplication = () => {
                                     <option value="high_school">High School</option>
                                     <option value="some_college">Some College</option>
                                     <option value="associate">Associate Degree</option>
-                                    <option value="bachelor">Bachelor's Degree</option>
-                                    <option value="master">Master's Degree</option>
+                                    <option value="bachelor">Bachelor&apos;s Degree</option>
+                                    <option value="master">Master&apos;s Degree</option>
                                     <option value="doctorate">Doctorate</option>
                                 </select>
                             </Field>
@@ -656,7 +656,7 @@ const VolunteerApplication = () => {
                                 />
                             </Field>
 
-                            <Field label="Driver's License Number">
+                            <Field label="Driver&apos;s License Number">
                                 <input
                                     type="text"
                                     name="driversLicenseNumber"
@@ -853,7 +853,7 @@ const VolunteerApplication = () => {
                                     <p>{formData.isCitizen === 'yes' ? 'Yes' : 'No'}</p>
                                 </div>
                                 <div>
-                                    <p className="font-medium">Has Driver's License:</p>
+                                    <p className="font-medium">Has Driver&apos;s License:</p>
                                     <p>{formData.hasDriverLicense === 'yes' ? 'Yes' : 'No'}</p>
                                 </div>
                                 <div>
@@ -952,7 +952,7 @@ const VolunteerApplication = () => {
                                     <p>{formData.dob}</p>
                                 </div>
                                 <div>
-                                    <p className="font-medium">Driver's License Number:</p>
+                                    <p className="font-medium">Driver&apos;s License Number:</p>
                                     <p>{formData.driversLicenseNumber || 'N/A'}</p>
                                 </div>
                                 <div>

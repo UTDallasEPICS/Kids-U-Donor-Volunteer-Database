@@ -140,11 +140,11 @@ export default function Import() {
   ];
 
   return (
-    <div className="font-sans p-8 w-full">
-      <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 space-y-6">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-sm p-8 space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Import Donations Data</h1>
+          <h1 className="text-3xl font-bold text-[#2f4b7c]">Import Donations Data</h1>
           <p className="text-gray-500 mt-2">Upload an Excel file (.xlsx, .xls) or CSV file (.csv) to import new records.</p>
         </div>
 
@@ -159,7 +159,7 @@ export default function Import() {
 
         {/* Drag-and-Drop Area */}
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+          className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#4a6fa5] transition-colors"
           onClick={handleAreaClick}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -184,7 +184,7 @@ export default function Import() {
             type="button"
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}
-            className="w-full max-w-xs flex justify-center items-center gap-2 bg-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full max-w-xs flex justify-center items-center gap-2 bg-[#2f4b7c] text-white font-medium py-3 px-6 rounded-xl hover:bg-[#4a6fa5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2f4b7c] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isUploading ? 'Uploading...' : 'Import Now'}
           </button>
@@ -192,7 +192,11 @@ export default function Import() {
 
         {/* Status Message */}
         {statusMessage && (
-          <div className={`text-center text-sm p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+          <div
+            className={`text-center text-sm p-3 rounded-xl ${
+              statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}
+          >
             <p className="font-medium">{statusMessage}</p>
           </div>
         )}
@@ -200,29 +204,16 @@ export default function Import() {
         {/* Database Fields Reference Section */}
         <div className="pt-4 border-t">
           <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel/CSV Columns</h2>
-          <div className="bg-gray-50 p-4 rounded-lg overflow-x-auto">
-            <p className="text-sm text-gray-600 mb-4">Ensure the first row of your Excel/CSV file contains columns matching this layout:</p>
-            <table className="w-full border-collapse text-xs">
-              <thead>
-                <tr className="bg-blue-600 text-white sticky top-0">
-                  {dbFields.map((field, idx) => (
-                    <th key={idx} className="border border-gray-400 px-3 py-2 text-left font-semibold whitespace-nowrap">
-                      {field}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white hover:bg-blue-50">
-                  {dbFields.map((field, idx) => (
-                    <td key={idx} className="border border-gray-300 px-3 py-3 bg-gray-50 text-gray-400 text-center">
-                      <span className="text-xs">example</span>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
-            <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-600 rounded">
+          <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-xl border border-[#4C7AB8]/30">
+            <p className="mb-3">Ensure the first row of your file contains columns matching these fields.</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
+              {dbFields.map((field) => (
+                <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">
+                  {field}
+                </p>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 border-l-4 border-[#4C7AB8] rounded">
               <p className="text-sm text-gray-700">
                 <span className="font-semibold">Total Columns Required:</span> {dbFields.length}
               </p>

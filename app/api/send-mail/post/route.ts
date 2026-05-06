@@ -136,6 +136,19 @@ export async function POST(request: Request) {
       }
     }
 
+    await prisma.mailLog.create({
+      data: {
+        recipientType: normalizedRecipientType,
+        to: normalizedRecipientType === "individual" ? normalizedTo : null,
+        subject: normalizedSubject,
+        body: normalizedBody,
+        senderEmail: normalizedFrom || null,
+        totalRecipients: recipients.length,
+        successCount: emailCount,
+        failureCount: Math.max(0, recipients.length - emailCount),
+      },
+    });
+
     
 
     return NextResponse.json(

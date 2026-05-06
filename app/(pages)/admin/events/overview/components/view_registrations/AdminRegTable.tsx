@@ -66,98 +66,99 @@ export const AdminRegTable = () => {
   };
 
   if (loading) {
-    return <div className="text-center p-4">Loading events...</div>;
+    return <div className="text-center p-4 text-gray-600">Loading events...</div>;
   }
 
-  const Header = () => (
-    <div className="flex justify-between items-center mb-5">
-      <h1 className="text-2xl font-bold text-gray-800">Events</h1>
-      <div className="px-4 py-2 ml-2">
-        <Link href="/Volunteers/registration/New_event">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-200">
-            Add A New Event
-          </button>
-        </Link>
-      </div>
-    </div>
-  );
   if (error) {
-    return <div className="text-red-600 p-4">{error}</div>;
+    return <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{error}</div>;
   }
 
   return (
-    <div className="overflow-x-auto">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Events and Registrations</h2>
+    <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+      <div className="flex flex-wrap justify-between items-center gap-3 p-4 border-b border-gray-200">
+        <h2 className="text-xl font-bold text-[#2f4b7c]">Events and Registrations</h2>
         <Link
           href="/admin/events"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
         >
           Add New Event
         </Link>
       </div>
 
-      <table className="min-w-full bg-white border border-gray-300">
+      <table className="min-w-full">
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-6 py-3 border-b text-left">Name</th>
-            <th className="px-6 py-3 border-b text-left">Date</th>
-            <th className="px-6 py-3 border-b text-left">Time</th>
-            <th className="px-6 py-3 border-b text-left">Location</th>
-            <th className="px-6 py-3 border-b text-left">Registrations</th>
-            <th className="px-6 py-3 border-b text-left">Background Check Required</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">Name</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">Date</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">Time</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">Location</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">Registrations</th>
+            <th className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700">
+              Background Check Required
+            </th>
           </tr>
         </thead>
         <tbody>
           {events.map((event) => (
             <React.Fragment key={event.id}>
               <tr onClick={() => handleRowClick(event.id)} className="hover:bg-gray-50 cursor-pointer">
-                <td className="px-6 py-4 border-b">{event.name}</td>
-                <td className="px-6 py-4 border-b">{format(new Date(event.schedule), "MMM dd, yyyy")}</td>
-                <td className="px-6 py-4 border-b">{format(new Date(event.schedule), "h:mm a")}</td>
-                <td className="px-6 py-4 border-b">
+                <td className="px-6 py-4 border-b text-sm text-gray-700 font-semibold">{event.name}</td>
+                <td className="px-6 py-4 border-b text-sm text-gray-700">
+                  {format(new Date(event.schedule), "MMM dd, yyyy")}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-700">
+                  {format(new Date(event.schedule), "h:mm a")}
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-700">
                   {event.location ? `${event.location.name}, ${event.location.city}` : "No location set"}
                 </td>
-                <td className="px-6 py-4 border-b">
-                  {format(new Date(event.schedule), 'h:mm a')}
-                </td>
-                <td className="px-6 py-4 border-b">
-                  {event.location ? `${event.location.name}, ${event.location.city}` : 'No location set'}
-                </td>
-                <td className="px-6 py-4 border-b">
+                <td className="px-6 py-4 border-b text-sm text-gray-700">
                   {event.eventRegistrations.length} volunteers
+                </td>
+                <td className="px-6 py-4 border-b text-sm text-gray-700">
+                  {event.bgCheckRequired ? "Yes" : "No"}
                 </td>
               </tr>
               {expandedEventId === event.id && (
                 <tr>
-                  <td colSpan={5} className="px-6 py-4 bg-gray-50">
-                    <div className="border rounded-lg p-4">
-                      <h3 className="font-semibold mb-2">Registered Volunteers</h3>
+                  <td colSpan={6} className="px-6 py-4 bg-gray-50">
+                    <div className="border border-gray-200 rounded-xl p-4 bg-white">
+                      <h3 className="font-semibold mb-3 text-[#2f4b7c]">Registered Volunteers</h3>
                       {event.eventRegistrations.length > 0 ? (
-                        <table className="min-w-full">
-                          <thead>
-                            <tr className="bg-gray-100">
-                              <th className="px-4 py-2 text-left">Name</th>
-                              <th className="px-4 py-2 text-left">Email</th>
-                              <th className="px-4 py-2 text-left">Phone</th>
-                              <th className="px-4 py-2 text-left">Group</th>
-                              <th className="px-4 py-2 text-left">Registration Date</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {event.eventRegistrations.map((registration) => (
-                              <tr key={registration.id} className="hover:bg-gray-100">
-                                <td className="px-4 py-2">
-                                  {registration.volunteer.firstName} {registration.volunteer.lastName}
-                                </td>
-                                <td className="px-4 py-2">{registration.volunteer.emailAddress}</td>
-                                <td className="px-4 py-2">{registration.volunteer.phoneNumber || "N/A"}</td>
-                                <td className="px-4 py-2">{registration.eventGroup}</td>
-                                <td className="px-4 py-2">{format(new Date(registration.date), "MMM dd, yyyy")}</td>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full">
+                            <thead>
+                              <tr className="bg-gray-100">
+                                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Name</th>
+                                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Email</th>
+                                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Phone</th>
+                                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">Group</th>
+                                <th className="px-4 py-2 text-left text-sm font-semibold text-gray-700">
+                                  Registration Date
+                                </th>
                               </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                            </thead>
+                            <tbody>
+                              {event.eventRegistrations.map((registration) => (
+                                <tr key={registration.id} className="hover:bg-gray-50">
+                                  <td className="px-4 py-2 text-sm text-gray-700">
+                                    {registration.volunteer.firstName} {registration.volunteer.lastName}
+                                  </td>
+                                  <td className="px-4 py-2 text-sm text-gray-700">
+                                    {registration.volunteer.emailAddress}
+                                  </td>
+                                  <td className="px-4 py-2 text-sm text-gray-700">
+                                    {registration.volunteer.phoneNumber || "N/A"}
+                                  </td>
+                                  <td className="px-4 py-2 text-sm text-gray-700">{registration.eventGroup}</td>
+                                  <td className="px-4 py-2 text-sm text-gray-700">
+                                    {format(new Date(registration.date), "MMM dd, yyyy")}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       ) : (
                         <p className="text-gray-500">No volunteers registered for this event yet.</p>
                       )}

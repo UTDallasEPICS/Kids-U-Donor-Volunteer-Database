@@ -54,6 +54,7 @@ const headCells = [
 export default function VolunteersPage() {
   const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
   const [scheduleTarget, setScheduleTarget] = useState<Volunteer | null>(null);
   const [meetingLink, setMeetingLink] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<string>("");
@@ -86,8 +87,9 @@ export default function VolunteersPage() {
       setVolunteers(result.volunteers);
       setIsLoading(false);
     } catch (error) {
-      router.push("/not-found");
       console.error("Error fetching:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load volunteers");
+      setIsLoading(false);
     }
   };
 
@@ -354,28 +356,34 @@ Kids-U Volunteer Team`;
   };
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumb />
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Volunteers</h2>
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-[#2f4b7c]">Volunteers</h2>
           <Link
             href="/admin/volunteer/application"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
           >
             View Applications
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-100">
                 {headCells.map((headCell) => (
                   <th
                     key={headCell.id}
-                    className="px-6 py-3 border-b text-left font-bold"
+                    className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700"
                   >
                     {headCell.label}
                   </th>
@@ -384,11 +392,11 @@ Kids-U Volunteer Team`;
             </thead>
             <tbody>
               {volunteers.map((volunteer) => (
-                <tr key={volunteer.id} className="hover:bg-gray-50 cursor-pointer">
+                <tr key={volunteer.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 border-b">
                     <div className="flex items-center gap-2">
                       <Link
-                        className="text-blue-500"
+                        className="text-[#2f4b7c] font-semibold"
                         href={`/admin/volunteer/${volunteer.id}`}
                       >
                         {`${volunteer.firstName} ${volunteer.lastName}`}
@@ -400,14 +408,14 @@ Kids-U Volunteer Team`;
                       )}
                     </div>
                   </td>
-                  <td className="px-6 py-4 border-b">{volunteer.emailAddress}</td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{volunteer.emailAddress}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {new Date(volunteer.dateSubmitted).toLocaleDateString("en-US")}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {volunteer.registration ? "Registered" : "Not Registered"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {volunteer.orientationInvitation?.firstEmailSentAt
                       ? "Email sent"
                       : "Not sent"}

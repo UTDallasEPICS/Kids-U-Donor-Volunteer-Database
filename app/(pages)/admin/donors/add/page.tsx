@@ -40,13 +40,14 @@ export default function AddDonor() {
   });
 
   return (
-    <Box sx={styles.container} component="form">
-      <Box sx={styles.title}>
-        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          Add Donor
-        </Typography>
-      </Box>
-      <Box sx={styles.innerContainer}>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <Box sx={styles.container} component="form">
+        <Box sx={styles.title}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2f4b7c" }}>
+            Add Donor
+          </Typography>
+        </Box>
+        <Box sx={styles.innerContainer}>
         <Box sx={styles.title}>
           <Typography variant="h5" style={styles.titleText}>
             Donor Info
@@ -251,9 +252,10 @@ export default function AddDonor() {
             </Box>
           )}
         />
-        <AddDonorFooter handleSubmit={handleSubmit} isDirty={isDirty} errors={errors} />
+          <AddDonorFooter handleSubmit={handleSubmit} isDirty={isDirty} errors={errors} />
+        </Box>
       </Box>
-    </Box>
+    </div>
   );
 }
 
@@ -264,6 +266,11 @@ const styles = {
     gridTemplateColumns: "repeat(3, 1fr)",
     gap: 2,
     width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#ffffff",
+    borderRadius: "16px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
   },
   innerContainer: {
     gridColumn: "span 3",

@@ -17,6 +17,7 @@ const headCells = [
 export default function GrantorsPage() {
   const [grantorsData, setGrantorsData] = useState<Grantor[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const fetchGrantorsData = async () => {
     try {
@@ -26,6 +27,7 @@ export default function GrantorsPage() {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grantors:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load grantors");
       setLoading(false);
     }
   };
@@ -51,28 +53,34 @@ export default function GrantorsPage() {
   }
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumb />
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Grantors</h2>
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-[#2f4b7c]">Grantors</h2>
           <Link
             href="/admin/grants/grantor/add"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
           >
             Add New Grantor
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-100">
                 {headCells.map((headCell) => (
                   <th
                     key={headCell.id}
-                    className="px-6 py-3 border-b text-left font-bold"
+                    className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700"
                   >
                     {headCell.label}
                   </th>
@@ -82,28 +90,28 @@ export default function GrantorsPage() {
             <tbody>
               {grantorsData?.map((grantor) => (
                 <tr key={grantor.id} className="hover:bg-gray-50 cursor-pointer">
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-[#2f4b7c] font-semibold">
                     <Link
-                      className="text-blue-500"
+                      className="text-[#2f4b7c]"
                       href={`/admin/grants/grantor/detail/${grantor.id}`}
                     >
                       {grantor.organization?.name || "—"}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 border-b">{grantor.type || "—"}</td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{grantor.type || "—"}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grantor.organization?.address?.addressLine1 || "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grantor.organization?.address?.city || "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grantor.organization?.address?.state || "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grantor.organization?.address?.zipCode || "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grantor.communicationPreference || "—"}
                   </td>
                 </tr>
@@ -115,40 +123,3 @@ export default function GrantorsPage() {
     </div>
   );
 }
-const styles = {
- box: {
-    marginLeft: "1em",
-    marginRight: "1em",
-    marginTop: "5em",
-  },
-  table: {
-    minWidth: 750,
-    borderLeft: "1px solid #ccc",
-    borderRight: "1px solid #ccc",
-    borderTop: "1px solid #ccc",
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-  },
-  tableCell: {
-    borderTop: "1px solid #ccc",
-  },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  /*pagination: {
-    display: "flex",
-    justifyContent: "left",
-    width: "100%",
-    backgroundColor: "#ccc",
-  },*/
-  /*breadcrumb: {
-    marginLeft: "5px",
-    marginTop: "8px"
-  }*/
-};

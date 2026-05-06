@@ -13,7 +13,7 @@ export default async function ApplicationDetailPage({ params }: { params: Promis
     return (
       <div className="p-6 text-center">
         <h1 className="text-2xl font-bold text-red-600">Application Not Found</h1>
-        <p className="mt-2 text-gray-500">We couldn't find the application you were looking for. Please check the ID and try again.</p>
+        <p className="mt-2 text-gray-500">We could not find the application you were looking for. Please check the ID and try again.</p>
       </div>
     );
   }

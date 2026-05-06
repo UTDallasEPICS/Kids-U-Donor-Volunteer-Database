@@ -295,8 +295,9 @@ const GrantAddPage = () => {
   };
 
   return (
-      <Paper elevation={3} sx={{ padding: 3, margin: 2 }}>
-        <Typography variant="h4" gutterBottom>Add New Grant</Typography>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <Paper elevation={0} sx={{ padding: 4, margin: "0 auto", maxWidth: 1200, borderRadius: 2, boxShadow: "0 1px 4px rgba(0,0,0,0.08)" }}>
+        <Typography variant="h4" gutterBottom sx={{ color: "#2f4b7c", fontWeight: "bold" }}>Add New Grant</Typography>
         <Divider sx={{ mb: 3 }} />
 
         <Grid container spacing={3}>
@@ -778,6 +779,7 @@ const GrantAddPage = () => {
           </Alert>
         </Snackbar>
       </Paper>
+    </div>
   );
 };
 

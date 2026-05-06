@@ -102,52 +102,53 @@ export default function AddDonation() {
   }, [donorMode]);
 
   return (
-    <Box sx={styles.container} component="form">
-      <Box sx={styles.title}>
-        <Typography variant="h4" sx={{ fontWeight: "bold" }}>
-          Add Donation
-        </Typography>
-      </Box>
-
-      <Box sx={{ gridColumn: "span 3" }}>
-        <TextField
-          sx={{ ...styles.textField, width: "15%" }}
-          select
-          label="Donor Mode"
-          value={donorMode}
-          onChange={(event) => setDonorMode(event.target.value)}
-        >
-          {donorModes.map((type, index) => (
-            <MenuItem key={index} value={type.value}>
-              {type.label}
-            </MenuItem>
-          ))}
-        </TextField>
-      </Box>
-
-      {donorMode === "Existing" && (
-        <Box sx={styles.innerContainer}>
-          <Box sx={styles.title}>
-            <Typography variant="h5" style={styles.titleText}>
-              Donor Info
-            </Typography>
-          </Box>
-          <TextField
-            sx={{ ...styles.textField, gridColumn: "span 3" }}
-            label="Donor Email"
-            value={donorEmail}
-            onChange={(event) => setDonorEmail(event.target.value)}
-          ></TextField>
+    <div className="min-h-screen bg-gray-50 p-6">
+      <Box sx={styles.container} component="form">
+        <Box sx={styles.title}>
+          <Typography variant="h4" sx={{ fontWeight: "bold", color: "#2f4b7c" }}>
+            Add Donation
+          </Typography>
         </Box>
-      )}
 
-      {donorMode === "New" && (
-        <Box sx={styles.innerContainer}>
-          <Box sx={styles.title}>
-            <Typography variant="h5" style={styles.titleText}>
-              Donor Info
-            </Typography>
+        <Box sx={{ gridColumn: "span 3" }}>
+          <TextField
+            sx={{ ...styles.textField, width: "15%" }}
+            select
+            label="Donor Mode"
+            value={donorMode}
+            onChange={(event) => setDonorMode(event.target.value)}
+          >
+            {donorModes.map((type, index) => (
+              <MenuItem key={index} value={type.value}>
+                {type.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+
+        {donorMode === "Existing" && (
+          <Box sx={styles.innerContainer}>
+            <Box sx={styles.title}>
+              <Typography variant="h5" style={styles.titleText}>
+                Donor Info
+              </Typography>
+            </Box>
+            <TextField
+              sx={{ ...styles.textField, gridColumn: "span 3" }}
+              label="Donor Email"
+              value={donorEmail}
+              onChange={(event) => setDonorEmail(event.target.value)}
+            ></TextField>
           </Box>
+        )}
+
+        {donorMode === "New" && (
+          <Box sx={styles.innerContainer}>
+            <Box sx={styles.title}>
+              <Typography variant="h5" style={styles.titleText}>
+                Donor Info
+              </Typography>
+            </Box>
 
           <FormInputDropdown
             name={"donor.type"}
@@ -349,123 +350,130 @@ export default function AddDonation() {
         </Box>
       )}
 
-      <Box sx={styles.innerContainer}>
-        <Box sx={styles.title}>
-          <Typography variant="h5" style={styles.titleText}>
-            Donation Info
-          </Typography>
+        <Box sx={styles.innerContainer}>
+          <Box sx={styles.title}>
+            <Typography variant="h5" style={styles.titleText}>
+              Donation Info
+            </Typography>
+          </Box>
+          <FormInputDropdown
+            name={"donation.type"}
+            control={control}
+            label={"Type"}
+            required={true}
+            menuItems={donationTypes}
+            sx={styles.textField}
+          />
+          <Controller
+            name="donation.type"
+            control={control}
+            render={({ field: { value } }) => {
+              const label = value !== "In-Kind" ? "Donation Amount" : "Item(s) Value";
+              return (
+                <FormInputTextfield
+                  name={"donation.amount"}
+                  control={control}
+                  label={label}
+                  required={true}
+                  type={"currency"}
+                  sx={styles.textField}
+                />
+              );
+            }}
+          />
+          <Controller
+            name="donation.type"
+            control={control}
+            render={({ field: { value } }) =>
+              value !== "In-Kind" ? (
+                <FormInputDropdown
+                  name={"donation.paymentMethod"}
+                  control={control}
+                  label={"Method"}
+                  required
+                  menuItems={paymentMethods}
+                  sx={styles.textField}
+                />
+              ) : (
+                <FormInputTextfield
+                  name={"donation.item"}
+                  control={control}
+                  label={"Item(s)"}
+                  required
+                  sx={styles.textField}
+                />
+              )
+            }
+          />
+          <FormInputTextfield
+            name={"donation.campaign"}
+            control={control}
+            label={"Campaign"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputTextfield
+            name={"donation.fundDesignation"}
+            control={control}
+            label={"Fund"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputDate
+            name={"donation.date"}
+            control={control}
+            label={"Date"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputDropdown
+            name={"donation.recurringFrequency"}
+            control={control}
+            label={"Recurrence"}
+            required={true}
+            menuItems={recurringFrequencies}
+            sx={styles.textField}
+          />
+          <FormInputDropdown
+            name={"donation.source"}
+            control={control}
+            label={"Donation Source"}
+            required={true}
+            menuItems={donationSources}
+            sx={styles.textField}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.isMatching"}
+            label={"Matching Donation?"}
+            required
+          />
+          <FormInputTextfield
+            name={"donation.taxDeductibleAmount"}
+            control={control}
+            label={"Tax Deductible Amount"}
+            type={"currency"}
+            required={true}
+            sx={styles.textField}
+          />
+          <FormInputCheckbox
+            control={control}
+            setValue={setValue}
+            name={"donation.acknowledgementSent"}
+            label={"Acknowledgement Sent?"}
+            required
+          />
+          <AddFooter
+            donorMode={donorMode}
+            email={donorEmail}
+            handleSubmit={handleSubmit}
+            isDirty={isDirty}
+            errors={errors}
+          />
         </Box>
-        <FormInputDropdown
-          name={"donation.type"}
-          control={control}
-          label={"Type"}
-          required={true}
-          menuItems={donationTypes}
-          sx={styles.textField}
-        />
-        <Controller
-          name="donation.type"
-          control={control}
-          render={({ field: { value } }) => {
-            const label = value !== "In-Kind" ? "Donation Amount" : "Item(s) Value";
-            return (
-              <FormInputTextfield
-                name={"donation.amount"}
-                control={control}
-                label={label}
-                required={true}
-                type={"currency"}
-                sx={styles.textField}
-              />
-            );
-          }}
-        />
-        <Controller
-          name="donation.type"
-          control={control}
-          render={({ field: { value } }) =>
-            value !== "In-Kind" ? (
-              <FormInputDropdown
-                name={"donation.paymentMethod"}
-                control={control}
-                label={"Method"}
-                required
-                menuItems={paymentMethods}
-                sx={styles.textField}
-              />
-            ) : (
-              <FormInputTextfield
-                name={"donation.item"}
-                control={control}
-                label={"Item(s)"}
-                required
-                sx={styles.textField}
-              />
-            )
-          }
-        />
-        <FormInputTextfield
-          name={"donation.campaign"}
-          control={control}
-          label={"Campaign"}
-          required={true}
-          sx={styles.textField}
-        />
-        <FormInputTextfield
-          name={"donation.fundDesignation"}
-          control={control}
-          label={"Fund"}
-          required={true}
-          sx={styles.textField}
-        />
-        <FormInputDate name={"donation.date"} control={control} label={"Date"} required={true} sx={styles.textField} />
-        <FormInputDropdown
-          name={"donation.recurringFrequency"}
-          control={control}
-          label={"Recurrence"}
-          required={true}
-          menuItems={recurringFrequencies}
-          sx={styles.textField}
-        />
-        <FormInputDropdown
-          name={"donation.source"}
-          control={control}
-          label={"Donation Source"}
-          required={true}
-          menuItems={donationSources}
-          sx={styles.textField}
-        />
-        <FormInputCheckbox
-          control={control}
-          setValue={setValue}
-          name={"donation.isMatching"}
-          label={"Matching Donation?"}
-          required
-        />
-        <FormInputTextfield
-          name={"donation.taxDeductibleAmount"}
-          control={control}
-          label={"Tax Deductible Amount"}
-          type={"currency"}
-          required={true}
-          sx={styles.textField}
-        />
-        <FormInputCheckbox
-          control={control}
-          setValue={setValue}
-          name={"donation.acknowledgementSent"}
-          label={"Acknowledgement Sent?"}
-          required
-        />
-        <AddFooter
-          donorMode={donorMode}
-          email={donorEmail}
-          handleSubmit={handleSubmit}
-          isDirty={isDirty}
-          errors={errors}
-        />
       </Box>
-    </Box>
+    </div>
   );
 }
 const styles = {
@@ -475,6 +483,11 @@ const styles = {
     gridTemplateColumns: "repeat(3, 1fr)",
     gap: 2,
     width: "100%",
+    maxWidth: "1200px",
+    margin: "0 auto",
+    backgroundColor: "#ffffff",
+    borderRadius: "16px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.08)",
   },
   innerContainer: {
     gridColumn: "span 3",

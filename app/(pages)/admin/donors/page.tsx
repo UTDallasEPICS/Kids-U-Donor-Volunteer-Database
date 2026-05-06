@@ -24,6 +24,7 @@ type DonorWithRelations = PrismaDonor & {
 export default function DonorsList() {
   const [data, setData] = useState<DonorWithRelations[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const router = useRouter();
 
@@ -34,17 +35,21 @@ export default function DonorsList() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        const message = errorData?.message || "Something went wrong";
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 401 || response.status === 403) {
+          throw new Error("Not authorized. Please sign in again.");
+        }
+        const message = errorData?.message || errorData?.error || "Unable to load donors.";
         throw new Error(message);
       }
 
       const result = await response.json();
-      setData(result.data);
+      setData(Array.isArray(result.data) ? result.data : []);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching:", error);
-      router.push("/not-found");
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load donors");
+      setIsLoading(false);
     }
   };
 
@@ -69,28 +74,34 @@ export default function DonorsList() {
   }
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumb />
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Donors</h2>
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-[#2f4b7c]">Donors</h2>
           <Link
             href="/admin/donors/add"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
           >
             Add New Donor
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-100">
                 {headCells.map((headCell) => (
                   <th
                     key={headCell.id}
-                    className="px-6 py-3 border-b text-left font-bold"
+                    className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700"
                   >
                     {headCell.label}
                   </th>
@@ -109,21 +120,21 @@ export default function DonorsList() {
                 const last = lastDateIso ? new Date(lastDateIso).toLocaleDateString() : "";
 
                 return (
-                  <tr key={donor.id} className="hover:bg-gray-50 cursor-pointer">
-                    <td className="px-6 py-4 border-b">
+                  <tr key={donor.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 border-b text-sm text-[#2f4b7c] font-semibold">
                       <Link
-                        className="text-blue-500"
+                        className="text-[#2f4b7c]"
                         href={`/admin/donors/detail/${donor.id}`}
                       >
                         {donor.type}
                       </Link>
                     </td>
-                    <td className="px-6 py-4 border-b">{name}</td>
-                    <td className="px-6 py-4 border-b">{email}</td>
-                    <td className="px-6 py-4 border-b">{phone}</td>
-                    <td className="px-6 py-4 border-b">${total.toFixed(2)}</td>
-                    <td className="px-6 py-4 border-b">{last}</td>
-                    <td className="px-6 py-4 border-b">{donor.status}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">{name}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">{email}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">{phone}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">${total.toFixed(2)}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">{last}</td>
+                    <td className="px-6 py-4 border-b text-sm text-gray-700">{donor.status}</td>
                   </tr>
                 );
               })}
@@ -134,23 +145,3 @@ export default function DonorsList() {
     </div>
   );
 }
-
-const styles = {
-  box: {
-    marginLeft: "1em",
-    marginRight: "1em",
-    marginTop: "5em",
-  },
-  table: {
-    minWidth: 750,
-    borderLeft: "1px solid #ccc",
-    borderRight: "1px solid #ccc",
-    borderTop: "1px solid #ccc",
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-  },
-  tableCell: {
-    borderTop: "1px solid #ccc",
-  },
-};
