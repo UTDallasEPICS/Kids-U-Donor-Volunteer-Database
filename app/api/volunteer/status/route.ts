@@ -18,13 +18,13 @@ export async function GET(req: NextRequest) {
       }),
       prisma.volunteer.findFirst({
         where: { emailAddress: email },
-        select: { backgroundCheck: { select: { status: true } } },
+        select: { backgroundCheckStatus: true },
       }),
     ]);
 
     const result = {
       appStatus: app?.status ?? "NONE",
-      bgCheckStatus: volunteer?.backgroundCheck?.status ?? "NONE",
+      bgCheckStatus: volunteer?.backgroundCheckStatus ?? "NONE",
     };
     console.log("[volunteer/status]", email, result);
     return NextResponse.json(result);

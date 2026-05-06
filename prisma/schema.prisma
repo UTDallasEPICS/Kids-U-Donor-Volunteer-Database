@@ -242,6 +242,7 @@ model Volunteer {
   codeOfEthicsFormSigned        Boolean            @default(false)
   abuseNeglectReportFormSigned  Boolean            @default(false)
   personnelPoliciesFormSigned   Boolean            @default(false)
+  backgroundCheckStatus          BackgroundCheckStatus @default(PENDING)
   orientationCompleted          Boolean            @default(false)
   trainingModulesCompleted      Boolean            @default(false)
 

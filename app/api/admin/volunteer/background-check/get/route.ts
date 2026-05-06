@@ -3,47 +3,20 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const [pending, history] = await Promise.all([
-      prisma.volunteerBackgroundCheck.findMany({
-        where: { status: "PENDING" },
-        select: {
-          id: true,
-          fullName: true,
-          dateOfBirth: true,
-          county: true,
-          addressLine: true,
-          city: true,
-          state: true,
-          zipCode: true,
-          race: true,
-          gender: true,
-          agreedToBackgroundCheck: true,
-          eSignature: true,
-          signatureDate: true,
-          createdAt: true,
-          status: true,
-          volunteer: { select: { emailAddress: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.volunteerBackgroundCheck.findMany({
-        where: { status: { in: ["APPROVED", "REJECTED"] } },
-        select: {
-          id: true,
-          fullName: true,
-          dateOfBirth: true,
-          county: true,
-          city: true,
-          state: true,
-          createdAt: true,
-          status: true,
-          volunteer: { select: { emailAddress: true } },
-        },
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
+    const pending = await prisma.volunteer.findMany({
+      where: { isDeleted: false, backgroundCheckStatus: "PENDING" },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        emailAddress: true,
+        dateSubmitted: true,
+        backgroundCheckStatus: true,
+      },
+      orderBy: { dateSubmitted: "desc" },
+    });
 
-    return NextResponse.json({ pending, history }, { status: 200 });
+    return NextResponse.json({ pending }, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error fetching background checks:", errorMessage);

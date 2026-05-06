@@ -1,34 +1,46 @@
 import prisma from "@/app/utils/db";
 import { NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+interface JWTPayload {
+  userId: string;
+  email: string;
+  role: string;
+}
 
 export async function GET() {
   try {
-    const records = await prisma.volunteerBackgroundCheck.findMany({
-      where: {
-        status: "PENDING", // Changed from approved: false to status: PENDING
-      },
+    if (!JWT_SECRET) {
+      return NextResponse.json({ error: "Server configuration error" }, { status: 500 });
+    }
+
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as unknown as JWTPayload;
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
       select: {
-        id: true,
-        fullName: true,
-        dateOfBirth: true,
-        county: true,
-        addressLine: true,
-        city: true,
-        state: true,
-        zipCode: true,
-        race: true,
-        gender: true, // This matches your schema (not sex)
-        agreedToBackgroundCheck: true, // This matches your schema (not agreeToBackgroundCheck)
-        eSignature: true,
-        signatureDate: true,
-        createdAt: true,
+        person: {
+          select: { volunteer: { select: { backgroundCheckStatus: true } } },
+        },
       },
-      orderBy: { createdAt: "desc" },
     });
-    return NextResponse.json({ records }, { status: 200 });
+
+    const status = user?.person?.volunteer?.backgroundCheckStatus ?? "PENDING";
+
+    return NextResponse.json({ status }, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error fetching pending background checks:", errorMessage);
+    console.error("Error fetching background check status:", errorMessage);
     return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
   }
 }
