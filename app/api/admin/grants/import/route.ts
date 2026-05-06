@@ -132,12 +132,11 @@ function firstNonEmpty(row: Row, keys: string[]): string | null {
 
 function buildGrantName(args: {
   funder: string | null;
-  kidsUProgram: string | null;
   fundingArea: string | null;
 }): string {
   const parts = [
     args.funder,
-    args.kidsUProgram || args.fundingArea,
+    args.fundingArea,
   ].filter(Boolean) as string[];
   return parts.join(" | ").slice(0, 255) || "Unnamed Grant";
 }
@@ -273,7 +272,7 @@ export async function POST(req: NextRequest) {
 
         const grantName = buildGrantName({
           funder: orgName,
-          kidsUProgram,
+
           fundingArea,
         });
 
