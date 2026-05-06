@@ -149,7 +149,10 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     const data = await prisma.donor.findMany({
-      include: {
+      select: {
+        id: true,
+        type: true,
+        status: true,
         person: {
           select: {
             firstName: true,

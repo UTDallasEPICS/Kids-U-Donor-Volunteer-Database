@@ -35,10 +35,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Import", reference: "/admin/grants/import" },
             ]
           },
-          {
-            name: "Export",
-            reference: "/admin/export",
-          },
           { 
             name: "Volunteers", 
             reference: "/admin/volunteer", 
@@ -56,7 +52,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             reference: "/admin/events", 
             hasSubmenu: true,
             submenuItems: [
-              { name: "Add Orientation", reference: "/admin/orientations/add_orientation" },
               { name: "View Orientations", reference: "/admin/orientations/view_orientations" },
               { name: "Events", reference: "/admin/events" },
             ]

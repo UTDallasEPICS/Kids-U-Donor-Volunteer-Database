@@ -47,7 +47,6 @@ export default function VolunteerDashboard() {
   const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
   const [totalHours, setTotalHours] = useState<number>(0);
   const [attendedCount, setAttendedCount] = useState<number>(0);
-  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [orientationInvitation, setOrientationInvitation] = useState<OrientationInvitation | null>(null);
   const [showOrientationModal, setShowOrientationModal] = useState(false);
   const [selectedOrientationSlotId, setSelectedOrientationSlotId] = useState("");
@@ -64,12 +63,9 @@ export default function VolunteerDashboard() {
         const volunteerId = meData?.user?.volunteerId;
         if (!volunteerId) return;
 
-        const [events, hours, gallery] = await Promise.all([
+        const [events, hours] = await Promise.all([
           fetch(`/api/volunteer/events/upcoming?volunteerId=${volunteerId}`).then((res) => res.json()),
           fetch(`/api/volunteer/hours?volunteerId=${volunteerId}`).then((res) => res.json()),
-          fetch("/api/gallery/images")
-            .then((res) => res.json())
-            .catch(() => ({ images: [] })),
         ]);
 
         const orientationRes = await fetch(`/api/volunteer/orientation/options?volunteerId=${volunteerId}`);
@@ -100,9 +96,6 @@ export default function VolunteerDashboard() {
         setTotalHours(hours.total || 0);
         setAttendedCount(hours.attendedCount || 0);
 
-        if (gallery.images) {
-          setGalleryImages(gallery.images);
-        }
       } catch (err) {
         console.error("Failed to fetch dashboard data:", err);
       }
@@ -430,48 +423,6 @@ export default function VolunteerDashboard() {
             </div>
           </div>
 
-          {/* Image Gallery Section */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-[#2f4b7c]">Event Gallery</h2>
-              <p className="text-sm text-gray-500 mt-1">Recent moments from our volunteer activities</p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {galleryImages.length > 0 ? (
-                galleryImages.map((imgUrl, idx) => (
-                  <div
-                    key={idx}
-                    className="relative aspect-square rounded-xl overflow-hidden group cursor-pointer shadow-sm hover:shadow-md transition-all"
-                  >
-                    <Image
-                      src={imgUrl}
-                      alt={`Gallery image ${idx + 1}`}
-                      fill
-                      unoptimized={imgUrl.startsWith("data:")}
-                      sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 200px"
-                      className="object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </div>
-                ))
-              ) : (
-                <div className="col-span-full flex flex-col items-center justify-center py-12 text-center">
-                  <div className="w-20 h-20 bg-gradient-to-br from-[#2f4b7c]/10 to-[#4a6fa5]/10 rounded-full flex items-center justify-center mb-4">
-                    <svg className="w-10 h-10 text-[#2f4b7c]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <p className="text-sm text-gray-600">No images available yet</p>
-                </div>
-              )}
-            </div>
-          </div>
         </div>
 
         {/* Resources & Contact */}

@@ -40,10 +40,14 @@ export default function Checkinout() {
 
   const calculateHoursWorked = (checkIn: Date, checkOut: Date) => {
     const timeDiff = checkOut.getTime() - checkIn.getTime();
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const totalHours = timeDiff / (1000 * 60 * 60);
+    const wholeHours = Math.floor(totalHours);
+    const rawMinutes = Math.round((totalHours - wholeHours) * 60);
+    const minutes = rawMinutes === 60 ? 0 : rawMinutes;
+    const hours = rawMinutes === 60 ? wholeHours + 1 : wholeHours;
+    const hoursWorked = Math.round(totalHours * 100) / 100;
     return {
-      hoursWorked: hours,
+      hoursWorked,
       displayHours: hours,
       displayMinutes: minutes,
     };

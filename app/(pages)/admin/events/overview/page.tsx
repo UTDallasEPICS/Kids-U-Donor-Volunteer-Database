@@ -12,13 +12,13 @@ export default function EventsOverviewPage() {
       <span className="text-gray-400">/</span>
       <span className="font-semibold text-gray-700">Volunteers</span>
       <span className="text-gray-400">/</span>
-      <span className="font-semibold text-gray-700">Events Overview</span>
+      <span className="font-semibold text-gray-700">View Registrations</span>
     </div>
   );
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumb />
         <AdminRegTable />
       </div>

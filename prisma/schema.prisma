@@ -513,6 +513,19 @@ model MailRecipient {
   mail           Mail           @relation(fields: [mailId], references: [id])
 }
 
+model MailLog {
+  id              String   @id @default(uuid())
+  recipientType   String
+  to              String?
+  subject         String
+  body            String
+  sentAt          DateTime @default(now())
+  senderEmail     String?
+  totalRecipients Int
+  successCount    Int
+  failureCount    Int
+}
+
 model SentEmail {
   id          String    @id @default(uuid())
   subject     String

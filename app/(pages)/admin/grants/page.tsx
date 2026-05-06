@@ -18,6 +18,7 @@ const headCells = [
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const fetchGrantsData = async () => {
     try {
@@ -27,6 +28,7 @@ export default function GrantsPage() {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grants:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load grants");
       setLoading(false);
     }
   };
@@ -52,28 +54,34 @@ export default function GrantsPage() {
   }
 
   return (
-    <div className="flex font-sans">
-      <div className="flex-grow p-5">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
         <Breadcrumb />
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Grants</h2>
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-[#2f4b7c]">Grants</h2>
           <Link
             href="/admin/grants/add"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
           >
             Add New Grant
           </Link>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-300 rounded-lg overflow-hidden">
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full">
             <thead>
               <tr className="bg-gray-100">
                 {headCells.map((headCell) => (
                   <th
                     key={headCell.id}
-                    className="px-6 py-3 border-b text-left font-bold"
+                    className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700"
                   >
                     {headCell.label}
                   </th>
@@ -83,19 +91,19 @@ export default function GrantsPage() {
             <tbody>
               {grantsData?.map((grant) => (
                 <tr key={grant.id} className="hover:bg-gray-50 cursor-pointer">
-                  <td className="px-6 py-4 border-b max-w-xs">
+                  <td className="px-6 py-4 border-b max-w-xs text-sm text-[#2f4b7c] font-semibold">
                     <Link
-                      className="text-blue-500 block truncate" 
+                      className="text-[#2f4b7c] block truncate" 
                       href={`/admin/grants/detail/${grant.id}`}
                       title = {grant.name}
                     >
                       {grant.name}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
                       <Link
-                        className="text-blue-500"
+                        className="text-[#2f4b7c]"
                         href={`/admin/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}
                       >
                         {grant.representativeGrant[0].representative.grantor.organization.name}
@@ -104,22 +112,22 @@ export default function GrantsPage() {
                       "—"
                     )}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.representativeGrant?.[0]?.representative?.person?.firstName &&
                     grant.representativeGrant?.[0]?.representative?.person?.lastName
                       ? `${grant.representativeGrant[0].representative.person.firstName} ${grant.representativeGrant[0].representative.person.lastName}`
                       : "—"}
                   </td>
                   
-                  <td className="px-6 py-4 border-b">{grant.status}</td>
-                  <td className="px-6 py-4 border-b">{grant.purpose}</td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.status}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.purpose}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.startDate ? new Date(grant.startDate).toLocaleDateString() : "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.endDate ? new Date(grant.endDate).toLocaleDateString() : "—"}
                   </td>
-                  <td className="px-6 py-4 border-b">${grant.amountAwarded}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">${grant.amountAwarded}</td>
                 </tr>
               )) ?? null}
             </tbody>
@@ -129,42 +137,3 @@ export default function GrantsPage() {
     </div>
   );
 }
-
-const styles = {
-  box: {
-    marginLeft: "1em",
-    marginRight: "1em",
-    marginTop: "5em",
-  },
-  table: {
-    minWidth: 750,
-    borderLeft: "1px solid #ccc",
-    borderRight: "1px solid #ccc",
-    borderTop: "1px solid #ccc",
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-    whiteSpace: "nowrap",
-  },
-  tableCell: {
-    borderTop: "1px solid #ccc",
-  },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  /*pagination: {
-    display: "flex",
-    justifyContent: "left",
-    width: "100%",
-    backgroundColor: "#cccccc",
-  },*/
-  /*breadcrumb: {
-    marginLeft: "5px",
-    marginTop: "8px"
-  }*/
-};
