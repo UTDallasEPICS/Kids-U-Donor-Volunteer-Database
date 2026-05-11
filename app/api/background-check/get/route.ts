@@ -28,16 +28,20 @@ export async function GET() {
 
     const user = await prisma.user.findUnique({
       where: { id: decoded.userId },
-      select: {
-        person: {
-          select: { volunteer: { select: { backgroundCheckStatus: true } } },
-        },
-      },
+      select: { person: { select: { volunteer: { select: { id: true } } } } },
     });
 
-    const status = user?.person?.volunteer?.backgroundCheckStatus ?? "PENDING";
+    const volunteerId = user?.person?.volunteer?.id;
+    if (!volunteerId) {
+      return NextResponse.json({ submitted: false, record: null }, { status: 200 });
+    }
 
-    return NextResponse.json({ status }, { status: 200 });
+    const record = await prisma.volunteerBackgroundCheck.findFirst({
+      where: { volunteerId },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({ submitted: Boolean(record), record }, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error fetching background check status:", errorMessage);

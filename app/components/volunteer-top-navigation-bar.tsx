@@ -53,7 +53,7 @@ export default function VolunteerTopNavigationBar() {
       try {
         const res = await fetch('/api/background-check/get');
         const data = await res.json();
-        if (data.status === "APPROVED") {
+        if (data.submitted && data.record?.status === "APPROVED") {
           setBgCheckApproved(true);
         }
       } catch {

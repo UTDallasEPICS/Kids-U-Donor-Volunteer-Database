@@ -4,11 +4,10 @@ import { useState, useEffect } from 'react';
 
 interface BackgroundCheck {
   id: string;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  dateSubmitted: string;
-  backgroundCheckStatus: 'PENDING' | 'APPROVED' | 'DECLINED';
+  fullName: string;
+  createdAt: string;
+  status: 'PENDING' | 'APPROVED' | 'DECLINED';
+  volunteer?: { emailAddress: string } | null;
 }
 
 export default function AdminBackgroundCheckPage() {
@@ -108,15 +107,17 @@ export default function AdminBackgroundCheckPage() {
             </thead>
             <tbody>
               {checks.map((check) => {
-                const isApproved = check.backgroundCheckStatus === 'APPROVED';
+                const isApproved = check.status === 'APPROVED';
                 return (
                   <tr key={check.id} className="border-t hover:bg-gray-50">
                     <td className="px-6 py-4 text-sm text-gray-700 font-semibold">
-                      {check.firstName} {check.lastName}
+                      {check.fullName}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{check.emailAddress}</td>
                     <td className="px-6 py-4 text-sm text-gray-700">
-                      {new Date(check.dateSubmitted).toLocaleDateString()}
+                      {check.volunteer?.emailAddress ?? "—"}
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {new Date(check.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-700">
                       {isApproved ? 'Approved' : 'Pending'}

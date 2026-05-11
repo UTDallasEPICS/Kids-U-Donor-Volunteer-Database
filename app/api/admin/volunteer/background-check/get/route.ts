@@ -3,17 +3,15 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    const pending = await prisma.volunteer.findMany({
-      where: { isDeleted: false, backgroundCheckStatus: "PENDING" },
+    const pending = await prisma.volunteerBackgroundCheck.findMany({
+      where: { status: "PENDING" },
       select: {
         id: true,
-        firstName: true,
-        lastName: true,
-        emailAddress: true,
-        dateSubmitted: true,
-        backgroundCheckStatus: true,
+        fullName: true,
+        createdAt: true,
+        volunteer: { select: { emailAddress: true } },
       },
-      orderBy: { dateSubmitted: "desc" },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ pending }, { status: 200 });

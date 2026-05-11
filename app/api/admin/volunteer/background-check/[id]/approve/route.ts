@@ -9,13 +9,13 @@ export async function PATCH(_: Request, { params }: { params: { id: string } }) 
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
-    const volunteer = await prisma.volunteer.update({
+    const backgroundCheck = await prisma.volunteerBackgroundCheck.update({
       where: { id },
-      data: { backgroundCheckStatus: "APPROVED" },
-      select: { id: true, backgroundCheckStatus: true },
+      data: { status: "APPROVED" },
+      select: { id: true, status: true },
     });
 
-    return NextResponse.json({ message: "Background check approved", data: volunteer }, { status: 200 });
+    return NextResponse.json({ message: "Background check approved", data: backgroundCheck }, { status: 200 });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error("Error approving background check:", id, errorMessage);

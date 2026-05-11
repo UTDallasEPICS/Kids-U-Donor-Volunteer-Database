@@ -4,11 +4,9 @@ import { useEffect, useState } from 'react';
 
 type BGCRecord = {
   id: string;
-  firstName: string;
-  lastName: string;
-  emailAddress: string;
-  dateSubmitted: string;
-  backgroundCheckStatus: 'PENDING' | 'APPROVED' | 'DECLINED';
+  fullName: string;
+  createdAt: string;
+  volunteer?: { emailAddress: string } | null;
 };
 
 export default function BackgroundChecksPage() {
@@ -85,11 +83,13 @@ export default function BackgroundChecksPage() {
               {pending.map(record => (
                 <tr key={record.id} className="border-t hover:bg-gray-50">
                   <td className="px-6 py-4 text-sm text-gray-700 font-semibold">
-                    {record.firstName} {record.lastName}
+                    {record.fullName}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">{record.emailAddress}</td>
                   <td className="px-6 py-4 text-sm text-gray-700">
-                    {new Date(record.dateSubmitted).toLocaleDateString()}
+                    {record.volunteer?.emailAddress ?? "—"}
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">
+                    {new Date(record.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-700">Pending</td>
                   <td className="px-6 py-4 text-sm text-gray-700">
