@@ -4,24 +4,13 @@ import { NextResponse } from "next/server";
 export async function GET() {
   try {
     const checks = await prisma.volunteerBackgroundCheck.findMany({
+      where: { status: { in: ["APPROVED", "DECLINED"] } },
       select: {
         id: true,
         fullName: true,
-        dateOfBirth: true,
-        county: true,
-        addressLine: true,
-        city: true,
-        state: true,
-        zipCode: true,
-        race: true,
-        gender: true,
-        agreedToBackgroundCheck: true,
-        eSignature: true,
-        signatureDate: true,
-        status: true,
-        declineReason: true,
         createdAt: true,
-        updatedAt: true,
+        status: true,
+        volunteer: { select: { emailAddress: true } },
       },
       orderBy: { createdAt: "desc" },
     });
