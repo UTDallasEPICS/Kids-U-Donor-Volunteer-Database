@@ -21,11 +21,7 @@ export const FormInputTextfield = ({
       name={name}
       control={control}
       rules={{ required: required ? "This field is required." : false }}
-      render={({
-        field: { onChange, value },
-        fieldState: { invalid, isDirty, error },
-        formState,
-      }) => {
+      render={({ field: { onChange, value }, fieldState: { invalid, isDirty, error }, formState }) => {
         const handleZip = (event: React.ChangeEvent<HTMLInputElement>) => {
           const cursorPosition = event.target.selectionStart;
 
@@ -33,8 +29,7 @@ export const FormInputTextfield = ({
             onChange(Number(event.target.value).toString().slice(0, 5));
 
             setTimeout(() => {
-              event.target.selectionStart = event.target.selectionEnd =
-                cursorPosition;
+              event.target.selectionStart = event.target.selectionEnd = cursorPosition;
             }, 0);
           }
         };
@@ -47,17 +42,10 @@ export const FormInputTextfield = ({
 
           // Allow only one period
           const numSplit = num.split(".");
-          const formattedNum =
-            numSplit.length > 2
-              ? `${numSplit[0]}.${numSplit.slice(1).join("")}`
-              : num;
+          const formattedNum = numSplit.length > 2 ? `${numSplit[0]}.${numSplit.slice(1).join("")}` : num;
 
           // Remove leading zero case
-          if (
-            formattedNum.startsWith("0") &&
-            formattedNum.length > 1 &&
-            formattedNum[1] !== "."
-          ) {
+          if (formattedNum.startsWith("0") && formattedNum.length > 1 && formattedNum[1] !== ".") {
             onChange(parseFloat(formattedNum.substring(1)));
             return;
           }
@@ -94,17 +82,12 @@ export const FormInputTextfield = ({
             helperText={error ? error.message : null}
             onChange={onChangeHandler}
             value={value}
-            slotProps={{
-              input: {
-                startAdornment:
-                  type === "currency" ? (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ) : null,
-                readOnly: readOnly,
-              },
-              htmlInput: {
-                ...(maxLength ? { maxLength: maxLength } : {}),
-              },
+            InputProps={{
+              startAdornment: type === "currency" ? <InputAdornment position="start">$</InputAdornment> : null,
+              readOnly: readOnly,
+            }}
+            inputProps={{
+              ...(maxLength ? { maxLength: maxLength } : {}),
             }}
           />
         );
