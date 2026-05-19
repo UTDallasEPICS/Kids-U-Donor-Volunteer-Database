@@ -229,13 +229,11 @@ export const MiniDonationsTable = ({ donations }: { donations: DonationTableStat
               count={donations.length}
               rowsPerPage={rowsPerPage}
               page={page}
-              slotProps={{
-                select: {
-                  inputProps: {
-                    "aria-label": "rows per page",
-                  },
-                  native: true,
+              SelectProps={{
+                inputProps: {
+                  "aria-label": "rows per page",
                 },
+                native: true,
               }}
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}

@@ -17,6 +17,7 @@ export type OrganizationState = {
   pointOfContactName?: string | null;
   pointOfContactTitle?: string | null;
   referralSource?: string | null;
+  address?: AddressState;
 };
 
 export type PersonState = {
@@ -126,9 +127,12 @@ export type GrantState = {
 export type DonationResponse = {
   data: Donation & {
     donor: {
-      person: {
+      person?: {
         firstName: string;
         lastName: string;
+      };
+      organization?: {
+        name: string;
       };
     };
   };

@@ -1,6 +1,15 @@
 import { Control } from "react-hook-form";
 import { SxProps, Theme } from "@mui/material";
-import { AddressState, DonationState, DonorState, OrganizationState, PersonState, VolunteerState, GrantorState, GrantState } from "@/app/types/states";
+import {
+  AddressState,
+  DonationState,
+  DonorState,
+  OrganizationState,
+  PersonState,
+  VolunteerState,
+  GrantorState,
+  GrantState,
+} from "@/app/types/states";
 
 export type MenuItem = {
   label: string;
@@ -11,7 +20,6 @@ export type MenuItemType = {
   label: string;
   value: string;
 };
-
 
 export type CheckBoxItem = {
   label: string;
@@ -45,7 +53,7 @@ export type AddDonationDonorFormProps = DonationFormProps & DonorFormProps;
 
 export type FormInputProps = {
   name: string;
-  control?: Control<any>;
+  control?: any;
   label: string;
   required?: boolean;
   setValue?: any;

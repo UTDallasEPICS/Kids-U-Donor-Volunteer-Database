@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
 
     // Write file — named <userId>.<ext>, overwrites on same extension
     const filename = `${userId}.${ext}`;
-    const buffer = Buffer.from(await file.arrayBuffer());
-    await writeFile(join(UPLOAD_DIR, filename), buffer);
+    const fileBytes = new Uint8Array(await file.arrayBuffer());
+    await writeFile(join(UPLOAD_DIR, filename), fileBytes);
 
     const avatarPath = `/uploads/avatars/${filename}`;
     await prisma.user.update({

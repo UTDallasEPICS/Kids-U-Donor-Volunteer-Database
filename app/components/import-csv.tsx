@@ -74,18 +74,14 @@ export const Import = () => {
 
   return (
     <Box sx={styles.container}>
-      <Box sx={styles.uploadContainer} component="form">
+      <Box sx={styles.uploadContainer} component="form" onSubmit={handleSubmitFile}>
         <TextField
           type="file"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setFile(event.target.files?.[0] || null)}
           variant="outlined"
-          slotProps={{
-            htmlInput: { accept: ".csv" },
-          }}
+          inputProps={{ accept: ".csv" }}
         />
-        <Button type="submit" onSubmit={handleSubmitFile}>
-          Upload
-        </Button>
+        <Button type="submit">Upload</Button>
       </Box>
 
       <Box>

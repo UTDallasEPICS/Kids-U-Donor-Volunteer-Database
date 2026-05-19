@@ -1,34 +1,27 @@
 import { Controller } from "react-hook-form";
 import { FormInputProps } from "./form-input-props";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
+import TextField from "@mui/material/TextField";
 
-export const FormInputDate = ({
-  name,
-  control,
-  label,
-  required,
-  sx,
-}: FormInputProps) => {
+export const FormInputDate = ({ name, control, label, required, sx }: FormInputProps) => {
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <Controller
-        name={name}
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <DatePicker
+    <Controller
+      name={name}
+      control={control}
+      render={({ field: { onChange, value } }) => {
+        const dateValue = value ? new Date(value) : null;
+        const iso = dateValue ? dateValue.toISOString().slice(0, 10) : "";
+        return (
+          <TextField
             sx={sx}
             label={label}
-            slotProps={{
-              textField: {
-                required: required,
-              },
-            }}
-            value={value ? new Date(value) : null}
-            onChange={onChange}
+            required={required}
+            type="date"
+            value={iso}
+            onChange={(e) => onChange(e.target.value ? new Date(e.target.value) : null)}
+            InputLabelProps={{ shrink: true }}
           />
-        )}
-      />
-    </LocalizationProvider>
+        );
+      }}
+    />
   );
 };

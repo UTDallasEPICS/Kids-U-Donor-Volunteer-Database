@@ -27,10 +27,8 @@ export const FormInputDropdown: React.FC<FormInputSelectProps> = ({
           helperText={error ? error.message : null}
           onChange={onChange}
           value={value}
-          slotProps={{
-            input: {
-              readOnly: readOnly,
-            },
+          InputProps={{
+            readOnly: readOnly,
           }}
         >
           {menuItems.map((item: MenuItemType) => (

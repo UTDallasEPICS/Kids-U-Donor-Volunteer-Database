@@ -2,14 +2,22 @@ import { Box, Button, Tooltip } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FieldErrors, UseFormHandleSubmit } from "react-hook-form";
-import { DonationFormProps, DonorFormProps, GrantorFormProps, GrantFormProps, VolunteerFormProps } from "../form-components/form-input-props";
+import {
+  DonationFormProps,
+  DonorFormProps,
+  GrantorFormProps,
+  GrantFormProps,
+  VolunteerFormProps,
+} from "../form-components/form-input-props";
 
 type FooterProps = {
   id: string;
   name: string;
   href: string;
   apiUrl: string;
-  handleSubmit: UseFormHandleSubmit<DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps>;
+  handleSubmit: UseFormHandleSubmit<
+    DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps
+  >;
   isDirty: boolean;
   errors: FieldErrors<DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps>;
 };
@@ -36,7 +44,9 @@ export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, er
     handleButtonDisable();
   }, [isButtonDisabled]);
 
-  const handleSave = async (data: DonorFormProps | DonationFormProps) => {
+  const handleSave = async (
+    data: DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps
+  ) => {
     // If fields not changed, don't save
     if (!isDirty || Object.keys(errors).length > 0) {
       alert("Cannot save when fields are unchanged or there are validation errors.");

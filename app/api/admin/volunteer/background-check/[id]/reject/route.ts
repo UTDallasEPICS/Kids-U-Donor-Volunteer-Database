@@ -2,6 +2,8 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import { sendApplicationRejectionEmail } from "@/app/utils/email";
 
+// Could be removed
+
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
 
@@ -58,6 +60,13 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       },
       select: { volunteerId: true },
     });
+
+    let emailSent = false;
+    if (email) {
+      const firstName = existingCheck.fullName?.trim().split(" ")[0] || "Volunteer";
+      await sendApplicationRejectionEmail(email, firstName, declineReason || undefined);
+      emailSent = true;
+    }
 
     return NextResponse.json(
       {

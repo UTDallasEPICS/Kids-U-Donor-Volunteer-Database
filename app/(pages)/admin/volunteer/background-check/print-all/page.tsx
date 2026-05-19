@@ -1,12 +1,14 @@
-import { notFound } from 'next/navigation';
-import prisma from '@/app/utils/db';
-import PrintTrigger from '../[id]/print/PrintTrigger';
-import PrintToolbar from '../[id]/print/PrintToolbar';
+import { notFound } from "next/navigation";
+import prisma from "@/app/utils/db";
+import PrintTrigger from "../[id]/print/PrintTrigger";
+import PrintToolbar from "../[id]/print/PrintToolbar";
+
+// Could be removed
 
 export default async function PrintAllBackgroundChecksPage() {
   const records = await prisma.volunteerBackgroundCheck.findMany({
-    where: { approved: false },
-    orderBy: { createdAt: 'desc' },
+    where: { status: "PENDING" },
+    orderBy: { createdAt: "desc" },
   });
 
   if (records.length === 0) notFound();
@@ -82,7 +84,7 @@ export default async function PrintAllBackgroundChecksPage() {
             <div className="grid">
               <div className="field full">
                 <label>Agreed to Background Check</label>
-                <p>{record.agreedToBackgroundCheck ? 'Yes' : 'No'}</p>
+                <p>{record.agreedToBackgroundCheck ? "Yes" : "No"}</p>
               </div>
               <div className="field full">
                 <label>Electronic Signature</label>
