@@ -6,8 +6,8 @@ import Loading from "@/app/loading";
 
 const headCells = [
   { id: "grantor", label: "Grantor" },
-  { id: "representative", label: "Representative" },
-  { id: "name", label: "Name" },
+  //{ id: "representative", label: "Representative" },
+  //{ id: "name", label: "Name" },
   { id: "status", label: "Status" },
   { id: "purpose", label: "Purpose" },
   { id: "startDate", label: "Start Date" },
@@ -100,7 +100,7 @@ export default function GrantsPage() {
                       {grant.name}
                     </Link>
                   </td>
-                  <td className="px-6 py-4 border-b text-sm text-gray-700">
+                  {/*<td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
                       <Link
                         className="text-[#2f4b7c]"
@@ -111,13 +111,13 @@ export default function GrantsPage() {
                     ) : (
                       "—"
                     )}
-                  </td>
-                  <td className="px-6 py-4 border-b text-sm text-gray-700">
+                  </td>*/}
+                  {/*<td className="px-6 py-4 border-b text-sm text-gray-700">
                     {grant.representativeGrant?.[0]?.representative?.person?.firstName &&
                     grant.representativeGrant?.[0]?.representative?.person?.lastName
                       ? `${grant.representativeGrant[0].representative.person.firstName} ${grant.representativeGrant[0].representative.person.lastName}`
                       : "—"}
-                  </td>
+                  </td>*/}
                   
                   <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.status}</td>
                   <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.purpose}</td>
