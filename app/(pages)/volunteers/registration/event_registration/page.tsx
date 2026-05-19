@@ -101,7 +101,7 @@ export default function EventRegPage() {
                 <p className="font-semibold text-red-700">Background Check Required</p>
                 <p className="text-red-600 text-sm mt-1">
                   You need to be background checked to register for this event.{" "}
-                  <a href="/volunteers/apply/background-check" className="underline font-medium">Submit your background check here.</a>
+                  {/* <a href="/volunteers/apply/background-check" className="underline font-medium">Submit your background check here.</a> */}
                 </p>
               </div>
             </div>
