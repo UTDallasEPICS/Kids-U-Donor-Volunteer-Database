@@ -94,6 +94,7 @@ export async function POST(req: NextRequest) {
             status: body.data.donor.status || "Active",
             notes: body.data.donor.notes || "",
             isRetained: body.data.donor.isRetained || false,
+            isCorporateSponsor: body.data.donor.isCorporateSponsor || false,
             ...(body.data.donor.type !== "Individual"
               ? {
                   organization: {
@@ -101,6 +102,10 @@ export async function POST(req: NextRequest) {
                       name: body.data.organization.name || "",
                       emailAddress: body.data.organization.emailAddress || "",
                       phoneNumber: body.data.organization.phoneNumber || "",
+                      website: body.data.organization.website || "",
+                      pointOfContactName: body.data.organization.pointOfContactName || "",
+                      pointOfContactTitle: body.data.organization.pointOfContactTitle || "",
+                      referralSource: body.data.organization.referralSource || "",
                       address: {
                         create: {
                           addressLine1: body.data.address.addressLine1 || "",
@@ -121,6 +126,7 @@ export async function POST(req: NextRequest) {
                       lastName: body.data.person.lastName || "",
                       emailAddress: body.data.person.emailAddress || "",
                       phoneNumber: body.data.person.phoneNumber || "",
+                      referralSource: body.data.person.referralSource || "",
                       address: {
                         create: {
                           addressLine1: body.data.address.addressLine1 || "",

@@ -4,6 +4,7 @@ export interface Event {
   schedule: Date;
   description: string;
   locationId: string | null;
+  bgCheckRequired: boolean;
   location?: {
     id: string;
     name: string;

@@ -1,7 +1,31 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import logo from '/app/logo.png';
+import logo from '../../logo.png';
+import Link from "next/link";
+
+type OrientationReminder = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  daysSinceSignup: number;
+};
+
+type OrientationTask = {
+  id: string;
+  meetingLink: string;
+  confirmedAt: string | null;
+  volunteer: {
+    firstName: string;
+    lastName: string;
+    emailAddress: string;
+  };
+  selectedSlot: {
+    startTime: string;
+    endTime: string;
+  } | null;
+};
 
 
 export default function AdminDashboard() {
@@ -12,40 +36,39 @@ export default function AdminDashboard() {
   const [averageDonation, setAverageDonation] = useState<number | null>(null);
   const [pendingGrants, setPendingGrants] = useState<number | null>(null);
   const [tasks, setTasks] = useState<any[]>([]);
-  const [newTask, setNewTask] = useState("");
+  const [orientationReminders, setOrientationReminders] = useState<OrientationReminder[]>([]);
+  const [orientationTasks, setOrientationTasks] = useState<OrientationTask[]>([]);
+
+  const fetchJson = async (url: string) => {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Request failed: ${url}`);
+    return res.json();
+  };
 
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/admin/dashboard/box1').then(res => res.json()),
-      fetch('/api/admin/dashboard/box2').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/hours').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/donation').then(res => res.json()),
-      fetch('/api/admin/dashboard/box7/grants').then(res => res.json()),
-      fetch('/api/admin/dashboard/box6').then(res => res.json()),
-    ]).then(([volunteers, donors, hours, donation, grants, tasksData]) => {
+      fetchJson('/api/admin/dashboard/box1'),
+      fetchJson('/api/admin/dashboard/box2'),
+      fetchJson('/api/admin/dashboard/box3'),
+      fetchJson('/api/admin/dashboard/box7/hours'),
+      fetchJson('/api/admin/dashboard/box7/donation'),
+      fetchJson('/api/admin/dashboard/box7/grants'),
+      fetchJson('/api/admin/dashboard/box6'),
+      fetchJson('/api/admin/orientation/reminders'),
+      fetchJson('/api/admin/orientation/tasks'),
+    ]).then(([volunteers, donors, grantsCount, hours, donation, grants, tasksData, reminders, orientationTasksData]) => {
       setTotalVolunteers(volunteers.total);
       setTotalDonors(donors.total);
+      setTotalGrants(grantsCount.total);
       setVolunteerHours(hours.total);
       setAverageDonation(donation.average);
       setPendingGrants(grants.total);
-      setTasks(tasksData);
+      setTasks(Array.isArray(tasksData) ? tasksData : []);
+      setOrientationReminders(Array.isArray(reminders?.reminders) ? reminders.reminders : []);
+      setOrientationTasks(Array.isArray(orientationTasksData?.tasks) ? orientationTasksData.tasks : []);
     }).catch(err => console.error('Failed to fetch dashboard data:', err));
   }, []);
-
-
-  const handleAddTask = async () => {
-    if (newTask.trim()) {
-      const res = await fetch('/api/admin/dashboard/box6', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: newTask, completed: false })
-      });
-      const createdTask = await res.json();
-      setTasks([...tasks, createdTask]);
-      setNewTask("");
-    }
-  };
 
 
   const handleToggle = async (id: number) => {
@@ -57,13 +80,17 @@ export default function AdminDashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: task.title, completed: !task.completed })
     });
+    if (!res.ok) return;
     const updatedTask = await res.json();
-    setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+    if (updatedTask && typeof updatedTask.id === "number") {
+      setTasks(tasks.map(t => t.id === id ? updatedTask : t));
+    }
   };
 
 
   const handleDelete = async (id: number) => {
-    await fetch(`/api/admin/dashboard/box6/${id}`, { method: "DELETE" });
+    const res = await fetch(`/api/admin/dashboard/box6/${id}`, { method: "DELETE" });
+    if (!res.ok) return;
     setTasks(tasks.filter(task => task.id !== id));
   };
 
@@ -135,47 +162,33 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-
-      {/* Campaign Metrics*/}
-      <div className="grid grid-cols-1 lg:grid-cols-3 auto-rows-max gap-5 mb-6">
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Campaign Performance</h3>
-          <div className="flex items-center justify-center mb-4">
-            <div className="relative w-40 h-40">
-              <svg viewBox="0 0 100 100" className="transform -rotate-90">
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#D1D5DB" strokeWidth="20" strokeDasharray="27 190" strokeDashoffset="0" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#DC2626" strokeWidth="20" strokeDasharray="14 190" strokeDashoffset="-27" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#991B1B" strokeWidth="20" strokeDasharray="21 190" strokeDashoffset="-41" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#3B82F6" strokeWidth="20" strokeDasharray="20 190" strokeDashoffset="-62" />
-                <circle cx="50" cy="50" r="35" fill="none" stroke="#60A5FA" strokeWidth="20" strokeDasharray="13 190" strokeDashoffset="-82" />
-              </svg>
+      {orientationReminders.length > 0 && (
+        <div className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 p-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-bold text-amber-900">
+                Orientation scheduling reminder
+              </p>
+              <p className="text-sm text-amber-800 mt-1">
+                {orientationReminders.length} volunteer{orientationReminders.length > 1 ? "s" : ""} signed up over a week ago and still need the first orientation scheduling email.
+              </p>
+              <p className="text-xs text-amber-700 mt-2">
+                Oldest pending: {orientationReminders[0].firstName} {orientationReminders[0].lastName} ({orientationReminders[0].daysSinceSignup} days ago)
+              </p>
             </div>
-          </div>
-          <div className="space-y-2 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-gray-300 rounded-sm"></div>
-              <span className="text-gray-700">Special Projects 27%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-600 rounded-sm"></div>
-              <span className="text-gray-700">Tutoring 14%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-red-900 rounded-sm"></div>
-              <span className="text-gray-700">Corporate Events 21%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-sm"></div>
-              <span className="text-gray-700">General 20%</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-400 rounded-sm"></div>
-              <span className="text-gray-700">Holiday Events 13%</span>
-            </div>
+            <Link
+              href="/admin/volunteer"
+              className="inline-flex items-center justify-center rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700"
+            >
+              Go Schedule Orientation
+            </Link>
           </div>
         </div>
+      )}
 
 
+      {/* Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 auto-rows-max gap-5 mb-6">
         {/* Key Metrics */}
         <div className="bg-white rounded-2xl p-6 shadow-sm">
           <h3 className="text-base font-semibold text-gray-900 mb-5">Key Metrics</h3>
@@ -199,22 +212,26 @@ export default function AdminDashboard() {
         {/* Tasks */}
         <div className="bg-white rounded-2xl p-6 shadow-sm row-span-2 flex flex-col">
           <h3 className="text-base font-semibold text-gray-900 mb-4">Tasks</h3>
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={newTask}
-              onChange={(e) => setNewTask(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleAddTask()}
-              placeholder="Add a task"
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-            />
-            <button
-              onClick={handleAddTask}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
-            >
-              Add
-            </button>
-          </div>
+          {orientationTasks.length > 0 && (
+            <div className="mb-4 rounded-xl border border-blue-200 bg-blue-50 p-3">
+              <p className="text-sm font-semibold text-blue-900 mb-2">Orientation reminders</p>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {orientationTasks.map((task) => (
+                  <div key={task.id} className="rounded-lg bg-white p-3 border border-blue-100 text-sm">
+                    <div className="font-medium text-gray-900">
+                      {task.volunteer.firstName} {task.volunteer.lastName}
+                    </div>
+                    <div className="text-gray-600 text-xs mt-1">
+                      {task.selectedSlot?.startTime ? new Date(task.selectedSlot.startTime).toLocaleString("en-US") : "Orientation confirmed"}
+                    </div>
+                    <div className="text-xs text-blue-700 mt-1 break-all">
+                      {task.meetingLink}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           <div className="flex-1 space-y-2 overflow-y-auto">
             {tasks.length === 0 ? (

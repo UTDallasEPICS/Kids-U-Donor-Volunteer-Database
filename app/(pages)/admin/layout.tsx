@@ -35,18 +35,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               { name: "Import", reference: "/admin/grants/import" },
             ]
           },
-          {
-            name: "Export",
-            reference: "/admin/export",
-          },
           { 
             name: "Volunteers", 
             reference: "/admin/volunteer", 
             hasSubmenu: true,
             submenuItems: [
               { name: "Volunteers List", reference: "/admin/volunteer" },
+              { name: "Volunteer Logs", reference: "/admin/volunteer/logs" },
               { name: "View Registrations", reference: "/admin/events/overview" },
               { name: "View Applications", reference: "/admin/volunteer/application" },
+              { name: "Background Checks", reference: "/admin/volunteer/background-check" },
             ]
           },
           { 
@@ -54,9 +52,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             reference: "/admin/events", 
             hasSubmenu: true,
             submenuItems: [
-              { name: "Add Orientation", reference: "/admin/orientations/add_orientation" },
               { name: "View Orientations", reference: "/admin/orientations/view_orientations" },
-              { name: "Add Event", reference: "/admin/events/add-event" },
+              { name: "Events", reference: "/admin/events" },
             ]
           },
           { 

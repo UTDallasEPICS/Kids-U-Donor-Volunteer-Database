@@ -1,19 +1,21 @@
 // app/api/auth/register/route.ts
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
-import { sendVerificationEmail, generateToken } from '../../../utils/email';
+import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { sendVerificationEmail, generateToken } from "../../../utils/email";
 
 const prisma = new PrismaClient();
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
 
 export async function POST(request: NextRequest) {
   try {
-    const { 
-      email, 
-      password, 
-      firstName, 
+    const {
+      email: rawEmail,
+      password,
+      firstName,
       lastName,
-      middleInitial,         
+      middleInitial,
       phoneNumber,
       addressLine,
       city,
@@ -24,20 +26,27 @@ export async function POST(request: NextRequest) {
       reliableTransport,
       speakSpanish,
       referenceName,
-      businessOrSchoolName,  
+      businessOrSchoolName,
     } = await request.json();
 
-    if (!email || !password || !firstName || !lastName) {
-      return NextResponse.json(
-        { error: 'Email, password, first name, and last name are required' },
-        { status: 400 }
-      );
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+    const normalizedFirstName = typeof firstName === "string" ? firstName.trim() : "";
+    const normalizedLastName = typeof lastName === "string" ? lastName.trim() : "";
+
+    if (!email || !password || !normalizedFirstName || !normalizedLastName) {
+      return NextResponse.json({ error: "Email, password, first name, and last name are required" }, { status: 400 });
     }
 
+    if (!EMAIL_REGEX.test(email)) {
+      return NextResponse.json({ error: "Please enter a valid email address" }, { status: 400 });
+    }
 
-    if (password.length < 8) {
+    if (!PASSWORD_REGEX.test(password)) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters long' },
+        {
+          error:
+            "Password must be at least 8 characters and include uppercase, lowercase, number, and special character",
+        },
         { status: 400 }
       );
     }
@@ -55,10 +64,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser || existingPerson || existingVolunteer) {
-      return NextResponse.json(
-        { error: 'User with this email already exists' },
-        { status: 409 }
-      );
+      return NextResponse.json({ error: "User with this email already exists" }, { status: 409 });
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -68,8 +74,8 @@ export async function POST(request: NextRequest) {
     const result = await prisma.$transaction(async (prisma) => {
       const person = await prisma.person.create({
         data: {
-          firstName,
-          lastName,
+          firstName: normalizedFirstName,
+          lastName: normalizedLastName,
           emailAddress: email,
           phoneNumber: phoneNumber,
         },
@@ -77,30 +83,37 @@ export async function POST(request: NextRequest) {
 
       const volunteer = await prisma.volunteer.create({
         data: {
-          firstName,
+          firstName: normalizedFirstName,
           middleInitial: middleInitial || null,
-          lastName,
+          lastName: normalizedLastName,
           emailAddress: email,
-          phoneNumber: phoneNumber || 'Not provided',        
-          addressLine: addressLine || 'Not provided',        
-          city: city || 'Not provided',                      
-          state: state || 'Not provided',                    
-          zipCode: zipCode || '00000',                       
+          phoneNumber: phoneNumber || "Not provided",
+          addressLine: addressLine || "Not provided",
+          city: city || "Not provided",
+          state: state || "Not provided",
+          zipCode: zipCode || "00000",
           usCitizen: usCitizen ?? null,
           driversLicense: driversLicense ?? null,
           reliableTransport: reliableTransport ?? null,
           speakSpanish: speakSpanish ?? null,
           referenceName: referenceName || null,
           businessOrSchoolName: businessOrSchoolName || null,
-          registration: true, 
+          registration: true,
+          personId: person.id,
         },
+      });
+
+      // if the schema also stores a volunteerId on Person, keep both sides in sync
+      await prisma.person.update({
+        where: { id: person.id },
+        data: { volunteer: { connect: { id: volunteer.id } } },
       });
 
       const user = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
-          role: 'VOLUNTEER',
+          role: "VOLUNTEER",
           verified: false,
           verificationToken,
           verificationExpiry,
@@ -111,30 +124,39 @@ export async function POST(request: NextRequest) {
       return { user, person, volunteer };
     });
 
-    await sendVerificationEmail(email, verificationToken, firstName);
-    console.log('Email sent successfully to:', email);
+    // Send verification email
+    try {
+      await sendVerificationEmail(email, verificationToken, normalizedFirstName);
+      console.log("Email sent successfully to:", email);
+    } catch (emailError) {
+      console.error("Email sending failed:", emailError);
+      // Log full error details for debugging
+      if (emailError instanceof Error) {
+        console.error("Error message:", emailError.message);
+        console.error("Error stack:", emailError.stack);
+      }
+      // Still return success to avoid disrupting the signup flow
+      // but user should be warned
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Registration successful. Please check your email to verify your account.',
+        message: "Registration successful. Please check your email to verify your account.",
         user: {
           id: result.user.id,
           email: result.user.email,
           verified: result.user.verified,
           firstName: result.person.firstName,
           lastName: result.person.lastName,
-          volunteerId: result.volunteer.id, 
+          volunteerId: result.volunteer.id,
         },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('Registration error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    console.error("Registration error:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   } finally {
     await prisma.$disconnect();
   }

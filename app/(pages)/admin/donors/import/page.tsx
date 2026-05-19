@@ -29,19 +29,32 @@ export default function Import() {
     }
 
     setIsUploading(true);
-    setStatusMessage('Uploading Excel file...');
+    setStatusMessage('Uploading file...');
 
     try {
-      // Convert Excel -> CSV in the browser, then send CSV as 'csv' field
-      const csvText = await convertExcelToCSV(selectedFile);
+      let csvText: string;
+      let csvFileName: string;
+
+      // Check if file is CSV or Excel
+      const isCSV = selectedFile.type === 'text/csv' || selectedFile.name.endsWith('.csv');
+
+      if (isCSV) {
+        // Read CSV directly
+        csvText = await selectedFile.text();
+        csvFileName = selectedFile.name;
+      } else {
+        // Convert Excel to CSV
+        csvText = await convertExcelToCSV(selectedFile);
+        csvFileName = selectedFile.name.replace(/\.(xlsx|xls)$/i, '.csv');
+      }
+
       const blob = new Blob([csvText], { type: 'text/csv' });
-      const csvFileName = selectedFile.name.replace(/\.(xlsx|xls)$/i, '.csv');
 
       const formData = new FormData();
-      // backend import route expects 'csv' field
-      formData.append('csv', new File([blob], csvFileName, { type: 'text/csv' }));
+      // backend import route expects 'file' field
+      formData.append('file', new File([blob], csvFileName, { type: 'text/csv' }));
 
-      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/admin/donations/import`;
+      const apiUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api'}/api/admin/donors/import`;
 
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -89,20 +102,22 @@ export default function Import() {
     setIsDragging(false);
     const file = event.dataTransfer.files?.[0] || null;
     if (file) {
-      const allowedExtensions = ['.xlsx', '.xls'];
+      const allowedExtensions = ['.xlsx', '.xls', '.csv'];
       const fileNameParts = file.name.split('.');
       const fileExtension = `.${fileNameParts[fileNameParts.length - 1]}`.toLowerCase();
 
       const allowedMimeTypes = [
         'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/csv',
+        'text/plain'
       ];
 
       if (allowedExtensions.includes(fileExtension) || allowedMimeTypes.includes(file.type)) {
         setSelectedFile(file);
         setStatusMessage('');
       } else {
-        setStatusMessage('Error: Invalid file type. Please upload an Excel file (.xlsx or .xls).');
+        setStatusMessage('Error: Invalid file type. Please upload an Excel file (.xlsx, .xls) or CSV file (.csv).');
         setSelectedFile(null);
       }
     }
@@ -125,12 +140,12 @@ export default function Import() {
   ];
 
   return (
-    <div className="font-sans p-8 w-full">
-      <div className="w-full max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 space-y-6">
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-sm p-8 space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-800">Import Donations Data</h1>
-          <p className="text-gray-500 mt-2">Upload an Excel file (.xlsx, .xls) to import new records.</p>
+          <h1 className="text-3xl font-bold text-[#2f4b7c]">Import Donations Data</h1>
+          <p className="text-gray-500 mt-2">Upload an Excel file (.xlsx, .xls) or CSV file (.csv) to import new records.</p>
         </div>
 
         {/* Hidden File Input */}
@@ -139,13 +154,16 @@ export default function Import() {
           ref={fileInputRef}
           onChange={handleFileChange}
           className="hidden"
-          accept=".xlsx, .xls, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          accept=".xlsx, .xls, .csv, application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv"
         />
 
         {/* Drag-and-Drop Area */}
         <div
-          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+          className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-[#4a6fa5] transition-colors"
           onClick={handleAreaClick}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
         >
           <div className="flex flex-col items-center space-y-3 text-gray-600">
             <UploadIcon />
@@ -155,7 +173,7 @@ export default function Import() {
                 <p className="text-sm text-gray-500">({(selectedFile.size / 1024).toFixed(2)} KB)</p>
               </div>
             ) : (
-              <p>Click here or drag an Excel file to upload</p>
+              <p>Click here or drag an Excel or CSV file to upload</p>
             )}
           </div>
         </div>
@@ -166,7 +184,7 @@ export default function Import() {
             type="button"
             onClick={handleUpload}
             disabled={!selectedFile || isUploading}
-            className="w-full max-w-xs flex justify-center items-center gap-2 bg-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="w-full max-w-xs flex justify-center items-center gap-2 bg-[#2f4b7c] text-white font-medium py-3 px-6 rounded-xl hover:bg-[#4a6fa5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#2f4b7c] transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             {isUploading ? 'Uploading...' : 'Import Now'}
           </button>
@@ -174,18 +192,31 @@ export default function Import() {
 
         {/* Status Message */}
         {statusMessage && (
-          <div className={`text-center text-sm p-3 rounded-md ${statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+          <div
+            className={`text-center text-sm p-3 rounded-xl ${
+              statusMessage.startsWith('Error:') ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            }`}
+          >
             <p className="font-medium">{statusMessage}</p>
           </div>
         )}
 
         {/* Database Fields Reference Section */}
         <div className="pt-4 border-t">
-          <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel Columns</h2>
-          <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-lg">
-            <p className="mb-3">Ensure the first row of your Excel file contains columns matching these fields.</p>
+          <h2 className="text-lg font-semibold text-gray-700 mb-3">Expected Excel/CSV Columns</h2>
+          <div className="text-xs text-gray-600 bg-gray-50 p-4 rounded-xl border border-[#4C7AB8]/30">
+            <p className="mb-3">Ensure the first row of your file contains columns matching these fields.</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
-              {dbFields.map(field => <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">{field}</p>)}
+              {dbFields.map((field) => (
+                <p key={field} className="font-mono bg-gray-200 px-2 py-1 rounded">
+                  {field}
+                </p>
+              ))}
+            </div>
+            <div className="mt-4 p-3 bg-blue-50 border-l-4 border-[#4C7AB8] rounded">
+              <p className="text-sm text-gray-700">
+                <span className="font-semibold">Total Columns Required:</span> {dbFields.length}
+              </p>
             </div>
           </div>
         </div>

@@ -18,9 +18,35 @@ function normalizeStr(v: any): string | null {
 function parseDate(value: any): Date | null {
   const v = normalizeStr(value);
   if (!v) return null;
-  const d = new Date(String(v));
-  return isNaN(d.getTime()) ? null : d;
+
+  const year = new Date().getFullYear();
+
+  // Strip common prefixes e.g. "LOI Feb 15" → "Feb 15"
+  let s = v.replace(/^(LOI|Due|By|Before)\s+/i, "").trim();
+
+  // Strip range suffixes e.g. "Jan 1-31st" → "Jan 1", "March 1 to April 1" → "March 1"
+  s = s.replace(/[-–]\d+(st|nd|rd|th).*$/i, "").trim();
+  s = s.replace(/\s+to\s+.*$/i, "").trim();
+  s = s.replace(/\s+to\s*$/i, "").trim();
+
+  // Try standard parse
+  let d = new Date(s);
+  if (!isNaN(d.getTime())) return d;
+
+  // Try appending current year e.g. "Feb 15" → "Feb 15 2025"
+  d = new Date(`${s} ${year}`);
+  if (!isNaN(d.getTime())) return d;
+
+  // Try D-Mon format e.g. "15-Oct" → "Oct 15 2025"
+  const dmMatch = s.match(/^(\d{1,2})[\s\-–]([A-Za-z]{3,})$/);
+  if (dmMatch) {
+    d = new Date(`${dmMatch[2]} ${dmMatch[1]} ${year}`);
+    if (!isNaN(d.getTime())) return d;
+  }
+
+  return null;
 }
+
 
 function parseBoolean(value: any): boolean {
   const v = normalizeStr(value);
@@ -106,21 +132,15 @@ function firstNonEmpty(row: Row, keys: string[]): string | null {
 
 function buildGrantName(args: {
   funder: string | null;
-  kidsUProgram: string | null;
   fundingArea: string | null;
-  quarter: string | null;
-  dueDate: string | null;
-  link: string | null;
 }): string {
   const parts = [
     args.funder,
-    args.kidsUProgram || args.fundingArea,
-    args.quarter,
-    args.dueDate,
-    args.link,
+    args.fundingArea,
   ].filter(Boolean) as string[];
   return parts.join(" | ").slice(0, 255) || "Unnamed Grant";
 }
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -252,11 +272,8 @@ export async function POST(req: NextRequest) {
 
         const grantName = buildGrantName({
           funder: orgName,
-          kidsUProgram,
+
           fundingArea,
-          quarter: quarter ?? null,
-          dueDate: grantDue ?? loiDue ?? null,
-          link: link ?? null,
         });
 
         // Proposal summary now excludes Notes and Resources (left blank)
@@ -271,15 +288,15 @@ export async function POST(req: NextRequest) {
           amountRequested,
           amountAwarded,
           purpose: "General",
-          startDate: new Date(),
-          endDate: new Date(),
+          startDate: null,
+          endDate: null,
           isMultipleYears: false,
           quarter: quarter ?? "Unknown",
           acknowledgementSent: false,
           awardNotificationDate: null,
           fundingArea: fundingArea ?? "Not specified",
           internalProposalDueDate: internalProposalDueDate ?? null,
-          proposalDueDate: proposalDueDate ?? new Date(),
+          proposalDueDate: proposalDueDate ?? null,
           proposalSummary,
           proposalSubmissionDate: null,
           applicationType:

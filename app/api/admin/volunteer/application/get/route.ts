@@ -15,12 +15,20 @@ export async function GET() {
         email: true,
         phoneNumber: true,
         educationLevel: true,
-        accepted: true,
+        status: true,
       },
       orderBy: {
         createdAt: "desc",
       },
-    });
+    where: {
+    status: "PENDING",
+  }
+
+    }); 
+
+
+
+    console.log("Applications fetched successfully:", applications)
 
     return NextResponse.json(applications);
   } catch (error) {

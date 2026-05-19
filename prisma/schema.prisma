@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   VOLUNTEER
   ADMIN
+  SUPER_ADMIN
 }
 
 model Person {
@@ -18,47 +19,61 @@ model Person {
   lastName       String
   emailAddress   String          @unique
   phoneNumber    String?         @unique
+  referralSource String?
   address        Address?
   donor          Donor?
   representative Representative?
   user           User?
+  // inverse side of volunteer->person, no foreign key stored here
+  volunteer      Volunteer?
+  superAdmin     SuperAdmin?
 }
 
 model Organization {
-  id           String   @id @default(uuid())
-  name         String
-  emailAddress String?  @unique
-  address      Address?
-  grantor      Grantor?
-  donor        Donor?
+  id                  String   @id @default(uuid())
+  name                String
+  emailAddress        String?  @unique
+  phoneNumber         String?
+  website             String?
+  pointOfContactName  String?
+  pointOfContactTitle String?
+  referralSource      String?
+  address             Address?
+  grantor             Grantor?
+  donor               Donor?
 }
 
 model User {
-  id            String    @id @default(uuid())
-  role          Role
-  personId      String?   @unique
-  person        Person?   @relation(fields: [personId], references: [id])
-  email         String    @unique
-  password      String
-  emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  verified        Boolean   @default(false)
-  verificationToken    String?   @unique
-  verificationExpiry   DateTime?
-  twoFactorEnabled     Boolean   @default(false)
-  twoFactorCode        String?
-  twoFactorExpiry      DateTime?
-  resetToken           String?   @unique
-  resetTokenExpiry     DateTime?
+  id                          String                           @id @default(uuid())
+  role                        Role
+  personId                    String?                          @unique
+  person                      Person?                          @relation(fields: [personId], references: [id])
+  email                       String                           @unique
+  avatarPath                  String?
+  deletedAt                   DateTime?
+  password                    String
+  emailVerified               DateTime?
+  createdAt                   DateTime                         @default(now())
+  updatedAt                   DateTime                         @updatedAt
+  verified                    Boolean                          @default(false)
+  verificationToken           String?                          @unique
+  verificationExpiry          DateTime?
+  twoFactorEnabled            Boolean                          @default(false)
+  twoFactorCode               String?
+  twoFactorExpiry             DateTime?
+  resetToken                  String?                          @unique
+  resetTokenExpiry            DateTime?
+  orientationSlotsCreated     VolunteerOrientationSlot[]       @relation("SlotAdminUser")
+  orientationInvitesSent      VolunteerOrientationInvitation[] @relation("InitialInviteSender")
+  orientationInvitesConfirmed VolunteerOrientationInvitation[] @relation("ConfirmedAdminUser")
 }
 
-model Task {
-  id        Int      @id @default(autoincrement())
-  title     String
-  completed Boolean
-  createdAt DateTime @default(now())
-}
+// model Task {
+//   id        Int      @id @default(autoincrement())
+//   title     String
+//   completed Boolean
+//   createdAt DateTime @default(now())
+// }
 
 //Volunteer profile and Admin profile
 
@@ -108,15 +123,15 @@ model Grant {
   amountRequested         Float
   amountAwarded           Float                 @default(0)
   purpose                 String //specific area or general
-  startDate               DateTime
-  endDate                 DateTime
+  startDate               DateTime?
+  endDate                 DateTime?
   isMultipleYears         Boolean
   quarter                 String
   acknowledgementSent     Boolean
   awardNotificationDate   DateTime?
   fundingArea             String //specific area or general
   internalProposalDueDate DateTime?
-  proposalDueDate         DateTime
+  proposalDueDate         DateTime?
   proposalSummary         String?
   proposalSubmissionDate  DateTime?
   applicationType         String
@@ -154,7 +169,13 @@ model Donor {
   communicationPreference String
   status                  String
   notes                   String
-  isRetained              Boolean
+  isRetained              Boolean       @default(false)
+  isCorporateSponsor      Boolean       @default(false)
+  supporterId             String?       @unique // Supporter ID from external systems
+  totalContributed        Float? // Total amount contributed
+  lastPaymentReceived     DateTime? // Last payment date
+  tags                    String? // Tags or categories
+  anonymous               Boolean? // Anonymous supporter flag
   donation                Donation[]
   personId                String?       @unique
   person                  Person?       @relation(fields: [personId], references: [id])
@@ -216,34 +237,41 @@ model Volunteer {
   preferredEvents     String[]
 
   // Compliance & Requirements
-  volunteerApplicationCompleted Boolean @default(false)
-  backgroundCheckCompleted      Boolean @default(false)
-  codeOfEthicsFormSigned        Boolean @default(false)
-  abuseNeglectReportFormSigned  Boolean @default(false)
-  personnelPoliciesFormSigned   Boolean @default(false)
-  orientationCompleted          Boolean @default(false)
-  trainingModulesCompleted      Boolean @default(false)
+  volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
+  volunteerApplicationCompleted Boolean            @default(false)
+  codeOfEthicsFormSigned        Boolean            @default(false)
+  abuseNeglectReportFormSigned  Boolean            @default(false)
+  personnelPoliciesFormSigned   Boolean            @default(false)
+  orientationCompleted          Boolean            @default(false)
+  trainingModulesCompleted      Boolean            @default(false)
 
   // Volunteer Events & Hours
   volunteerEvents  Event[]
   eventHoursLogged EventHour[]
+  isDeleted        Boolean     @default(false)
 
   // Relations
-  application         VolunteerApplication? @relation(fields: [applicationId], references: [id])
+  application         VolunteerApplication?     @relation(fields: [applicationId], references: [id])
   applicationId       String?
   EmergencyContact    EmergencyContact?
   VolunteerAttendance VolunteerAttendance[]
   EventRegistration   EventRegistration[]
   MailRecipient       MailRecipient[]
+  Person              Person?                   @relation(fields: [personId], references: [id])
+  personId            String?                   @unique
+  backgroundCheck     VolunteerBackgroundCheck?
+  orientationInvitation  VolunteerOrientationInvitation?
+  bookedOrientationSlots VolunteerOrientationSlot[]      @relation("BookedVolunteer")
+  sentEmails          SentEmail[]
 }
 
-model volunteerAccount {
-  id          String @id @default(uuid())
-  username    String @unique
-  email       String @unique
-  password    String
-  volunteerId String @unique
-}
+// model volunteerAccount {
+//   id          String @id @default(uuid())
+//   username    String @unique
+//   email       String @unique
+//   password    String
+//   volunteerId String @unique
+// }
 
 model EventHour {
   id             String    @id @default(uuid())
@@ -317,10 +345,38 @@ model VolunteerApplication {
 
   agreedToTerms Boolean
   eSignature    String
-
-  accepted Boolean @default(false)
+  softdelete    Boolean            @default(false)
+  status        VolunteerAppStatus @default(PENDING)
 
   volunteer Volunteer[]
+}
+
+model VolunteerBackgroundCheck {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Personal Info
+  fullName    String
+  dateOfBirth DateTime
+  county      String
+  addressLine String
+  city        String
+  state       String
+  zipCode     String
+  race        String
+  gender      String
+
+  // Certification
+  agreedToBackgroundCheck Boolean
+  eSignature              String
+  signatureDate           String
+
+  status        BackgroundCheckStatus @default(PENDING)
+  declineReason String?
+
+  volunteerId String?    @unique
+  volunteer   Volunteer? @relation(fields: [volunteerId], references: [id])
 }
 
 model Event {
@@ -335,6 +391,7 @@ model Event {
   Volunteer            Volunteer?            @relation(fields: [volunteerId], references: [id])
   volunteerId          String?
   EventHour            EventHour[]
+  bgCheckRequired      Boolean               @default(false)
 }
 
 model EventRegistration {
@@ -366,13 +423,53 @@ model Location {
 }
 
 model Orientation {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String
-  schedule    DateTime
-  capacity    Int
-  locationId  String
-  location    Location @relation(fields: [locationId], references: [id])
+  id              Int      @id @default(autoincrement())
+  name            String
+  description     String
+  schedule        DateTime
+  capacity        Int
+  locationId      String
+  location        Location @relation(fields: [locationId], references: [id])
+  bgCheckRequired Boolean  @default(false)
+}
+
+model VolunteerOrientationInvitation {
+  id                       String                     @id @default(uuid())
+  volunteerId              String                     @unique
+  volunteer                Volunteer                  @relation(fields: [volunteerId], references: [id])
+  meetingLink              String
+  status                   OrientationInviteStatus    @default(DRAFT)
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  firstEmailSentAt         DateTime?
+  selectionDeadline        DateTime?
+  initialEmailSentByUserId String?
+  initialEmailSentByUser   User?                      @relation("InitialInviteSender", fields: [initialEmailSentByUserId], references: [id])
+  confirmedAt              DateTime?
+  confirmedAdminUserId     String?
+  confirmedAdminUser       User?                      @relation("ConfirmedAdminUser", fields: [confirmedAdminUserId], references: [id])
+  selectedSlotId           String?                    @unique
+  selectedSlot             VolunteerOrientationSlot?  @relation("SelectedSlot", fields: [selectedSlotId], references: [id])
+  slots                    VolunteerOrientationSlot[] @relation("InvitationSlots")
+}
+
+model VolunteerOrientationSlot {
+  id                   String                          @id @default(uuid())
+  invitationId         String
+  invitation           VolunteerOrientationInvitation  @relation("InvitationSlots", fields: [invitationId], references: [id])
+  adminUserId          String
+  adminUser            User                            @relation("SlotAdminUser", fields: [adminUserId], references: [id])
+  startTime            DateTime
+  endTime              DateTime
+  createdAt            DateTime                        @default(now())
+  isBooked             Boolean                         @default(false)
+  bookedAt             DateTime?
+  bookedByVolunteerId  String?
+  bookedByVolunteer    Volunteer?                      @relation("BookedVolunteer", fields: [bookedByVolunteerId], references: [id])
+  selectedByInvitation VolunteerOrientationInvitation? @relation("SelectedSlot")
+
+  @@unique([invitationId, startTime, adminUserId])
+  @@index([invitationId, startTime])
 }
 
 model Admin {
@@ -385,6 +482,13 @@ model Admin {
   locationId String
   location   Location @relation(fields: [locationId], references: [id])
   mails      Mail[]
+  isDeleted  Boolean  @default(false)
+}
+
+model SuperAdmin {
+  id       String  @id @default(uuid())
+  Person   Person? @relation(fields: [personId], references: [id])
+  personId String? @unique
 }
 
 model Mail {
@@ -409,6 +513,29 @@ model MailRecipient {
   mail           Mail           @relation(fields: [mailId], references: [id])
 }
 
+model MailLog {
+  id              String   @id @default(uuid())
+  recipientType   String
+  to              String?
+  subject         String
+  body            String
+  sentAt          DateTime @default(now())
+  senderEmail     String?
+  totalRecipients Int
+  successCount    Int
+  failureCount    Int
+}
+
+model SentEmail {
+  id          String    @id @default(uuid())
+  subject     String
+  body        String
+  sentAt      DateTime  @default(now())
+  isRead      Boolean   @default(false)
+  volunteerId String
+  volunteer   Volunteer @relation(fields: [volunteerId], references: [id])
+}
+
 enum RecipientType {
   PRIMARY
   CC
@@ -419,4 +546,23 @@ enum DeliveryStatus {
   PENDING
   SENT
   FAILED
+}
+
+enum VolunteerAppStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum OrientationInviteStatus {
+  DRAFT
+  SENT
+  CONFIRMED
+  EXPIRED
+}
+
+enum BackgroundCheckStatus {
+  PENDING
+  APPROVED
+  DECLINED
 }

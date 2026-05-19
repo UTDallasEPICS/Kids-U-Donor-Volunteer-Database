@@ -4,11 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { hoursWorked, checkInTime, checkOutTime, eventId } = body;
-    const volunteerId = "8bf18571-0f32-4a6a-a71b-e267e650dcc2"; // Updated volunteer ID
+    const { hoursWorked, checkInTime, checkOutTime, eventId, volunteerId } = body;
 
     // Validate required fields
-    if (!checkInTime || !checkOutTime || !eventId) {
+    if (!checkInTime || !checkOutTime || !eventId || !volunteerId) {
       return NextResponse.json(
         {
           error: "Missing required fields",
@@ -16,9 +15,22 @@ export async function POST(req: NextRequest) {
             checkInTime: !checkInTime,
             checkOutTime: !checkOutTime,
             eventId: !eventId,
+            volunteerId: !volunteerId,
           },
         },
         { status: 400 }
+      );
+    }
+
+    // Validate volunteer exists
+    const volunteer = await prisma.volunteer.findUnique({
+      where: { id: volunteerId },
+    });
+
+    if (!volunteer) {
+      return NextResponse.json(
+        { error: "Volunteer not found", details: "The specified volunteer does not exist" },
+        { status: 404 }
       );
     }
 

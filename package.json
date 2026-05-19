@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "seed": "prisma db seed"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -34,13 +35,14 @@
     "mime": "^4.0.4",
     "next": "14.1.0",
     "next-auth": "^4.24.11",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.7",
     "prettier": "^3.3.3",
     "psql": "^0.0.1",
     "qs": "^6.13.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.53.2",
+    "react-icons": "^5.6.0",
     "react-router-dom": "^6.22.1",
     "typescript": "^5.2.2",
     "xlsx": "^0.18.5"
@@ -54,7 +56,11 @@
     "autoprefixer": "^10.4.19",
     "postcss": "^8.4.40",
     "prisma": "6.7.0",
-    "tailwindcss": "^3.4.7"
+    "tailwindcss": "^3.4.7",
+    "tsx": "^4.20.6"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "description": "<!-- markdownlint-disable-next-line MD033 --> <details open><summary><h2>Table of Contents</h2></summary>",
   "main": "next.config.js",

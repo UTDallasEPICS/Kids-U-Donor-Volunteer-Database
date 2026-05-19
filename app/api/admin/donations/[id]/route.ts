@@ -22,6 +22,11 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
                 lastName: true,
               },
             },
+            organization: {
+              select: {
+                name: true,
+              },
+            }
           },
         },
       },

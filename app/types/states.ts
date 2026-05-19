@@ -6,11 +6,17 @@ export type DonorState = {
   status: string;
   notes: string;
   isRetained: boolean;
+  isCorporateSponsor: boolean;
 };
 
 export type OrganizationState = {
   name: string;
   emailAddress: string;
+  phoneNumber?: string | null;
+  website?: string | null;
+  pointOfContactName?: string | null;
+  pointOfContactTitle?: string | null;
+  referralSource?: string | null;
 };
 
 export type PersonState = {
@@ -18,6 +24,7 @@ export type PersonState = {
   lastName: string;
   emailAddress: string;
   phoneNumber?: string | null;
+  referralSource?: string | null;
 };
 
 export type AddressState = {
@@ -45,6 +52,75 @@ export type DonationState = {
   receiptNumber?: string | null;
   isAnonymous: boolean;
   acknowledgementSent: boolean;
+};
+
+export type VolunteerState = {
+  firstName: string;
+  lastName: string;
+  middleInitial: string;
+  emailAddress: string;
+  phoneNumber: string;
+  addressLine: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  businessOrSchoolName: string;
+  volunteerPreference: string;
+  preferredRoles: string[];
+  availability: string[];
+  location: string[];
+  preferredEvents: string[];
+  usCitizen: boolean;
+  driversLicense: boolean;
+  reliableTransport: boolean;
+  speakSpanish: boolean;
+  referenceName: string;
+  volunteerApplicationCompleted: boolean;
+  backgroundCheckCompleted: boolean;
+  codeOfEthicsFormSigned: boolean;
+  abuseNeglectReportFormSigned: boolean;
+  personnelPoliciesFormSigned: boolean;
+  orientationCompleted: boolean;
+  trainingModulesCompleted: boolean;
+  volunteerApplicationStatus: string;
+  registration: boolean;
+  dateSubmitted: Date;
+};
+
+export type GrantorState = {
+  type: string;
+  websiteLink: string;
+  communicationPreference: string;
+  recognitionPreference: string;
+  internalRelationshipManager: string;
+  organization: OrganizationState;
+};
+
+export type GrantState = {
+  name: string;
+  status: string;
+  amountRequested: number;
+  amountAwarded: number;
+  purpose: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  isMultipleYears: boolean;
+  quarter: string;
+  acknowledgementSent: boolean;
+  awardNotificationDate: Date;
+  fundingArea: string;
+  internalProposalDueDate: Date;
+  proposalDueDate: Date | null;
+  proposalSummary: string;
+  proposalSubmissionDate: Date;
+  applicationType: string;
+  internalOwner: string;
+  fundingRestriction: string;
+  matchingRequirement: string;
+  useArea: string;
+  isEligibleForRenewal: boolean;
+  renewalApplicationDate: Date;
+  renewalAwardStatus: string;
 };
 
 export type DonationResponse = {

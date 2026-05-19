@@ -1,24 +1,30 @@
 import prisma from "@/app/utils/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-// GET: Fetch all volunteers (Important fields)
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    // Fetch volunteers with only important fields
     const volunteers = await prisma.volunteer.findMany({
       select: {
         id: true,
         firstName: true,
         lastName: true,
         emailAddress: true,
-        registration: true,
+        applicationId: true,
+      },
+      orderBy: {
+        firstName: "asc",
       },
     });
 
-    return NextResponse.json({ volunteers }, { status: 200 });
+    // Transform to include registration status
+    const volunteersWithStatus = volunteers.map((volunteer) => ({
+      ...volunteer,
+      registration: !!volunteer.applicationId,
+    }));
+
+    return NextResponse.json({ volunteers: volunteersWithStatus }, { status: 200 });
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error fetching volunteers:", errorMessage);
-    return NextResponse.json({ message: "Internal server error", error: errorMessage }, { status: 500 });
+    console.error("Error fetching volunteers:", error);
+    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }

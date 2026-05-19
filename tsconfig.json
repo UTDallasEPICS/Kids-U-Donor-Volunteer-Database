@@ -38,7 +38,8 @@
     "app/pages/home.js",
     "app/utils/getOrganization.js",
     "frontend/src/pages/ApiTestPage.js",
-    "app/(pages)/admin/grants/detail/[id]/page.tsx"
+    "app/(pages)/admin/grants/detail/[id]/page.tsx",
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

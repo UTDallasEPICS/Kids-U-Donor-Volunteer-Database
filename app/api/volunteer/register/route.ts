@@ -2,13 +2,16 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])\S{8,}$/;
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const {
       firstName,
       lastName,
-      email,
+      email: rawEmail,
       phoneNumber,
       username,
       password,
@@ -23,6 +26,23 @@ export async function POST(req: NextRequest) {
       speakSpanish,
       referenceName,
     } = body;
+
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+
+    if (!firstName || !lastName || !email || !username || !password) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (!EMAIL_REGEX.test(email)) {
+      return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+    }
+
+    if (!PASSWORD_REGEX.test(password)) {
+      return NextResponse.json(
+        { error: "Password must be 8+ characters and include uppercase, lowercase, number, and special character" },
+        { status: 400 }
+      );
+    }
 
     // Check if volunteer account already exists with this email or username
     const existingAccount = await prisma.volunteerAccount.findFirst({

@@ -1,292 +1,139 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import type { Grant } from "@/prisma";
-import {
-  Box,
-  TextField,
-  Typography,
-  Breadcrumbs,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TablePagination,
-  Paper,
-  CircularProgress,
-  TableFooter,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  OutlinedInput,
-  Checkbox,
-  ListItemText,
-  SelectChangeEvent,
-} from "@mui/material"
-import Grid from "@mui/material/Grid";
-import Link from "next/link"
+import Link from "next/link";
+import Loading from "@/app/loading";
 
-const columns = [
-  "grantor",
-  "representative",
-  "name",
-  "status",
-  "purpose",
-  "startDate",
-  "endDate",
-  "awardNotificationDate",
-  "amountAwarded",
-  "amountRequested",
-  "proposalDueDate",
-  "proposalSubmissionDate",
-];
-
-const searchOptions = [
-  "name",
-  "status",
-  "grantor"
+const headCells = [
+  { id: "grantor", label: "Grantor" },
+  //{ id: "representative", label: "Representative" },
+  //{ id: "name", label: "Name" },
+  { id: "status", label: "Status" },
+  { id: "purpose", label: "Purpose" },
+  { id: "startDate", label: "Start Date" },
+  { id: "endDate", label: "End Date" },
+  { id: "amountAwarded", label: "Amount Awarded" },
 ];
 
 export default function GrantsPage() {
   const [grantsData, setGrantsData] = useState<Grant[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [totalCount, setTotalCount] = React.useState(0);
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [searchValue, setSearchValue] = useState("");
-  const [searchCriteria, setSearchCriteria] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const fetchGrantsData = async () => {
     try {
-      const response = await fetch(`/api/admin/grants/get?page=${page}&rowsPerPage=${rowsPerPage}&searchCriteria=${searchCriteria}&searchValue=${searchValue}`);
+      const response = await fetch(`/api/admin/grants/get`);
       const result = await response.json();
       setGrantsData(result.data);
-      setTotalCount(result.count);
-      console.log(result.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching grants:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Failed to load grants");
       setLoading(false);
     }
   };
 
-  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0); //Bring back to first page
-  };
-
-  const handleColumnChange = (event: SelectChangeEvent<typeof selectedColumns>) => {
-    const {
-      target: { value },
-    } = event;
-    setSelectedColumns(
-      typeof value === "string" ? value.split(",") : value,
-    );
-  };
-
-  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    setSearchValue(event.target.value as string);
-  };
-
-  const handleCriteriaChange = (event: SelectChangeEvent<string>) => {
-    setSearchCriteria(event.target.value as string);
-  };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") { //This ensures the code runs only in the browser
-      //sessionStorage for selected columns
-      if (sessionStorage.getItem("page") !== "grantList") {
-        sessionStorage.clear();
-      }
-      sessionStorage.setItem("page", "grantList");
-
-      const savedColumns = sessionStorage.getItem("selectedColumns");
-      if (savedColumns) {
-        setSelectedColumns(JSON.parse(savedColumns));
-      } else {
-        setSelectedColumns(columns);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof window !== "undefined" && selectedColumns.length > 0) {
-      sessionStorage.setItem("selectedColumns", JSON.stringify(selectedColumns));
-    }
-  }, [selectedColumns]);
-
   useEffect(() => {
     fetchGrantsData();
-  }, [page, rowsPerPage, searchValue, searchCriteria]);
+  }, []);
+
+  const Breadcrumb = () => (
+    <div className="mb-5 text-sm text-gray-600 flex items-center space-x-2">
+      <span className="hover:text-blue-500 cursor-pointer transition-colors duration-200">
+        Home
+      </span>
+      <span className="text-gray-400">/</span>
+      <span className="font-semibold text-gray-700">Grants</span>
+      <span className="text-gray-400">/</span>
+      <span className="font-semibold text-gray-700">Grants List</span>
+    </div>
+  );
 
   if (loading) {
-    return <CircularProgress style={styles.center} />
+    return <Loading />;
   }
 
   return (
-    <Box>
-      <Box>
-        <Breadcrumbs style={styles.breadcrumb}>
-          <Link href={"/"} style={{ textDecoration: 'underline', }}>Dashboard</Link>
-          <Typography>Grants</Typography>
-          <Typography>Grant List</Typography>
-        </Breadcrumbs>
-      </Box>
-      <Box>
-        <Grid container spacing={2} alignItems="center" marginLeft={2} marginTop={1} marginBottom={1}>
-          <Grid>
-            <FormControl variant="outlined" sx={{ width: 150 }}>
-              <InputLabel>Search By</InputLabel>
-              <Select
-                label="Search By"
-                value={searchCriteria}
-                onChange={handleCriteriaChange}
-              >
-                {searchOptions.map((option) => (
-                  <MenuItem key={option} value={option}>
-                    <ListItemText>{option}</ListItemText>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid>
-            <TextField
-              label="Search Value"
-              variant="outlined"
-              name="value"
-              value={searchValue}
-              onChange={handleSearchChange}
-              disabled={!searchCriteria} //Disable search input until something is selected
-            />
-          </Grid>
-          <Grid>
-            <FormControl sx={{ width: 500 }}>
-              <InputLabel>Included Columns</InputLabel>
-              <Select
-                multiple
-                value={selectedColumns}
-                onChange={handleColumnChange}
-                input={<OutlinedInput label="Included Columns" />}
-                renderValue={(selected) => selected.join(", ")}
-              >
-                {columns.map((col) => (
-                  <MenuItem key={col} value={col}>
-                    <Checkbox checked={selectedColumns.includes(col)} />
-                    <ListItemText primary={col} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
-      </Box>
-      <Box>
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small">
-            <TableHead>
-              <TableRow>
-                {selectedColumns.includes("grantor") && <TableCell style={styles.tableCellHeader}>Grantor</TableCell>}
-                {selectedColumns.includes("representative") && <TableCell style={styles.tableCellHeader}>Representative</TableCell>}
-                {selectedColumns.includes("name") && <TableCell style={styles.tableCellHeader}>Name</TableCell>}
-                {selectedColumns.includes("status") && <TableCell style={styles.tableCellHeader}>Status</TableCell>}
-                {selectedColumns.includes("purpose") && <TableCell style={styles.tableCellHeader}>Purpose</TableCell>}
-                {selectedColumns.includes("startDate") && <TableCell style={styles.tableCellHeader}>Start Date</TableCell>}
-                {selectedColumns.includes("endDate") && <TableCell style={styles.tableCellHeader}>End Date</TableCell>}
-                {selectedColumns.includes("awardNotificationDate") && <TableCell style={styles.tableCellHeader}>Award Notification Date</TableCell>}
-                {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCellHeader}>Amount Awarded</TableCell>}
-                {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCellHeader}>Amount Requested</TableCell>}
-                {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCellHeader}>Proposal Due Date</TableCell>}
-                {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCellHeader}>Proposal Submission Date</TableCell>}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {grantsData?.map((grant) => (
-                <TableRow key={grant.id}>
-{selectedColumns.includes("grantor") && grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
-  <TableCell style={styles.tableCell}>
-    <Link href={`/admin/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}>
-      {grant.representativeGrant[0].representative.grantor.organization.name}
-    </Link>
-  </TableCell>
-) : null}
+    <div className="min-h-screen bg-gray-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <Breadcrumb />
 
-{selectedColumns.includes("representative") && grant.representativeGrant?.[0]?.representative?.person?.firstName && grant.representativeGrant?.[0]?.representative?.person?.lastName ? (
-  <TableCell style={styles.tableCell}>
-    {grant.representativeGrant[0].representative.person.firstName} {grant.representativeGrant[0].representative.person.lastName}
-  </TableCell>
-) : null}
-                  {selectedColumns.includes("name") && <TableCell style={styles.tableCell}><Link href={`/grants/detail/${grant.id}`}>{grant.name}</Link></TableCell>}
-                  {selectedColumns.includes("status") && <TableCell style={styles.tableCell}>{grant.status}</TableCell>}
-                  {selectedColumns.includes("purpose") && <TableCell style={styles.tableCell}>{grant.purpose}</TableCell>}
-                  {selectedColumns.includes("startDate") && <TableCell style={styles.tableCell}>{new Date(grant.startDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes("endDate") && <TableCell style={styles.tableCell}>{new Date(grant.endDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes("awardNotificationDate") && <TableCell style={styles.tableCell}>{grant.awardNotificationDate ? new Date(grant.awardNotificationDate).toLocaleDateString() : "N/A"}</TableCell>}
-                  {selectedColumns.includes("amountAwarded") && <TableCell style={styles.tableCell}>{"$" + grant.amountAwarded}</TableCell>}
-                  {selectedColumns.includes("amountRequested") && <TableCell style={styles.tableCell}>{"$" + grant.amountRequested}</TableCell>}
-                  {selectedColumns.includes("proposalDueDate") && <TableCell style={styles.tableCell}>{new Date(grant.proposalDueDate).toLocaleDateString()}</TableCell>}
-                  {selectedColumns.includes("proposalSubmissionDate") && <TableCell style={styles.tableCell}>{grant.proposalSubmissionDate ? new Date(grant.proposalSubmissionDate).toLocaleDateString() : "N/A"}</TableCell>}
-                </TableRow>
+        {errorMessage && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+          <h2 className="text-2xl font-bold text-[#2f4b7c]">Grants</h2>
+          <Link
+            href="/admin/grants/add"
+            className="bg-[#2f4b7c] hover:bg-[#4a6fa5] text-white font-semibold py-2.5 px-5 rounded-xl"
+          >
+            Add New Grant
+          </Link>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <table className="min-w-full">
+            <thead>
+              <tr className="bg-gray-100">
+                {headCells.map((headCell) => (
+                  <th
+                    key={headCell.id}
+                    className="px-6 py-3 border-b text-left text-sm font-semibold text-gray-700"
+                  >
+                    {headCell.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {grantsData?.map((grant) => (
+                <tr key={grant.id} className="hover:bg-gray-50 cursor-pointer">
+                  <td className="px-6 py-4 border-b max-w-xs text-sm text-[#2f4b7c] font-semibold">
+                    <Link
+                      className="text-[#2f4b7c] block truncate" 
+                      href={`/admin/grants/detail/${grant.id}`}
+                      title = {grant.name}
+                    >
+                      {grant.name}
+                    </Link>
+                  </td>
+                  {/*<td className="px-6 py-4 border-b text-sm text-gray-700">
+                    {grant.representativeGrant?.[0]?.representative?.grantor?.organization?.name ? (
+                      <Link
+                        className="text-[#2f4b7c]"
+                        href={`/admin/grants/grantor/detail/${grant.representativeGrant[0].representative.grantorId}`}
+                      >
+                        {grant.representativeGrant[0].representative.grantor.organization.name}
+                      </Link>
+                    ) : (
+                      "—"
+                    )}
+                  </td>*/}
+                  {/*<td className="px-6 py-4 border-b text-sm text-gray-700">
+                    {grant.representativeGrant?.[0]?.representative?.person?.firstName &&
+                    grant.representativeGrant?.[0]?.representative?.person?.lastName
+                      ? `${grant.representativeGrant[0].representative.person.firstName} ${grant.representativeGrant[0].representative.person.lastName}`
+                      : "—"}
+                  </td>*/}
+                  
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.status}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">{grant.purpose}</td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
+                    {grant.startDate ? new Date(grant.startDate).toLocaleDateString() : "—"}
+                  </td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">
+                    {grant.endDate ? new Date(grant.endDate).toLocaleDateString() : "—"}
+                  </td>
+                  <td className="px-6 py-4 border-b text-sm text-gray-700">${grant.amountAwarded}</td>
+                </tr>
               )) ?? null}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={12} style={{ padding: 0 }}>
-                  <TablePagination
-                    rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                    component="div"
-                    count={totalCount}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    style={styles.pagination}
-                  />
-                </TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      </Box>
-    </Box >
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }
-
-const styles = {
-  table: {
-    minWidth: 650,
-  },
-  tableCellHeader: {
-    fontWeight: "bold",
-    border: "1px solid #aaa",
-    backgroundColor: "#ccc",
-  },
-  tableCell: {
-    border: "1px solid #ccc",
-  },
-  center: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: "100vh",
-    marginLeft: "auto",
-    marginRight: "auto",
-  },
-  pagination: {
-    display: "flex",
-    justifyContent: "left",
-    width: "100%",
-    backgroundColor: "#ccc",
-  },
-  breadcrumb: {
-    marginLeft: "5px",
-    marginTop: "8px"
-  }
-};

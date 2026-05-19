@@ -1,11 +1,27 @@
 import { PrismaClient } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-// Fetch all representatives
 export async function GET() {
-  const data = await prisma.volunteer.findMany();
+  const data = await prisma.volunteer.findMany({
+    orderBy: { dateSubmitted: "desc" },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      emailAddress: true,
+      registration: true,
+      dateSubmitted: true,
+      orientationInvitation: {
+        select: {
+          id: true,
+          status: true,
+          firstEmailSentAt: true,
+        },
+      },
+    },
+  });
 
-  return NextResponse.json({ message: "GET REQUEST", data: data }, { status: 200 });
+  return NextResponse.json({ volunteers: data }, { status: 200 });
 }

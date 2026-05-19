@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const body = await req.json();
 
   try {
-    const { name, description, schedule, capacity, locationId } = body;
+    const { name, description, schedule, capacity, locationId, bgCheckRequired } = body;
 
     const orientation = await prisma.orientation.create({
       data: {
@@ -14,6 +14,7 @@ export async function POST(req: Request) {
         description,
         schedule: new Date(schedule),
         capacity: parseInt(capacity),
+        bgCheckRequired: bgCheckRequired ?? false,
         location: {
           connect: { id: locationId },
         },

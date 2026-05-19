@@ -1,5 +1,6 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
+import { sendApplicationApprovalEmail } from "@/app/utils/email";
 
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;
@@ -19,12 +20,38 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       return NextResponse.json({ message: "Registration field must be a boolean" }, { status: 400 });
     }
 
+    // Fetch application details before updating to use for email
+    const application = await prisma.volunteerApplication.findUnique({
+      where: { id },
+      select: {
+        email: true,
+        legalName: true,
+        status: true,
+      },
+    });
+
+    if (!application) {
+      return NextResponse.json({ message: "Volunteer Application not found" }, { status: 404 });
+    }
+
     const updatedVolunteerApplication = await prisma.volunteerApplication.update({
       where: { id },
-      data: { accepted },
+      data: { status: "APPROVED" },
     });
 
     console.log("Volunteer Application updated successfully:", updatedVolunteerApplication);
+
+    // Extract first name from legal name
+    const firstName = application.legalName.split(" ")[0] || "Applicant";
+
+    // Send approval email
+    try {
+      await sendApplicationApprovalEmail(application.email, firstName);
+      console.log("Approval email sent successfully to:", application.email);
+    } catch (emailError) {
+      console.error("Failed to send approval email:", emailError);
+      // Don't fail the request if email fails, but log the error
+    }
 
     // If accepted, send POST request to internal endpoint to create volunteer
     if (accepted) {
@@ -51,8 +78,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
     return NextResponse.json(
       {
-        message: `Updated registration for volunteer Application with id: ${id}`,
+        message: `Updated registration for volunteer Application with id: ${id}. Approval email sent.`,
         data: updatedVolunteerApplication,
+        emailSent: true,
       },
       { status: 200 }
     );
