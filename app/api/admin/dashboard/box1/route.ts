@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // BOX 1: Total Volunteer Count
 
 import { NextResponse } from "next/server";

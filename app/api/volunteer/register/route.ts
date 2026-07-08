@@ -13,9 +13,7 @@ export async function POST(req: NextRequest) {
       lastName,
       email: rawEmail,
       phoneNumber,
-      username,
       password,
-      // Other volunteer fields
       addressLine,
       city,
       state,
@@ -29,7 +27,7 @@ export async function POST(req: NextRequest) {
 
     const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
 
-    if (!firstName || !lastName || !email || !username || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -44,29 +42,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if volunteer account already exists with this email or username
-    const existingAccount = await prisma.volunteerAccount.findFirst({
-      where: {
-        OR: [{ email: email }, { username: username }],
-      },
-    });
-
-    if (existingAccount) {
-      return NextResponse.json(
-        {
-          error: "An account with this email or username already exists",
-        },
-        { status: 400 }
-      );
+    const existingUser = await prisma.user.findFirst({ where: { email } });
+    if (existingUser) {
+      return NextResponse.json({ error: "An account with this email already exists" }, { status: 400 });
     }
 
-    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create volunteer and account in a transaction
-    const result = await prisma.$transaction(async (prisma) => {
-      // Create volunteer first
-      const volunteer = await prisma.volunteer.create({
+    const result = await prisma.$transaction(async (tx) => {
+      const volunteer = await tx.volunteer.create({
         data: {
           firstName,
           lastName,
@@ -84,17 +68,15 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Create volunteer account
-      const account = await prisma.volunteerAccount.create({
+      const user = await tx.user.create({
         data: {
-          username,
-          password: hashedPassword,
           email,
-          volunteerId: volunteer.id,
+          password: hashedPassword,
+          role: "VOLUNTEER",
         },
       });
 
-      return { volunteer, account };
+      return { volunteer, user };
     });
 
     return NextResponse.json(
@@ -103,17 +85,11 @@ export async function POST(req: NextRequest) {
         firstName: result.volunteer.firstName,
         lastName: result.volunteer.lastName,
         email: result.volunteer.emailAddress,
-        username: result.account.username,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error("Registration error:", error);
-    return NextResponse.json(
-      {
-        error: "Registration failed",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Registration failed" }, { status: 500 });
   }
 }

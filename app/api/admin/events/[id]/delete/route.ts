@@ -1,22 +1,23 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   try {
     await prisma.eventRegistration.deleteMany({
-      where: { eventId: params.id },
+      where: { eventId: id },
     });
 
     await prisma.volunteerAttendance.deleteMany({
-      where: { eventId: params.id },
+      where: { eventId: id },
     });
 
     await prisma.eventHour.deleteMany({
-      where: { eventId: params.id },
+      where: { eventId: id },
     });
 
     await prisma.event.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ message: "Event deleted successfully" }, { status: 200 });

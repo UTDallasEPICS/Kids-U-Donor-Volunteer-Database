@@ -7,17 +7,16 @@ import { cookies } from 'next/headers';
 import { send2FACode, generate2FACode } from '../../../utils/email'; 
 
 const prisma = new PrismaClient();
-const JWT_SECRET = process.env.JWT_SECRET;
-const TOKEN_EXPIRY = '7d'; 
-const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; 
+const TOKEN_EXPIRY = '7d';
+const TOKEN_MAX_AGE_SECONDS = 60 * 60 * 24 * 7;
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const TWO_FA_CODE_REGEX = /^\d{6}$/;
 
-if (!JWT_SECRET) {
-  throw new Error('JWT_SECRET environment variable is not defined');
-}
-
 export async function POST(request: NextRequest) {
+  const JWT_SECRET = process.env.JWT_SECRET;
+  if (!JWT_SECRET) {
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 });
+  }
   try {
     const { email: rawEmail, password, twoFactorCode } = await request.json(); 
     const email = typeof rawEmail === 'string' ? rawEmail.trim().toLowerCase() : '';

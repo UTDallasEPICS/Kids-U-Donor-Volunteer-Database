@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // app/api/admin/dashboard/box8/route.ts
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";

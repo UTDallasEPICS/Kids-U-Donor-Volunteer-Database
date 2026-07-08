@@ -21,10 +21,10 @@ export async function seedMockVolunteerData(prisma: PrismaClient) {
         phoneNumber: "555-123-4567",
         emailAddress: "john.doe@example.com",
         volunteerPreference: "Weekends",
-        preferredRoles: ["Tutor", "Mentor"],
-        availability: ["Saturday", "Sunday"],
-        location: ["Main Campus"],
-        preferredEvents: ["Tutoring", "Sports"],
+        preferredRoles: JSON.stringify(["Tutor", "Mentor"]),
+        availability: JSON.stringify(["Saturday", "Sunday"]),
+        location: JSON.stringify(["Main Campus"]),
+        preferredEvents: JSON.stringify(["Tutoring", "Sports"]),
       },
     });
     console.log(`Created volunteer: ${volunteer.firstName} ${volunteer.lastName} (ID: ${volunteer.id})\n`);

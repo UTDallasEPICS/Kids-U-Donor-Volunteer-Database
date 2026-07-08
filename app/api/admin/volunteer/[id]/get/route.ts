@@ -1,7 +1,7 @@
 import prisma from "@/app/utils/db";
 
-export async function GET(req: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   if (!id || typeof id !== "string") {
     return new Response(JSON.stringify({ message: "Invalid volunteer ID" }), {
@@ -30,7 +30,16 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
       });
     }
 
-    return new Response(JSON.stringify({ volunteer }), {
+    const parseJsonArr = (v: string | string[]) => { if (Array.isArray(v)) return v; try { return JSON.parse(v); } catch { return []; } };
+    const result = {
+      ...volunteer,
+      preferredRoles: parseJsonArr(volunteer.preferredRoles),
+      availability: parseJsonArr(volunteer.availability),
+      location: parseJsonArr(volunteer.location),
+      preferredEvents: parseJsonArr(volunteer.preferredEvents),
+    };
+
+    return new Response(JSON.stringify({ volunteer: result }), {
       status: 200,
     });
   } catch (error) {

@@ -115,7 +115,7 @@ export default function DonorsList() {
                   : donor.organization?.name || "—";
                 const email = donor.person?.emailAddress || donor.organization?.emailAddress || "";
                 const phone = donor.person?.phoneNumber || "";
-                const total = (donor.donation || []).reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                const total = (donor.donation || []).reduce((sum: number, d: { amount: number }) => sum + (Number(d.amount) || 0), 0);
                 const lastDateIso = donor.donation && donor.donation[0]?.date;
                 const last = lastDateIso ? new Date(lastDateIso).toLocaleDateString() : "";
 

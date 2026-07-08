@@ -79,9 +79,7 @@ export const Import = () => {
           type="file"
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => setFile(event.target.files?.[0] || null)}
           variant="outlined"
-          slotProps={{
-            htmlInput: { accept: ".csv" },
-          }}
+          inputProps={{ accept: ".csv" }}
         />
         <Button type="submit" onSubmit={handleSubmitFile}>
           Upload

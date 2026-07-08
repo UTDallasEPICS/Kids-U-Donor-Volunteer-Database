@@ -2,9 +2,9 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 import { sendApplicationRejectionEmail, sendApplicationApprovalEmail } from "@/app/utils/email";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const { status, declineReason } = body;
 

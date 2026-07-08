@@ -22,14 +22,14 @@ function isAdmin(user: UserPayload | null): user is UserPayload {
   return !!user && (user.role === "ADMIN" || user.role === "SUPER_ADMIN");
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = parsePayload(req);
     if (!isAdmin(payload)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const body = await req.json();
     const meetingLink = typeof body.meetingLink === "string" ? body.meetingLink.trim() : "";
     const selectedSlotId = typeof body.selectedSlotId === "string" ? body.selectedSlotId : "";
@@ -87,14 +87,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = parsePayload(req);
     if (!isAdmin(payload)) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     await prisma.$transaction(async (tx) => {
       await tx.volunteerOrientationSlot.deleteMany({ where: { invitationId: id } });

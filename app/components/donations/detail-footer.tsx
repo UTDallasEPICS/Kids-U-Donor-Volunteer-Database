@@ -36,7 +36,7 @@ export const DetailFooter = ({ id, name, href, apiUrl, handleSubmit, isDirty, er
     handleButtonDisable();
   }, [isButtonDisabled]);
 
-  const handleSave = async (data: DonorFormProps | DonationFormProps) => {
+  const handleSave = async (data: DonorFormProps | DonationFormProps | VolunteerFormProps | GrantorFormProps | GrantFormProps) => {
     // If fields not changed, don't save
     if (!isDirty || Object.keys(errors).length > 0) {
       alert("Cannot save when fields are unchanged or there are validation errors.");

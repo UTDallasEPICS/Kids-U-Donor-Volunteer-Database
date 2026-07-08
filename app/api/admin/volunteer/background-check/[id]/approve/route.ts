@@ -1,8 +1,8 @@
 import prisma from "@/app/utils/db";
 import { NextResponse } from "next/server";
 
-export async function PATCH(_: Request, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function PATCH(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   try {
     if (!id) {

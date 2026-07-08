@@ -94,17 +94,15 @@ export const FormInputTextfield = ({
             helperText={error ? error.message : null}
             onChange={onChangeHandler}
             value={value}
-            slotProps={{
-              input: {
-                startAdornment:
-                  type === "currency" ? (
-                    <InputAdornment position="start">$</InputAdornment>
-                  ) : null,
-                readOnly: readOnly,
-              },
-              htmlInput: {
-                ...(maxLength ? { maxLength: maxLength } : {}),
-              },
+            InputProps={{
+              startAdornment:
+                type === "currency" ? (
+                  <InputAdornment position="start">$</InputAdornment>
+                ) : null,
+              readOnly: readOnly,
+            }}
+            inputProps={{
+              ...(maxLength ? { maxLength: maxLength } : {}),
             }}
           />
         );

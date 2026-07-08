@@ -1,6 +1,5 @@
-import { MenuItem, Select, TextField, Typography } from "@mui/material";
+import { Box, MenuItem, Select, TextField, Typography } from "@mui/material";
 import { green } from "@mui/material/colors";
-import { Box } from "@mui/system";
 import React from "react";
 
 const TypographyStyle = {

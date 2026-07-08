@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 		}
 
 		if (fund) {
-			where.fundDesignation = { contains: fund, mode: "insensitive" };
+			where.fundDesignation = { contains: fund };
 		}
 
 		if (minAmount || maxAmount) {
@@ -50,18 +50,18 @@ export async function GET(request: Request) {
 		}
 
 		// Donation-level filters
-		if (paymentMethod) where.paymentMethod = { equals: paymentMethod, mode: "insensitive" };
-		if (campaign) where.campaign = { contains: campaign, mode: "insensitive" };
+		if (paymentMethod) where.paymentMethod = { equals: paymentMethod };
+		if (campaign) where.campaign = { contains: campaign };
 		if (acknowledgementSent === 'true' || acknowledgementSent === 'false') {
 			where.acknowledgementSent = acknowledgementSent === 'true';
 		}
-		if (recurringFrequency) where.recurringFrequency = { equals: recurringFrequency, mode: "insensitive" };
+		if (recurringFrequency) where.recurringFrequency = { equals: recurringFrequency };
 
 		// Donor-level composite filters
 		const donorWhere: any = {};
 		if (donorType) donorWhere.type = donorType;
-		if (donorStatus) donorWhere.status = { equals: donorStatus, mode: "insensitive" };
-		if (commPref) donorWhere.communicationPreference = { equals: commPref, mode: "insensitive" };
+		if (donorStatus) donorWhere.status = { equals: donorStatus };
+		if (commPref) donorWhere.communicationPreference = { equals: commPref };
 		if (Object.keys(donorWhere).length) {
 			where.donor = { is: donorWhere };
 		}

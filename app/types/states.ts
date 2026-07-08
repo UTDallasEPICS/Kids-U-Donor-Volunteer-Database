@@ -17,6 +17,7 @@ export type OrganizationState = {
   pointOfContactName?: string | null;
   pointOfContactTitle?: string | null;
   referralSource?: string | null;
+  address?: AddressState | null;
 };
 
 export type PersonState = {
@@ -87,13 +88,19 @@ export type VolunteerState = {
   dateSubmitted: Date;
 };
 
+export type GrantorOrganizationState = {
+  name: string;
+  emailAddress: string;
+  address: AddressState;
+};
+
 export type GrantorState = {
   type: string;
   websiteLink: string;
   communicationPreference: string;
   recognitionPreference: string;
   internalRelationshipManager: string;
-  organization: OrganizationState;
+  organization: GrantorOrganizationState;
 };
 
 export type GrantState = {
@@ -126,16 +133,19 @@ export type GrantState = {
 export type DonationResponse = {
   data: Donation & {
     donor: {
-      person: {
+      person?: {
         firstName: string;
         lastName: string;
-      };
-    };
+      } | null;
+      organization?: {
+        name: string;
+      } | null;
+    } | null;
   };
 };
 
 export type DonorResponse = {
-  data: Donor & {
+  data: Omit<Donor, 'donation'> & {
     person: {
       firstName: string;
       lastName: string;
