@@ -14,7 +14,6 @@ export async function GET(req: NextRequest) {
       case "name":
         where.name = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       case "grantor":
@@ -26,7 +25,6 @@ export async function GET(req: NextRequest) {
                 organization: {
                   name: {
                     contains: searchValueParam,
-                    mode: "insensitive",
                   },
                 },
               },
@@ -37,7 +35,6 @@ export async function GET(req: NextRequest) {
       case "status":
         where.status = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       default:

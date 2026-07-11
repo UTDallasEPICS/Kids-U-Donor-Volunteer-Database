@@ -2,7 +2,7 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // PATCH handler for updates
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
@@ -21,10 +21,10 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       where: { id },
       data: {
         ...volunteerData,
-        preferredRoles: parseArr(volunteerData.preferredRoles),
-        availability: parseArr(volunteerData.availability),
-        location: parseArr(volunteerData.location),
-        preferredEvents: parseArr(volunteerData.preferredEvents),
+        preferredRoles: JSON.stringify(parseArr(volunteerData.preferredRoles)),
+        availability: JSON.stringify(parseArr(volunteerData.availability)),
+        location: JSON.stringify(parseArr(volunteerData.location)),
+        preferredEvents: JSON.stringify(parseArr(volunteerData.preferredEvents)),
       },
     });
 
@@ -43,8 +43,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 
 
 // DELETE handler for deletion
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   try {
     if (!id) {

@@ -21,7 +21,6 @@ export async function GET(req: NextRequest) {
             person: {
               firstName: {
                 contains: searchValueParam,
-                mode: "insensitive",
               },
             },
           },
@@ -29,7 +28,6 @@ export async function GET(req: NextRequest) {
             person: {
               lastName: {
                 contains: searchValueParam,
-                mode: "insensitive",
               },
             },
           },
@@ -37,7 +35,6 @@ export async function GET(req: NextRequest) {
             organization: {
               name: {
                 contains: searchValueParam,
-                mode: "insensitive",
               },
             },
           },
@@ -46,13 +43,11 @@ export async function GET(req: NextRequest) {
       case "campaign":
         where.campaign = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       case "fundDesignation":
         where.fundDesignation = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       default:

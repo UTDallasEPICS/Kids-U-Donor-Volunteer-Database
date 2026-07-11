@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // This file will handle single item operations
 
 // Fetch single Grant based on id, Ex. http://localhost:3000/api/grants/[id]
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await prisma.grant.findUnique({
@@ -46,9 +46,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 // Update single Grant based on id
 /*export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const body = await req.json();
@@ -78,9 +78,9 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 // Delete single Grant based on id
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = params;
+  const { id } = await params;
 
   try {
     const data = await prisma.grant.delete({

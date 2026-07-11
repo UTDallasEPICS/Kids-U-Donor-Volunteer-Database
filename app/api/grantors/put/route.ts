@@ -1,11 +1,10 @@
 import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
-
+export async function PUT(req: NextRequest) {
   try {
     const grantor = await req.json();
+    const id: string = grantor.id;
 
     const updatedGrantor = await prisma.grantor.update({
       where: { id },
@@ -21,7 +20,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
 
     return NextResponse.json({ data: updatedGrantor }, { status: 200 });
   } catch (error) {
-    console.error("Error updating grantor with ID:", id, error);
+    console.error("Error updating grantor:", error);
     return NextResponse.json({ message: "Grantor item not found or update failed" }, { status: 404 });
   }
 }

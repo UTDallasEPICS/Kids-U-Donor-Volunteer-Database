@@ -22,6 +22,8 @@ function boolToYesNo(val?: boolean | null): string {
   return val ? "Yes" : "No";
 }
 
+const parseJsonArr = (v: string | string[]): string[] => { if (Array.isArray(v)) return v; try { return JSON.parse(v); } catch { return []; } };
+
 export async function GET() {
   try {
     const volunteers = await prisma.volunteer.findMany({
@@ -89,10 +91,10 @@ export async function GET() {
         boolToYesNo(v.speakSpanish),
         v.businessOrSchoolName ?? "",
         v.volunteerPreference,
-        v.preferredRoles.join("; "),
-        v.availability.join("; "),
-        v.location.join("; "),
-        v.preferredEvents.join("; "),
+        parseJsonArr(v.preferredRoles).join("; "),
+        parseJsonArr(v.availability).join("; "),
+        parseJsonArr(v.location).join("; "),
+        parseJsonArr(v.preferredEvents).join("; "),
         v.referenceName ?? "",
         boolToYesNo(v.volunteerApplicationCompleted),
         v.backgroundCheck?.status === "APPROVED" ? "Yes" : "No",

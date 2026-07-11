@@ -42,37 +42,37 @@ export async function GET(req: NextRequest) {
     switch (searchCriteria) {
       case "name":
         where.organization = {
-          name: { contains: searchValue, mode: "insensitive" },
+          name: { contains: searchValue },
         };
         break;
       case "type":
-        where.type = { contains: searchValue, mode: "insensitive" };
+        where.type = { contains: searchValue };
         break;
       case "addressLine1":
         where.organization = {
           address: {
-            addressLine1: { contains: searchValue, mode: "insensitive" },
+            addressLine1: { contains: searchValue },
           },
         };
         break;
       case "city":
         where.organization = {
           address: {
-            city: { contains: searchValue, mode: "insensitive" },
+            city: { contains: searchValue },
           },
         };
         break;
       case "state":
         where.organization = {
           address: {
-            state: { contains: searchValue, mode: "insensitive" },
+            state: { contains: searchValue },
           },
         };
         break;
       case "zipcode":
         where.organization = {
           address: {
-            zipCode: { contains: searchValue, mode: "insensitive" },
+            zipCode: { contains: searchValue },
           },
         };
         break;

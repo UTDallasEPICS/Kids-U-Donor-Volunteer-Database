@@ -1,9 +1,10 @@
 import prisma, { prismaSoftDelete } from "@/app/utils/db";
-export async function DELETE(request: Request, { params }: { params: { id: string } }) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const payload = await request.json().catch(() => ({}));
     const idFromBody = typeof payload?.id === "string" ? payload.id.trim() : "";
-    const idFromParams = typeof params?.id === "string" ? params.id.trim() : "";
+    const resolvedParams = await params;
+    const idFromParams = typeof resolvedParams?.id === "string" ? resolvedParams.id.trim() : "";
     const id = idFromBody || idFromParams;
 
     if (!id) {

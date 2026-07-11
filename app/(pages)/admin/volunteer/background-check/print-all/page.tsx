@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import prisma from '@/app/utils/db';
 import PrintTrigger from '../[id]/print/PrintTrigger';
@@ -5,7 +7,7 @@ import PrintToolbar from '../[id]/print/PrintToolbar';
 
 export default async function PrintAllBackgroundChecksPage() {
   const records = await prisma.volunteerBackgroundCheck.findMany({
-    where: { approved: false },
+    where: { status: 'PENDING' },
     orderBy: { createdAt: 'desc' },
   });
 

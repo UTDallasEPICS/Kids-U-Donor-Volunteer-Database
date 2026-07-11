@@ -1,2 +1,0 @@
--- DropIndex
--- DROP INDEX "Volunteer_emailAddress_idx";

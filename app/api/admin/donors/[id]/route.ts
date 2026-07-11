@@ -3,7 +3,7 @@ import prisma from "@/app/utils/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // Fetch single Donor based on id, Ex. http://localhost:3000/api/donors/[id]
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await prisma.donor.findUnique({
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update a single Donor based on id, and only fields that require updating
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
@@ -117,7 +117,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete single Donor based on id
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {

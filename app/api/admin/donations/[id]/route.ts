@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // This file will handle single item operations
 
 // Fetch single Donation based on id, Ex. http://localhost:3000/api/v1/donations/[id]
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await prisma.donation.findUnique({
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // Update a single Donation based on id, and only fields that require updating
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   try {
@@ -80,8 +80,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // Delete single Donation based on id
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const { id } = params;
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
   try {
     const data = await prisma.donation.delete({

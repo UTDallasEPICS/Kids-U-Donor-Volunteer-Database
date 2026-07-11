@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 // BOX 2: Total Grant Count
 
 import { NextResponse } from "next/server";

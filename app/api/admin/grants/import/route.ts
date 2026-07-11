@@ -338,7 +338,6 @@ export async function POST(req: NextRequest) {
           }));
           const res = await prisma.grantAttachment.createMany({
             data: toCreate,
-            skipDuplicates: true,
           });
           summary.attachmentsCreated += res.count;
         }

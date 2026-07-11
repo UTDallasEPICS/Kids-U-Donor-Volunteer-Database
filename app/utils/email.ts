@@ -62,7 +62,7 @@ export async function verifyEmailConfig() {
   }
 }
 
-verifyEmailConfig();
+// verifyEmailConfig();
 
 // Send email verification email
 export async function sendVerificationEmail(to: string, token: string, firstName: string) {
@@ -456,7 +456,7 @@ export async function sendApplicationRejectionEmail(to: string, firstName: strin
             <div class="content">
               <h2>Hello ${firstName},</h2>
               <p>Thank you for your interest in volunteering with Kids-U. We appreciate the time and effort you invested in submitting your application.</p>
-              
+
               <div class="notice">
                 <p><strong>Status:</strong> Your volunteer application has been reviewed and unfortunately, we are unable to move forward at this time.</p>
               </div>
@@ -530,7 +530,7 @@ export async function sendApplicationApprovalEmail(to: string, firstName: string
             </div>
             <div class="content">
               <h2>Hello ${firstName},</h2>
-              
+
               <div class="success-box">
                 <p><strong>Congratulations!</strong> Your volunteer application has been approved. We're excited to have you join the Kids-U volunteer team!</p>
               </div>

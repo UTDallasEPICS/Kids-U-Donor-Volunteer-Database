@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -231,10 +231,10 @@ model Volunteer {
 
   // Volunteer Preferences & Skills
   volunteerPreference String   @default("No preference")
-  preferredRoles      String[]
-  availability        String[]
-  location            String[]
-  preferredEvents     String[]
+  preferredRoles      String   @default("[]") // JSON array
+  availability        String   @default("[]") // JSON array
+  location            String   @default("[]") // JSON array
+  preferredEvents     String   @default("[]") // JSON array
 
   // Compliance & Requirements
   volunteerApplicationStatus    VolunteerAppStatus @default(PENDING)
@@ -497,7 +497,7 @@ model Mail {
   body              String
   creationDateTime  DateTime
   scheduledDateTime DateTime
-  attachments       String[] // Changed to array of strings
+  attachments       String   @default("[]") // JSON array
   adminId           String
   admin             Admin           @relation(fields: [adminId], references: [id])
   mailRecipients    MailRecipient[]

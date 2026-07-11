@@ -163,7 +163,6 @@ export async function POST(req: NextRequest) {
           startTime: slot.startTime,
           endTime: slot.endTime,
         })),
-        skipDuplicates: true,
       });
 
       return invitationRecord;

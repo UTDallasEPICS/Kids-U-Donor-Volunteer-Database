@@ -100,13 +100,13 @@ export async function GET(request: Request) {
       }
     }
     if (fund) {
-      where.fundingArea = { contains: fund, mode: "insensitive" };
+      where.fundingArea = { contains: fund };
     }
     if (status) {
-      where.status = { equals: status, mode: "insensitive" };
+      where.status = { equals: status };
     }
     if (applicationType) {
-      where.applicationType = { equals: applicationType, mode: "insensitive" };
+      where.applicationType = { equals: applicationType };
     }
     if (minAmount || maxAmount) {
       where.amountAwarded = {};

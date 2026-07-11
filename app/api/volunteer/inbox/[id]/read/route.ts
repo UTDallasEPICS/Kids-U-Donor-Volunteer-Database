@@ -3,11 +3,12 @@ import prisma from '@/app/utils/db';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
     const email = await prisma.sentEmail.update({
-      where: { id: params.id },
+      where: { id },
       data: { isRead: true },
     });
     return NextResponse.json({ email });

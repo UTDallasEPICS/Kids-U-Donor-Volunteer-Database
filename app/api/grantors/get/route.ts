@@ -22,14 +22,12 @@ export async function GET(req: NextRequest) {
         where.organization = {
           name: {
             contains: searchValueParam,
-            mode: "insensitive",
           },
         };
         break;
       case "type":
         where.type = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       case "addressLine1":
@@ -37,7 +35,6 @@ export async function GET(req: NextRequest) {
           address: {
             addressLine1: {
               contains: searchValueParam,
-              mode: "insensitive",
             },
           },
         };
@@ -47,7 +44,6 @@ export async function GET(req: NextRequest) {
           address: {
             city: {
               contains: searchValueParam,
-              mode: "insensitive",
             },
           },
         };
@@ -57,7 +53,6 @@ export async function GET(req: NextRequest) {
           address: {
             state: {
               contains: searchValueParam,
-              mode: "insensitive",
             },
           },
         };
@@ -67,7 +62,6 @@ export async function GET(req: NextRequest) {
           address: {
             zipCode: {
               contains: searchValueParam,
-              mode: "insensitive",
             },
           },
         };
@@ -75,19 +69,16 @@ export async function GET(req: NextRequest) {
       case "email":
         where.organization = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       case "phone":
         where.organization = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       case "website":
         where.organization = {
           contains: searchValueParam,
-          mode: "insensitive",
         };
         break;
       default:
@@ -119,7 +110,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-/*export async function GET1(req: NextRequest, { params }: { params: { id: string } }) {
+/*export async function GET1(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
     const data = await prisma.grantor.findUnique({
