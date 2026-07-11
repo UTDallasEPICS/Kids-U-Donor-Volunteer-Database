@@ -1,69 +1,45 @@
-# syntax=docker/dockerfile:1
+# Build container
+FROM node:lts-alpine AS builder
 
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Dockerfile reference guide at
-# https://docs.docker.com/go/dockerfile-reference/
+# Use Workdir because things like tailwind will scan the entire current dir and can cause issues if it scans root
+WORKDIR /app
 
-# Want to help us make this template better? Share your feedback here: https://forms.gle/ybq9Krt8jtBL3iCk7
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+COPY pnpm-workspace.yaml ./
 
-ARG NODE_VERSION=20.11.1
+ENV PNPM_HOME="~/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN npm i -g pnpm
 
-################################################################################
-# Use node image for base image for all stages.
-FROM node:${NODE_VERSION}-alpine as base
+RUN pnpm i --frozen-lockfile
 
-# Set working directory for all build stages.
-WORKDIR /usr/src/app
-
-
-################################################################################
-# Create a stage for installing production dependecies.
-FROM base as deps
-
-# Download dependencies as a separate step to take advantage of Docker's caching.
-# Leverage a cache mount to /root/.npm to speed up subsequent builds.
-# Leverage bind mounts to package.json and package-lock.json to avoid having to copy them
-# into this layer.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci --omit=dev
-
-################################################################################
-# Create a stage for building the application.
-FROM deps as build
-
-# Download additional development dependencies before building, as some projects require
-# "devDependencies" to be installed to build. If you don't need this, remove this step.
-RUN --mount=type=bind,source=package.json,target=package.json \
-    --mount=type=bind,source=package-lock.json,target=package-lock.json \
-    --mount=type=cache,target=/root/.npm \
-    npm ci
-
-# Copy the rest of the source files into the image.
-COPY . .
-# Run the build script.
-RUN npm run build
-
-################################################################################
-# Create a new stage to run the application with minimal runtime dependencies
-# where the necessary files are copied from the build stage.
-FROM base as final
-
-# Run the application as a non-root user.
-USER node
-
-# Copy package.json so that package manager commands can be used.
-COPY package.json .
-
-# Copy the production dependencies from the deps stage and also
-# the built application from the build stage into the image.
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-COPY --from=build /usr/src/app/.next ./.next
+COPY . ./
+RUN pnpm prisma generate
+RUN pnpm run build
 
 
-# Expose the port that the application listens on.
+# Deployment container
+FROM node:lts-alpine AS deployment
+WORKDIR /app
+# Copy stuff from build container to ensure we have prisma and everything it needs
+COPY --from=builder /app/.next ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/pnpm-workspace.yaml ./
+COPY --from=builder /app/prisma ./prisma
+# COPY --from=builder /app/prisma.config.ts ./
+RUN npm i -g pnpm
+
+# Install Prisma without running any scripts to avoid running nuxt scripts
+RUN pnpm i --dev --ignore-scripts --frozen-lockfile
+# Run the build scripts needed for prisma to work (for migrations and seeding)
+RUN pnpm rebuild esbuild @prisma/engines prisma
+RUN pnpm prisma generate
+COPY --from=builder /app/entrypoint.sh /entrypoint
+
+# Ensure we can actually run the entrypoint script
+RUN chmod +x /entrypoint
 EXPOSE 3000
-
-# Run the application.
-CMD npm run dev
+ENTRYPOINT ["/entrypoint"]
+CMD ["pnpm", "run", "start"]
