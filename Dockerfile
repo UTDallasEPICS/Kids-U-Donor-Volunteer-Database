@@ -23,7 +23,7 @@ RUN pnpm run build
 FROM node:lts-alpine AS deployment
 WORKDIR /app
 # Copy stuff from build container to ensure we have prisma and everything it needs
-COPY --from=builder /app/.next ./
+COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
