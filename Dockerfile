@@ -23,5 +23,6 @@ RUN pnpm run build
 FROM node:lts-alpine AS deployment
 WORKDIR /app
 COPY --from=builder /app/.next/standalone ./.next/standalone
+COPY --from=builder /app/.next/static ./.next/standalone/.next
 EXPOSE 3000
 CMD ["node", ".next/standalone/server.js"]
