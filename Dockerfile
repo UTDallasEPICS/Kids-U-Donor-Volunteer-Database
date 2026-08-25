@@ -22,24 +22,8 @@ RUN pnpm run build
 # Deployment container
 FROM node:lts-alpine AS deployment
 WORKDIR /app
-# Copy stuff from build container to ensure we have prisma and everything it needs
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/package.json ./
-COPY --from=builder /app/pnpm-lock.yaml ./
-COPY --from=builder /app/pnpm-workspace.yaml ./
-COPY --from=builder /app/prisma ./prisma
-# COPY --from=builder /app/prisma.config.ts ./
-RUN npm i -g pnpm
-
-# Install Prisma without running any scripts to avoid running nuxt scripts
-RUN pnpm i --dev --ignore-scripts --frozen-lockfile
-# Run the build scripts needed for prisma to work (for migrations and seeding)
-RUN pnpm rebuild esbuild @prisma/engines prisma
-RUN pnpm prisma generate
-COPY --from=builder /app/entrypoint.sh /entrypoint
-
-# Ensure we can actually run the entrypoint script
-RUN chmod +x /entrypoint
+COPY --from=builder /app/.next/standalone ./.next/standalone
+COPY --from=builder /app/.next/static ./.next/standalone/.next/static
+COPY --from=builder /app/public ./.next/standalone/public
 EXPOSE 3000
-ENTRYPOINT ["/entrypoint"]
-CMD ["pnpm", "run", "start"]
+CMD ["node", ".next/standalone/server.js"]
